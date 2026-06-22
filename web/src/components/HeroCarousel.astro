@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 import carrusel from '../assets/carrusel.png';
 ---
 
-<div class="hero-carousel">
+<div class="hero-carousel wrap">
   <Image
     src={carrusel}
     alt="Mockups de NOOK, SMASH, Volea, Getflow y Louvr Performance"
@@ -25,15 +25,9 @@ import carrusel from '../assets/carrusel.png';
   @media (max-width: 900px) {
     .hero-carousel {
       margin-top: 70px;
-      margin-left: -20px;
-      margin-right: -20px;
-      width: calc(100% + 40px);
-      overflow: hidden;
     }
     .hero-carousel :global(img) {
-      width: 180%;
-      max-width: none;
-      margin-left: -5%;
+      width: 100%;
     }
   }
 </style>
