@@ -1,0 +1,46 @@
+---
+import '../styles/tokens.css';
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+---
+
+<nav class="nav">
+  <a href="#inicio" class="nav-logo" aria-label="StackD inicio">
+    <div class="logo-mark">
+      <Image src={logo} alt="StackD" width={32} />
+    </div>
+    <span class="logo-text">StackD</span>
+  </a>
+</nav>
+
+<style>
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 56px 0 0;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--black);
+  }
+  .logo-mark :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .logo-text {
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  @media (max-width: 900px) {
+    .nav {
+      padding: 56px 0 0;
+    }
+  }
+</style>

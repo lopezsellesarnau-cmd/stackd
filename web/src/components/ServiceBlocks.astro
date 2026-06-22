@@ -1,0 +1,65 @@
+---
+import '../styles/tokens.css';
+import { Image } from 'astro:assets';
+import comoTrabajamos from '../assets/como_trabajamos.png';
+import paginaWeb from '../assets/pagina_web.png';
+import mantenimiento from '../assets/manetnimeitn.png';
+import automatizacion from '../assets/automatizacion.png';
+import vscode from '../assets/vscode.png';
+---
+
+<section class="wrap">
+  <div class="blocks-grid">
+    <div class="block-tall" data-reveal>
+      <Image src={comoTrabajamos} alt="Cómo trabajamos" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+    <div data-reveal>
+      <Image src={paginaWeb} alt="Páginas web" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+    <div data-reveal>
+      <Image src={mantenimiento} alt="Mantenimiento" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+    <div data-reveal>
+      <Image src={automatizacion} alt="Automatización con IA" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+    <div data-reveal>
+      <Image src={vscode} alt="Editor de código" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .blocks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px;
+    padding-bottom: 90px;
+  }
+  .blocks-grid :global(img) {
+    width: 100%;
+    height: auto;
+  }
+  .block-tall {
+    grid-row: span 2;
+  }
+
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 900px) {
+    .blocks-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .block-tall {
+      grid-row: auto;
+    }
+  }
+</style>

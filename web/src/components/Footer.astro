@@ -1,0 +1,62 @@
+---
+import '../styles/tokens.css';
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+---
+
+<footer class="wrap">
+  <div class="footer-email">
+    <b>Email:</b>
+    <span>info@louvrlabs.com</span>
+  </div>
+  <div class="footer-logo">
+    <div class="logo-mark">
+      <Image src={logo} alt="StackD" width={28} />
+    </div>
+    <span class="logo-text">StackD</span>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid #eee;
+    padding: 36px 0 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  footer .footer-email b {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  footer .footer-email span {
+    font-size: 16px;
+  }
+  footer .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  footer .footer-logo .logo-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  footer .footer-logo .logo-text {
+    font-size: 17px;
+  }
+
+  @media (max-width: 900px) {
+    footer {
+      flex-direction: column;
+      gap: 32px;
+      text-align: center;
+      padding: 40px 0 calc(80px + env(safe-area-inset-bottom));
+    }
+    footer .footer-logo {
+      justify-content: center;
+    }
+  }
+</style>

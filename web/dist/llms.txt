@@ -1,0 +1,24 @@
+# StackD — Project Structure
+
+## Overview
+StackD is a single-page marketing site built with Astro, presenting webs, automations, and software services for SMEs.
+
+## Sections
+
+- **Inicio** (/) — Hero, services overview, projects, team, FAQ, and contact CTA
+- **#proyectos** — Project showcase: SMASH, NOOK, Volea.io, Getflow
+- **#contacto** — Contact CTA (mailto:info@louvrlabs.com)
+
+## Tech Stack
+- Astro 5 (latest stable)
+- TypeScript strict mode
+- Vanilla IntersectionObserver animations
+- @astrojs/sitemap
+
+## Contact
+- Email: info@louvrlabs.com
+- Website: https://TODO.example
+
+## Team
+- Arnau — Diseño y desarrollo
+- Ezequiel — Desarrollo y relación con clientes

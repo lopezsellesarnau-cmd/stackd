@@ -1,0 +1,57 @@
+---
+import '../styles/tokens.css';
+---
+
+<header class="hero" id="inicio">
+  <h1>
+    Webs, automatizaciones y software<br />
+    <span class="light">que tu negocio necesita</span>
+  </h1>
+  <div class="hero-ctas">
+    <a href="#contacto" class="btn btn-primary">Hablemos de tu proyecto</a>
+    <a href="#proyectos" class="btn btn-outline">Ver nuestro trabajo</a>
+  </div>
+</header>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 64px 0 0;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .hero.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hero h1 {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.5px;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .hero h1 .light {
+    font-weight: 400;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      padding: 48px 0 0;
+    }
+    .hero h1 {
+      font-size: 34px;
+    }
+  }
+</style>

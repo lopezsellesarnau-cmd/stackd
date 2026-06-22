@@ -1,0 +1,49 @@
+---
+interface Props {
+  name?: string;
+  url?: string;
+  logo?: string;
+  email?: string;
+  // TODO: add real social profile URLs when available
+  sameAs?: string[];
+}
+
+const {
+  name = 'StackD',
+  url = import.meta.env.PUBLIC_CANONICAL_URL ?? 'https://TODO.example',
+  logo = `${url}/assets/logo.png`,
+  email = 'info@louvrlabs.com',
+  sameAs = [],
+} = Astro.props;
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name,
+  url,
+  logo,
+  email,
+  sameAs,
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name,
+  url,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${url}/?q={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
+---
+
+<!-- Organization JSON-LD -->
+<script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+
+<!-- WebSite JSON-LD -->
+<script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />

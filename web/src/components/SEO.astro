@@ -1,0 +1,35 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalURL?: string;
+  ogImage?: string;
+}
+
+const {
+  title = 'StackD — Webs, automatizaciones y software que tu negocio necesita',
+  description = 'Diseño y desarrollo de páginas web, mantenimiento y automatización de procesos con IA para pymes que quieren dejar de perder tiempo en tareas repetitivas.',
+  canonicalURL = import.meta.env.PUBLIC_CANONICAL_URL ?? 'https://TODO.example',
+  ogImage = import.meta.env.PUBLIC_OG_IMAGE_URL ?? `${canonicalURL}/og.png`,
+} = Astro.props;
+---
+
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImage} />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={ogImage} />

@@ -1,0 +1,42 @@
+---
+import SEO from '../components/SEO.astro';
+import JsonLd from '../components/JsonLd.astro';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'StackD — Webs, automatizaciones y software que tu negocio necesita',
+  description = 'Diseño y desarrollo de páginas web, mantenimiento y automatización de procesos con IA para pymes que quieren dejar de perder tiempo en tareas repetitivas.',
+} = Astro.props;
+
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <SEO title={title} description={description} />
+    <JsonLd />
+    {plausibleDomain && (
+      <script
+        defer
+        data-domain={plausibleDomain}
+        src="https://plausible.io/js/script.tagged-events.js"
+      />
+    )}
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+    <script>
+      import '../scripts/reveal.ts';
+    </script>
+  </body>
+</html>

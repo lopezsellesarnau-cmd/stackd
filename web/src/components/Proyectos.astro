@@ -1,0 +1,96 @@
+---
+import '../styles/tokens.css';
+import { Image } from 'astro:assets';
+import smash from '../assets/smash.png';
+import nook from '../assets/nook.png';
+import volea from '../assets/volea.png';
+import getflowDesktop from '../assets/getflow.jpg';
+import getflowMobile from '../assets/Getflow_phone.jpg';
+---
+
+<section class="proyectos-section wrap" id="proyectos">
+  <h2 class="proyectos-title">Proyectos</h2>
+  <div class="proyectos-row">
+    <div data-reveal>
+      <Image src={smash} alt="SMASH – La red social para jugadores de pádel" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+    <div data-reveal>
+      <Image src={nook} alt="NOOK – El Airbnb del trastero" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+    <div data-reveal>
+      <Image src={volea} alt="Volea.io – Gestión de clubes de pádel" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+    </div>
+  </div>
+  <div class="getflow-row">
+    <Image
+      src={getflowDesktop}
+      alt="Getflow – Onboarding de clientes sin emails perdidos"
+      class="desktop-only"
+      widths={[800, 1200, 1600]}
+      sizes="100vw"
+    />
+    <Image
+      src={getflowMobile}
+      alt="Getflow – Onboarding de clientes sin emails perdidos"
+      class="mobile-only"
+      widths={[400, 800]}
+      sizes="(max-width: 900px) 100vw, 400px"
+    />
+  </div>
+</section>
+
+<style>
+  .proyectos-section {
+    padding: 60px 0 90px;
+  }
+  .proyectos-title {
+    text-align: center;
+    font-size: 44px;
+    font-weight: 700;
+    margin-bottom: 50px;
+  }
+  .proyectos-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+  }
+  .proyectos-row :global(img),
+  .getflow-row :global(img) {
+    width: 100%;
+  }
+
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .desktop-only { display: block; }
+  .mobile-only { display: none; }
+
+  @media (max-width: 900px) {
+    .proyectos-row {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .proyectos-title {
+      font-size: 32px;
+    }
+    .getflow-row .desktop-only {
+      display: none;
+    }
+    .getflow-row .mobile-only {
+      display: block;
+    }
+  }
+  @media (min-width: 901px) {
+    .getflow-row .mobile-only {
+      display: none;
+    }
+  }
+</style>
