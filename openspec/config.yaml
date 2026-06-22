@@ -1,0 +1,45 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Stack: static HTML (vanilla, no framework, no build tooling)
+  Architecture: single-page static site, inline CSS, zero JS
+  Assets: 14 images in assets/ (PNG/JPG)
+  Testing: none detected
+  Domain: web dev agency (StackD) — webs, automatizaciones (IA), software for SMEs
+  Team: Arnau (design+dev), Ezequiel (dev+client relations)
+
+testing:
+  strict_tdd: false
+  runner: null
+  layers:
+    unit: false
+    integration: false
+    e2e: false
+  coverage: false
+  linter: false
+  type_checker: false
+  formatter: false
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

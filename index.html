@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>StackD — Webs, automatizaciones y software que tu negocio necesita</title>
 <style>
   :root {
@@ -171,7 +171,8 @@
     .team-card.right-align .team-rule { margin-left: 0; }
     .faq-item { text-align: left; }
     .faq-rule { margin: 24px auto 24px 0; }
-    footer { flex-direction: column; gap: 32px; text-align: center; padding: 40px 0 80px; }
+    footer { flex-direction: column; gap: 32px; text-align: center; padding: 40px 0 calc(80px + env(safe-area-inset-bottom)); }
+    footer .footer-logo { justify-content: center; }
   }
   @media (min-width: 901px) {
     .getflow-row .mobile-only { display: none; }
