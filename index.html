@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StackD — Webs, automatizaciones y software que tu negocio necesita</title>
+<style>
+  :root {
+    --black: #111111;
+    --white: #ffffff;
+    --gray-bg: #EAEAEA;
+    --radius-md: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--black);
+    background: var(--white);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; height: auto; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+  /* NAV */
+  .nav {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; padding: 56px 0 0;
+  }
+  .nav .logo-mark {
+    width: 32px; height: auto;
+  }
+  .nav .logo-mark img { width: 100%; height: auto; display: block; }
+  .nav .logo-text { font-size: 20px; font-weight: 400; }
+
+  /* HERO */
+  .hero { text-align: center; padding: 64px 0 0; }
+  .hero h1 {
+    font-size: 56px; font-weight: 700; line-height: 1.12;
+    letter-spacing: -0.5px; max-width: 920px; margin: 0 auto;
+  }
+  .hero h1 .light { font-weight: 400; }
+  .hero-ctas {
+    display: flex; gap: 16px; justify-content: center;
+    margin-top: 40px; flex-wrap: wrap;
+  }
+  .btn {
+    font-size: 17px; font-weight: 500; padding: 16px 30px;
+    border-radius: var(--radius-md); border: 3px solid transparent; cursor: pointer;
+    text-decoration: none; display: inline-block;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    line-height: 1.2;
+  }
+  .btn:hover { transform: translateY(-1px); opacity: 0.92; }
+  .btn-primary { background: var(--black); color: var(--white); border-color: var(--black); }
+  .btn-outline { background: var(--white); color: var(--black); border-color: var(--black); }
+
+  /* CARROUSEL IMG (full Figma block) */
+  .hero-carousel { margin-top: 80px; }
+  .hero-carousel img { width: 100%; }
+
+  /* INTRO TEXT */
+  .hero-intro {
+    text-align: center; max-width: 640px;
+    margin: 24px auto 90px; font-size: 22px; line-height: 1.5;
+  }
+  .hero-intro b { font-weight: 700; }
+  .hero-intro .lt { font-weight: 300; }
+  .intro-divider {
+    display: block;
+    width: 64px; height: 3px; background: var(--black);
+    margin: 0 auto 28px; border-radius: 2px;
+  }
+
+  /* SERVICE BLOCKS — each block is one Figma-exported image */
+  .blocks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px;
+    padding-bottom: 90px;
+  }
+  .blocks-grid img { width: 100%; }
+  .block-tall { grid-row: span 2; }
+
+  /* PROYECTOS */
+  .proyectos-section { padding: 60px 0 90px; }
+  .proyectos-title {
+    text-align: center; font-size: 44px; font-weight: 700; margin-bottom: 50px;
+  }
+  .proyectos-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px; margin-bottom: 22px;
+  }
+  .proyectos-row img,
+  .getflow-row img { width: 100%; }
+
+  /* QUIENES SOMOS + FAQ (kept as text) */
+  .bottom-section { padding: 110px 0 100px; }
+  .bottom-grid {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px;
+  }
+  .col-title { font-size: 38px; font-weight: 700; margin-bottom: 36px; }
+  .col-title.right { text-align: right; }
+
+  .team-card {
+    border: 3px solid var(--gray-bg); border-radius: 47px;
+    padding: 40px; margin-bottom: 24px;
+  }
+  .team-card h4 { font-size: 28px; font-weight: 700; margin-bottom: 14px; }
+  .team-rule {
+    width: 48px; height: 3px; background: var(--black);
+    border-radius: 2px; margin-bottom: 18px;
+  }
+  .team-card p { font-size: 17px; line-height: 1.5; }
+  .team-card.right-align { text-align: right; }
+  .team-card.right-align .team-rule { margin-left: auto; }
+
+  .faq-item { margin-bottom: 30px; text-align: right; }
+  .faq-item h4 { font-size: 22px; font-weight: 700; line-height: 1.3; margin-bottom: 10px; }
+  .faq-item p { font-size: 16px; line-height: 1.5; }
+  .faq-rule {
+    width: 48px; height: 2px; background: var(--gray-bg);
+    margin: 24px 0 24px auto;
+  }
+
+  /* CTA FINAL */
+  .cta-final { text-align: center; padding: 0 0 90px; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid #eee; padding: 36px 0 50px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  footer .footer-email b { display: block; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  footer .footer-email span { font-size: 16px; }
+  footer .footer-logo { display: flex; align-items: center; gap: 12px; }
+  footer .footer-logo .logo-mark {
+    display: flex; align-items: center; justify-content: center;
+  }
+  footer .footer-logo .logo-text { font-size: 17px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .wrap { padding: 0 20px; }
+    .nav { padding: 56px 0 0; }
+    .hero { padding: 48px 0 0; }
+    .hero h1 { font-size: 34px; }
+    .hero-carousel {
+      margin-top: 70px;
+      margin-left: -20px;
+      margin-right: -20px;
+      width: calc(100% + 40px);
+      overflow: hidden;
+    }
+    .hero-carousel img {
+      width: 180%;
+      max-width: none;
+      margin-left: -5%;
+    }
+    .blocks-grid { grid-template-columns: 1fr; gap: 16px; }
+    .block-tall { grid-row: auto; }
+    .proyectos-row { grid-template-columns: 1fr; gap: 16px; }
+    .proyectos-title { font-size: 32px; }
+    .getflow-row .desktop-only { display: none; }
+    .getflow-row .mobile-only { display: block; }
+    .bottom-grid { grid-template-columns: 1fr; gap: 40px; }
+    .col-title.right { text-align: left; }
+    .team-card.right-align { text-align: left; }
+    .team-card.right-align .team-rule { margin-left: 0; }
+    .faq-item { text-align: left; }
+    .faq-rule { margin: 24px auto 24px 0; }
+    footer { flex-direction: column; gap: 32px; text-align: center; padding: 40px 0 80px; }
+  }
+  @media (min-width: 901px) {
+    .getflow-row .mobile-only { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo-mark">
+    <img src="assets/logo.png" alt="StackD">
+  </div>
+  <div class="logo-text">StackD</div>
+</nav>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <h1>Webs, automatizaciones y software<br><span class="light">que tu negocio necesita</span></h1>
+  <div class="hero-ctas">
+    <a href="#contacto" class="btn btn-primary">Hablemos de tu proyecto</a>
+    <a href="#proyectos" class="btn btn-outline">Ver nuestro trabajo</a>
+  </div>
+</header>
+
+<!-- CARROUSEL (Figma block as image) -->
+<div class="hero-carousel wrap">
+  <img src="assets/carrusel.png" alt="Mockups de NOOK, SMASH, Volea, Getflow y Louvr Performance">
+</div>
+
+<!-- INTRO TEXT -->
+<div class="wrap">
+  <div class="hero-intro">
+    <span class="intro-divider"></span>
+    <b>Diseño y desarrollo de páginas web, mantenimiento y automatización de
+    procesos con IA</b> <span class="lt">para pymes que quieren dejar de perder tiempo en
+    tareas repetitivas.</span>
+  </div>
+</div>
+
+<!-- SERVICE BLOCKS — each one is the Figma block exported as image -->
+<section class="wrap">
+  <div class="blocks-grid">
+    <img src="assets/como_trabajamos.png" alt="Cómo trabajamos" class="block-tall">
+    <img src="assets/pagina_web.png" alt="Páginas web">
+    <img src="assets/manetnimeitn.png" alt="Mantenimiento">
+    <img src="assets/automatizacion.png" alt="Automatización con IA">
+    <img src="assets/vscode.png" alt="Editor de código">
+  </div>
+</section>
+
+<!-- PROYECTOS -->
+<section class="proyectos-section wrap" id="proyectos">
+  <h2 class="proyectos-title">Proyectos</h2>
+  <div class="proyectos-row">
+    <img src="assets/smash.png" alt="SMASH – La red social para jugadores de pádel">
+    <img src="assets/nook.png" alt="NOOK – El Airbnb del trastero">
+    <img src="assets/volea.png" alt="Volea.io – Gestión de clubes de pádel">
+  </div>
+  <div class="getflow-row">
+    <img src="assets/getflow.jpg" alt="Getflow – Onboarding de clientes sin emails perdidos" class="desktop-only">
+    <img src="assets/Getflow_phone.jpg" alt="Getflow – Onboarding de clientes sin emails perdidos" class="mobile-only">
+  </div>
+</section>
+
+<!-- QUIENES SOMOS + FAQ -->
+<section class="bottom-section wrap">
+  <div class="bottom-grid">
+
+    <div>
+      <h2 class="col-title">Quiénes somos</h2>
+
+      <div class="team-card">
+        <h4>Arnau</h4>
+        <div class="team-rule"></div>
+        <p>Diseño y desarrollo. Diseña la interfaz, prepara los mockups y construye el producto de principio a fin — del primer boceto al código en producción.</p>
+      </div>
+
+      <div class="team-card right-align">
+        <h4>Ezequiel</h4>
+        <div class="team-rule"></div>
+        <p>Desarrollo y relación con clientes. Programa, y es quien habla cara a cara contigo — en llamada o en visita — para entender exactamente qué necesitas.</p>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="col-title right">FAQ</h2>
+
+      <div class="faq-item">
+        <h4>¿Cuánto tarda un proyecto en estar listo?</h4>
+        <p>Depende del alcance, pero en la mayoría de casos tenéis una demo funcional en pocos días y el proyecto completo en pocas semanas — no meses esperando sin ver nada.</p>
+      </div>
+      <div class="faq-rule"></div>
+
+      <div class="faq-item">
+        <h4>Ya tengo página web, ¿también puedo trabajar con vosotros?</h4>
+        <p>Sí. Si ya tienes web, podemos encargarnos del mantenimiento, mejorarla, o automatizar procesos que ahora haces a mano — no hace falta empezar de cero.</p>
+      </div>
+      <div class="faq-rule"></div>
+
+      <div class="faq-item">
+        <h4>¿Qué pasa si no sé muy bien qué necesito, solo que algo no funciona bien?</h4>
+        <p>Perfecto, es lo más normal. En la primera llamada o visita analizamos dónde se pierde tiempo en tu negocio y te proponemos la solución concreta — sin compromiso.</p>
+      </div>
+      <div class="faq-rule"></div>
+
+      <div class="faq-item">
+        <h4>¿Trabajáis solo con un tipo de negocio o sector?</h4>
+        <p>Trabajamos con cualquier negocio que quiera dejar de perder tiempo en tareas repetitivas — desde clubes deportivos hasta comercios o gestorías. Cada proyecto se adapta al sector, no al revés.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final wrap" id="contacto">
+  <a href="mailto:info@louvrlabs.com" class="btn btn-primary" style="font-size:20px; padding:18px 48px;">¿Listo para automatizar tu negocio?</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="wrap">
+  <div class="footer-email">
+    <b>Email:</b>
+    <span>info@louvrlabs.com</span>
+  </div>
+  <div class="footer-logo">
+    <div class="logo-mark" style="width:28px;">
+      <img src="assets/logo.png" alt="StackD">
+    </div>
+    <div class="logo-text">StackD</div>
+  </div>
+</footer>
+
+</body>
+</html>
