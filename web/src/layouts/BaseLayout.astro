@@ -10,7 +10,7 @@ interface Props {
 }
 
 const {
-  title = 'StackD — Webs, automatizaciones y software que tu negocio necesita',
+  title = 'StackD — Software que tu negocio necesita',
   description = 'Diseño y desarrollo de páginas web, mantenimiento y automatización de procesos con IA para pymes que quieren dejar de perder tiempo en tareas repetitivas.',
 } = Astro.props;
 
@@ -22,6 +22,9 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
     <SEO title={title} description={description} />
     <JsonLd />
     {plausibleDomain && (
@@ -34,6 +37,7 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
     <slot name="head" />
   </head>
   <body>
+    <div class="bg-grid"></div>
     <slot />
     <script>
       import '../scripts/reveal.ts';

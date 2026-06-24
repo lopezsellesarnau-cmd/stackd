@@ -1,64 +1,150 @@
 ---
 import '../styles/tokens.css';
-import { Image } from 'astro:assets';
-import smash from '../assets/smash.png';
-import nook from '../assets/nook.png';
-import volea from '../assets/volea.png';
-import getflowDesktop from '../assets/getflow.jpg';
-import getflowMobile from '../assets/Getflow_phone.jpg';
 ---
 
-<section class="proyectos-section wrap" id="proyectos">
-  <h2 class="proyectos-title">Proyectos</h2>
-  <div class="proyectos-row">
-    <div data-reveal>
-      <Image src={smash} alt="SMASH – La red social para jugadores de pádel" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+<section class="projects wrap" id="proyectos" data-reveal>
+  <span class="sec-eyebrow">// proyectos</span>
+  <h2 class="sec-title">Lo que ya hemos construido</h2>
+  <p class="sec-desc">Producto real, en manos de usuarios reales — no mockups de relleno.</p>
+
+  <div class="projects-grid">
+
+    <div class="project-card">
+      <div class="project-window-bar">
+        <div class="project-window-dots"><span></span><span></span><span></span></div>
+        <span class="project-tag">App Store · iOS</span>
+      </div>
+      <div class="project-shot">
+        <video autoplay loop muted playsinline preload="metadata">
+          <source src="/videos/smash.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="project-info">
+        <h3>SMASH</h3>
+        <p>La red social hecha por y para jugadores de pádel.</p>
+      </div>
     </div>
-    <div data-reveal>
-      <Image src={nook} alt="NOOK – El Airbnb del trastero" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
-    </div>
-    <div data-reveal>
-      <Image src={volea} alt="Volea.io – Gestión de clubes de pádel" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
-    </div>
-  </div>
-  <div class="getflow-row">
-    <Image
-      src={getflowDesktop}
-      alt="Getflow – Onboarding de clientes sin emails perdidos"
-      class="desktop-only"
-      widths={[800, 1200, 1600]}
-      sizes="100vw"
-    />
-    <Image
-      src={getflowMobile}
-      alt="Getflow – Onboarding de clientes sin emails perdidos"
-      class="mobile-only"
-      widths={[400, 800]}
-      sizes="(max-width: 900px) 100vw, 400px"
-    />
+
+    <a class="project-card" href="https://testflight.apple.com/join/77Geb3Ka" target="_blank" rel="noopener">
+      <div class="project-window-bar">
+        <div class="project-window-dots"><span></span><span></span><span></span></div>
+        <span class="project-tag">TestFlight · iOS</span>
+      </div>
+      <div class="project-shot">
+        <video autoplay loop muted playsinline preload="metadata">
+          <source src="/videos/nook.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="project-info">
+        <h3>NOOK</h3>
+        <p>El Airbnb del trastero: alquila espacio que no usas, encuentra el que necesitas.</p>
+      </div>
+    </a>
+
+    <a class="project-card" href="https://www.volea.io" target="_blank" rel="noopener">
+      <div class="project-window-bar">
+        <div class="project-window-dots"><span></span><span></span><span></span></div>
+        <span class="project-tag">Web · SaaS</span>
+      </div>
+      <div class="project-shot">
+        <video autoplay loop muted playsinline preload="metadata">
+          <source src="/videos/volea.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="project-info">
+        <h3>Volea.io</h3>
+        <p>Gestiona tu club de pádel sin Excel, sin WhatsApp, sin líos.</p>
+      </div>
+    </a>
+
+    <a class="project-card" href="https://www.usegateflow.io" target="_blank" rel="noopener">
+      <div class="project-window-bar">
+        <div class="project-window-dots"><span></span><span></span><span></span></div>
+        <span class="project-tag">Web · SaaS</span>
+      </div>
+      <div class="project-shot">
+        <video autoplay loop muted playsinline preload="metadata">
+          <source src="/videos/getflow.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="project-info">
+        <h3>Getflow</h3>
+        <p>Onboarding de clientes sin emails perdidos ni pasos olvidados.</p>
+      </div>
+    </a>
+
   </div>
 </section>
 
 <style>
-  .proyectos-section {
-    padding-top: 60px;
-    padding-bottom: 90px;
+  .projects {
+    padding-top: 30px;
+    padding-bottom: 70px;
   }
-  .proyectos-title {
-    text-align: center;
-    font-size: 44px;
-    font-weight: 700;
-    margin-bottom: 50px;
-  }
-  .proyectos-row {
+  .projects-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 22px;
-    margin-bottom: 22px;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 32px;
   }
-  .proyectos-row :global(img),
-  .getflow-row :global(img) {
+  .project-card {
+    background: var(--bg-raised);
+    border: 0.5px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    display: block;
+    text-decoration: none;
+    color: var(--cream);
+  }
+  .project-card:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-3px);
+  }
+  .project-window-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 0.5px solid var(--line);
+  }
+  .project-window-dots {
+    display: flex;
+    gap: 5px;
+  }
+  .project-window-dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line-strong);
+  }
+  .project-tag {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--amber);
+  }
+  .project-shot {
+    background: #1a1a18;
+  }
+  .project-shot video {
     width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+  }
+  .project-info {
+    padding: 18px 20px 22px;
+  }
+  .project-info h3 {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--cream);
+  }
+  .project-info p {
+    font-size: 13.5px;
+    color: var(--cream-dim);
   }
 
   [data-reveal] {
@@ -71,27 +157,9 @@ import getflowMobile from '../assets/Getflow_phone.jpg';
     transform: translateY(0);
   }
 
-  .desktop-only { display: block; }
-  .mobile-only { display: none; }
-
-  @media (max-width: 900px) {
-    .proyectos-row {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-    .proyectos-title {
-      font-size: 32px;
-    }
-    .getflow-row .desktop-only {
-      display: none;
-    }
-    .getflow-row .mobile-only {
-      display: block;
-    }
-  }
-  @media (min-width: 901px) {
-    .getflow-row .mobile-only {
-      display: none;
+  @media (min-width: 768px) {
+    .projects-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 </style>

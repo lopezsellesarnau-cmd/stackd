@@ -1,46 +1,118 @@
 ---
 import '../styles/tokens.css';
-import { Image } from 'astro:assets';
-import comoTrabajamos from '../assets/como_trabajamos.png';
-import paginaWeb from '../assets/pagina_web.png';
-import mantenimiento from '../assets/manetnimeitn.png';
-import automatizacion from '../assets/automatizacion.png';
-import vscode from '../assets/vscode.png';
 ---
 
-<section class="wrap">
-  <div class="blocks-grid">
-    <div class="block-tall" data-reveal>
-      <Image src={comoTrabajamos} alt="Cómo trabajamos" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+<section class="services wrap" id="servicios" data-reveal>
+  <span class="sec-eyebrow">// servicios</span>
+  <h2 class="sec-title">Lo que construimos</h2>
+  <p class="sec-desc">Cinco formas de quitarte trabajo manual de encima, con el mismo equipo de principio a fin.</p>
+
+  <div class="services-grid">
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+      </div>
+      <h3>Páginas web</h3>
+      <p>Diseño y desarrollo a medida, rápidas, pensadas para convertir.</p>
+      <div class="service-stack"><span>Figma</span><span>Framer</span><span>Next.js</span></div>
     </div>
-    <div data-reveal>
-      <Image src={paginaWeb} alt="Páginas web" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+      </div>
+      <h3>Apps</h3>
+      <p>Aplicaciones móviles nativas para iOS y Android, de la idea a las stores.</p>
+      <div class="service-stack"><span>Flutter</span><span>Swift</span><span>Firebase</span></div>
     </div>
-    <div data-reveal>
-      <Image src={mantenimiento} alt="Mantenimiento" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </div>
+      <h3>SaaS</h3>
+      <p>Plataformas web con suscripción, paneles de gestión y pagos integrados.</p>
+      <div class="service-stack"><span>Supabase</span><span>Stripe</span><span>Vercel</span></div>
     </div>
-    <div data-reveal>
-      <Image src={automatizacion} alt="Automatización con IA" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 5.5L20 9l-5.5 2.5L12 17l-2.5-5.5L4 9l5.5-1.5L12 2z"/></svg>
+      </div>
+      <h3>Automatización con IA</h3>
+      <p>Procesos manuales convertidos en flujos automáticos.</p>
+      <div class="service-stack"><span>Claude</span><span>n8n</span></div>
     </div>
-    <div data-reveal>
-      <Image src={vscode} alt="Editor de código" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <h3>Mantenimiento</h3>
+      <p>Actualizaciones, seguridad, soporte continuo sin sustos.</p>
+      <div class="service-stack"><span>VS Code</span><span>Next.js</span><span>Sentry</span></div>
     </div>
+
   </div>
 </section>
 
 <style>
-  .blocks-grid {
+  .services {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+  .services-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 22px;
-    padding-bottom: 90px;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 32px;
   }
-  .blocks-grid :global(img) {
-    width: 100%;
-    height: auto;
+  .service-card {
+    background: var(--bg-raised);
+    border: 0.5px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
   }
-  .block-tall {
-    grid-row: span 2;
+  .service-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--amber-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    color: var(--amber);
+  }
+  .service-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  .service-card h3 {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--cream);
+  }
+  .service-card p {
+    font-size: 13.5px;
+    color: var(--cream-dim);
+    margin-bottom: 14px;
+  }
+  .service-stack {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .service-stack span {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--cream-dim);
+    border: 0.5px solid var(--line);
+    padding: 3px 8px;
+    border-radius: 5px;
   }
 
   [data-reveal] {
@@ -53,13 +125,9 @@ import vscode from '../assets/vscode.png';
     transform: translateY(0);
   }
 
-  @media (max-width: 900px) {
-    .blocks-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-    .block-tall {
-      grid-row: auto;
+  @media (min-width: 768px) {
+    .services-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>

@@ -2,36 +2,77 @@
 import '../styles/tokens.css';
 ---
 
-<div class="wrap">
-  <div class="hero-intro" data-reveal>
-    <span class="intro-divider"></span>
-    <b>Diseño y desarrollo de páginas web, mantenimiento y automatización de
-    procesos con IA</b> <span class="lt">para pymes que quieren dejar de perder tiempo en
-    tareas repetitivas.</span>
+<section class="process wrap" data-reveal>
+  <span class="sec-eyebrow">// proceso</span>
+  <h2 class="sec-title">Cómo trabajamos</h2>
+
+  <div class="process-list">
+    <div class="process-item">
+      <div class="process-num">01</div>
+      <div class="process-text">
+        <h4>Hablamos de tu problema</h4>
+        <p>Llamada o visita, sin compromiso.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <div class="process-num">02</div>
+      <div class="process-text">
+        <h4>Te enseñamos una demo concreta</h4>
+        <p>De la solución, antes de comprometerte a nada.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <div class="process-num">03</div>
+      <div class="process-text">
+        <h4>Lo construimos y lo lanzamos</h4>
+        <p>Del primer boceto al código en producción.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <div class="process-num">04</div>
+      <div class="process-text">
+        <h4>Mantenimiento continuo incluido</h4>
+        <p>Sin sustos, sin sorpresas en la factura.</p>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 
 <style>
-  .hero-intro {
-    text-align: center;
-    max-width: 640px;
-    margin: 24px auto 90px;
-    font-size: 22px;
-    line-height: 1.5;
+  .process {
+    padding-top: 30px;
+    padding-bottom: 70px;
   }
-  .hero-intro b {
-    font-weight: 700;
+  .process-list {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
   }
-  .hero-intro .lt {
-    font-weight: 300;
+  .process-item {
+    display: flex;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 0.5px solid var(--line);
   }
-  .intro-divider {
-    display: block;
-    width: 64px;
-    height: 3px;
-    background: var(--black);
-    margin: 0 auto 28px;
-    border-radius: 2px;
+  .process-item:first-child {
+    border-top: 0.5px solid var(--line);
+  }
+  .process-num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--amber);
+    flex-shrink: 0;
+    width: 28px;
+  }
+  .process-text h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--cream);
+  }
+  .process-text p {
+    font-size: 13.5px;
+    color: var(--cream-dim);
   }
 
   [data-reveal] {
@@ -42,11 +83,5 @@ import '../styles/tokens.css';
   [data-reveal].is-revealed {
     opacity: 1;
     transform: translateY(0);
-  }
-
-  @media (max-width: 900px) {
-    .hero-intro {
-      margin: 24px auto 70px;
-    }
   }
 </style>

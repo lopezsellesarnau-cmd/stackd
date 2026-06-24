@@ -1,6 +1,14 @@
 :root {
-  --black: #111111;
-  --white: #ffffff;
-  --gray-bg: #EAEAEA;
-  --radius-md: 20px;
+  --bg: #0d0d0c;
+  --bg-raised: #161614;
+  --cream: #F5F3EC;
+  --cream-dim: rgba(245,243,236,0.6);
+  --cream-faint: rgba(245,243,236,0.35);
+  --amber: #FAC775;
+  --amber-dim: rgba(250,199,117,0.15);
+  --line: rgba(245,243,236,0.12);
+  --line-strong: rgba(245,243,236,0.22);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }

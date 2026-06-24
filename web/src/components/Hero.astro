@@ -2,21 +2,37 @@
 import '../styles/tokens.css';
 ---
 
-<header class="hero wrap" id="inicio">
+<section class="hero wrap" id="inicio">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    <span>arnau · ezequiel · mateo</span>
+  </div>
+
   <h1>
-    Webs, automatizaciones y software<br />
-    <span class="light">que tu negocio necesita</span>
+    Construimos software<br />
+    <span class="typed-line" id="typed"></span><span class="cursor" id="cursor">|</span>
   </h1>
+
+  <p class="hero-sub">webs · apps · SaaS · automatización con IA · mantenimiento</p>
+
   <div class="hero-ctas">
     <a href="#contacto" class="btn btn-primary">Hablemos de tu proyecto</a>
-    <a href="#proyectos" class="btn btn-outline">Ver nuestro trabajo</a>
+    <a href="#proyectos" class="btn btn-outline">Ver proyectos</a>
   </div>
-</header>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="r"></span><span class="y"></span><span class="g"></span>
+    </div>
+    <pre class="terminal-body" id="termtext"></pre>
+  </div>
+</section>
 
 <style>
   .hero {
+    padding-top: 56px;
+    padding-bottom: 64px;
     text-align: center;
-    padding: 64px 0 0;
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.6s ease, transform 0.6s ease;
@@ -25,33 +41,166 @@ import '../styles/tokens.css';
     opacity: 1;
     transform: translateY(0);
   }
-
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 0.5px solid var(--line-strong);
+    border-radius: 20px;
+    margin-bottom: 28px;
+  }
+  .hero-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    flex-shrink: 0;
+  }
+  .hero-badge span {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--cream-dim);
+    letter-spacing: 0.3px;
+  }
   .hero h1 {
-    font-size: 56px;
-    font-weight: 700;
-    line-height: 1.12;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 34px;
+    line-height: 1.15;
     letter-spacing: -0.5px;
-    max-width: 920px;
-    margin: 0 auto;
+    margin: 0 0 16px;
+    color: var(--cream);
   }
-  .hero h1 .light {
-    font-weight: 400;
+  .typed-line {
+    color: var(--amber);
   }
-
+  .cursor {
+    color: var(--amber);
+  }
+  .hero-sub {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--cream-dim);
+    margin: 0 0 32px;
+    line-height: 1.7;
+  }
   .hero-ctas {
     display: flex;
-    gap: 16px;
-    justify-content: center;
-    margin-top: 40px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .terminal {
+    max-width: 420px;
+    margin: 44px auto 0;
+    background: var(--bg-raised);
+    border: 0.5px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: left;
+  }
+  .terminal-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--line);
+  }
+  .terminal-bar span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+  .terminal-bar .r { background: #E24B4A; }
+  .terminal-bar .y { background: var(--amber); }
+  .terminal-bar .g { background: #1D9E75; }
+  .terminal-body {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #9fe1cb;
+    padding: 16px;
+    min-height: 96px;
+    white-space: pre-wrap;
+    margin: 0;
   }
 
-  @media (max-width: 900px) {
+  @media (min-width: 768px) {
     .hero {
-      padding: 48px 0 0;
+      padding-top: 50px;
+      padding-bottom: 80px;
     }
     .hero h1 {
-      font-size: 34px;
+      font-size: 54px;
+      max-width: 720px;
+      margin: 0 auto 18px;
+    }
+    .hero-sub {
+      font-size: 14.5px;
+      max-width: 480px;
+      margin: 0 auto 36px;
+    }
+    .hero-ctas {
+      flex-direction: row;
+      max-width: none;
+      justify-content: center;
+    }
+    .terminal {
+      max-width: 480px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero h1 {
+      font-size: 62px;
     }
   }
 </style>
+
+<script>
+  const words = ["que funciona.", "que convierte.", "que tu negocio necesita."];
+  let wi = 0, ci = 0, deleting = false;
+  const typedEl = document.getElementById('typed');
+
+  function tick() {
+    const w = words[wi];
+    if (!deleting) {
+      ci++;
+      if (typedEl) typedEl.textContent = w.slice(0, ci);
+      if (ci === w.length) { deleting = true; setTimeout(tick, 1500); return; }
+    } else {
+      ci--;
+      if (typedEl) typedEl.textContent = w.slice(0, ci);
+      if (ci === 0) { deleting = false; wi = (wi + 1) % words.length; }
+    }
+    setTimeout(tick, deleting ? 35 : 65);
+  }
+  tick();
+
+  setInterval(() => {
+    const c = document.getElementById('cursor') as HTMLElement | null;
+    if (c) c.style.opacity = c.style.opacity === '0' ? '1' : '0';
+  }, 500);
+
+  const lines = [
+    "npx stackd init mi-negocio",
+    "analizando proceso manual...",
+    "generando automatizacion con IA",
+    "listo en 1 semana"
+  ];
+  const term = document.getElementById('termtext');
+  let li = 0, lc = 0;
+
+  function typeLine() {
+    if (li >= lines.length) return;
+    const line = lines[li];
+    lc++;
+    let out = "";
+    for (let i = 0; i < li; i++) { out += (i === 0 ? "$ " : "  ") + lines[i] + "\n"; }
+    out += (li === 0 ? "$ " : "  ") + line.slice(0, lc);
+    if (term) term.textContent = out;
+    if (lc === line.length) { li++; lc = 0; setTimeout(typeLine, 350); return; }
+    setTimeout(typeLine, 28);
+  }
+  setTimeout(typeLine, 700);
+</script>

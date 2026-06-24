@@ -5,60 +5,90 @@ import logo from '../assets/logo.png';
 ---
 
 <footer class="wrap">
-  <div class="footer-email">
-    <b>Email:</b>
-    <span>info@louvrlabs.com</span>
-  </div>
-  <div class="footer-logo">
-    <div class="logo-mark">
-      <Image src={logo} alt="StackD" width={28} />
+  <div class="footer-top">
+    <div class="footer-brand">
+      <Image src={logo} alt="StackD" width={24} />
+      <span>StackD</span>
     </div>
-    <span class="logo-text">StackD</span>
+    <div class="footer-links">
+      <a href="mailto:info@louvrlabs.com">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        info@louvrlabs.com
+      </a>
+      <a href="https://www.linkedin.com/in/arnau-lopez-selles" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V8h4v1.5A5 5 0 0 1 16 8z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://x.com/ArnauSelles" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 1.2h3.4l-7.4 8.5 8.7 11.5h-6.8l-5.3-7-6.1 7H1l7.9-9-8.4-11h7l4.8 6.4z"/></svg>
+        @ArnauSelles
+      </a>
+    </div>
   </div>
+  <div class="footer-bottom">© 2026 StackD — Louvr Labs</div>
 </footer>
 
 <style>
   footer {
-    border-top: 1px solid #eee;
+    border-top: 0.5px solid var(--line);
     padding-top: 36px;
-    padding-bottom: 50px;
+    padding-bottom: 56px;
+  }
+  .footer-top {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 28px;
+  }
+  .footer-brand {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 9px;
   }
-  footer .footer-email b {
-    display: block;
+  .footer-brand :global(img) {
+    width: 24px;
+    height: auto;
+  }
+  .footer-brand span {
+    font-family: var(--font-display);
+    font-weight: 600;
     font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
+    color: var(--cream);
   }
-  footer .footer-email span {
-    font-size: 16px;
-  }
-  footer .footer-logo {
+  .footer-links {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--cream-dim);
   }
-  footer .footer-logo .logo-mark {
-    display: flex;
+  .footer-links a {
+    text-decoration: none;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    transition: color 0.2s;
   }
-  footer .footer-logo .logo-text {
-    font-size: 17px;
+  .footer-links a:hover {
+    color: var(--amber);
+  }
+  .footer-bottom {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cream-faint);
+    padding-top: 20px;
+    border-top: 0.5px solid var(--line);
   }
 
-  @media (max-width: 900px) {
-    footer {
-      flex-direction: column;
-      gap: 32px;
-      text-align: center;
-      padding-top: 40px;
-      padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  @media (min-width: 768px) {
+    .footer-top {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
     }
-    footer .footer-logo {
-      justify-content: center;
+    .footer-links {
+      flex-direction: row;
+      gap: 28px;
     }
   }
 </style>

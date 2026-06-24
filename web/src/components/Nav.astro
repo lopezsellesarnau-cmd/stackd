@@ -4,43 +4,77 @@ import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
 ---
 
-<nav class="nav">
-  <a href="#inicio" class="nav-logo" aria-label="StackD inicio">
-    <div class="logo-mark">
-      <Image src={logo} alt="StackD" width={32} />
+<header class="nav-wrap wrap">
+  <nav class="nav">
+    <div class="nav-brand">
+      <Image src={logo} alt="StackD" width={26} />
+      <span>StackD</span>
     </div>
-    <span class="logo-text">StackD</span>
-  </a>
-</nav>
+    <div class="nav-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#equipo">Equipo</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a href="#contacto" class="nav-cta">Hablemos</a>
+  </nav>
+</header>
 
 <style>
+  .nav-wrap {
+    position: relative;
+    z-index: 10;
+  }
   .nav {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 56px 0 0;
+    justify-content: space-between;
+    padding: 22px 0;
   }
-  .nav-logo {
+  .nav-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: var(--black);
+    gap: 9px;
   }
-  .logo-mark :global(img) {
-    width: 100%;
+  .nav-brand :global(img) {
+    width: 26px;
     height: auto;
-    display: block;
   }
-  .logo-text {
-    font-size: 20px;
-    font-weight: 400;
+  .nav-brand span {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--cream);
+  }
+  .nav-links {
+    display: none;
+    gap: 28px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--cream-dim);
+  }
+  .nav-links a {
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover {
+    color: var(--amber);
+  }
+  .nav-cta {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--bg);
+    background: var(--amber);
+    padding: 9px 16px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
   }
 
-  @media (max-width: 900px) {
-    .nav {
-      padding: 56px 0 0;
+  @media (min-width: 768px) {
+    .nav-links {
+      display: flex;
     }
   }
 </style>
