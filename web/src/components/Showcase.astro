@@ -1,0 +1,68 @@
+---
+import '../styles/tokens.css';
+---
+
+<section class="showcase wrap" data-reveal>
+  <span class="sec-eyebrow">// automatización con IA</span>
+  <h2 class="sec-title">Tu equipo, sin el trabajo repetitivo</h2>
+  <p class="sec-desc">Las consultas entran, la IA las resuelve, y tu equipo solo ve lo que de verdad necesita su criterio.</p>
+
+  <div class="showcase-frame">
+    <div class="sc-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="sc-t">stackd · flujo automático</span></div>
+    <div class="sc-grid">
+      <div class="sc-list">
+        <div class="sc-item"><span class="sc-pill done">resuelto</span><div class="sc-txt"><div class="t1">Consulta de facturación</div><div class="t2">respondida por IA · 2 min</div></div></div>
+        <div class="sc-item"><span class="sc-pill prog">en curso</span><div class="sc-txt"><div class="t1">Incidencia de un cliente</div><div class="t2">registrada · proveedor avisado</div></div></div>
+        <div class="sc-item active"><span class="sc-pill new">nueva</span><div class="sc-txt"><div class="t1">Solicitud de documento</div><div class="t2">requiere tu aprobación</div></div></div>
+        <div class="sc-item"><span class="sc-pill done">enviado</span><div class="sc-txt"><div class="t1">Recordatorio a 32 clientes</div><div class="t2">enviado por WhatsApp</div></div></div>
+      </div>
+      <div class="sc-agent">
+        <div class="sc-agent-head"><span class="sc-agent-name">Agente StackD</span><span class="sc-agent-model">Opus 4.8</span></div>
+        <div class="sc-agent-step">Analizando la solicitud…</div>
+        <div class="sc-agent-body">
+          <p>He preparado el documento y la respuesta al cliente. Cambios:</p>
+          <div class="sc-agent-line">· documento-solicitado.pdf generado</div>
+          <div class="sc-agent-line">· respuesta redactada en el tono del negocio</div>
+          <div class="sc-agent-line">· pendiente: tu visto bueno</div>
+        </div>
+        <div class="sc-agent-actions"><span class="sc-btn">Aprobar y enviar →</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .showcase { padding-top: 30px; padding-bottom: 70px; }
+  .showcase-frame { margin-top: 32px; background: var(--bg-raised); border: 0.5px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px -40px rgba(0,0,0,0.8); }
+  .sc-bar { display: flex; align-items: center; gap: 6px; padding: 12px 16px; border-bottom: 0.5px solid var(--line); }
+  .sc-bar .d { width: 9px; height: 9px; border-radius: 50%; }
+  .sc-bar .d.r { background: #E24B4A; } .sc-bar .d.y { background: var(--amber); } .sc-bar .d.g { background: #1D9E75; }
+  .sc-bar .sc-t { font-family: var(--font-mono); font-size: 10.5px; color: var(--cream-faint); margin-left: 8px; }
+  .sc-grid { display: grid; grid-template-columns: 1fr; }
+  .sc-list { padding: 8px; border-bottom: 0.5px solid var(--line); }
+  .sc-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; }
+  .sc-item.active { background: rgba(250,199,117,0.06); }
+  .sc-pill { font-family: var(--font-mono); font-size: 10px; padding: 3px 9px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; }
+  .sc-pill.done { background: rgba(93,202,165,0.14); color: #5dcaa5; }
+  .sc-pill.prog { background: var(--amber-dim); color: var(--amber); }
+  .sc-pill.new { background: rgba(125,179,255,0.14); color: #7db3ff; }
+  .sc-txt .t1 { font-size: 13.5px; font-weight: 500; color: var(--cream); }
+  .sc-txt .t2 { font-size: 12px; color: var(--cream-dim); }
+  .sc-agent { padding: 18px 16px; }
+  .sc-agent-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .sc-agent-name { font-family: var(--font-display); font-size: 14px; font-weight: 500; color: var(--cream); }
+  .sc-agent-model { font-family: var(--font-mono); font-size: 10px; color: var(--cream-faint); border: 0.5px solid var(--line); padding: 2px 7px; border-radius: 5px; }
+  .sc-agent-step { font-family: var(--font-mono); font-size: 11px; color: var(--amber); margin-bottom: 13px; }
+  .sc-agent-body p { font-size: 13px; color: var(--cream); margin-bottom: 9px; }
+  .sc-agent-line { font-family: var(--font-mono); font-size: 11.5px; color: var(--cream-dim); padding: 3px 0; }
+  .sc-agent-actions { margin-top: 16px; }
+  .sc-btn { display: inline-block; background: var(--amber); color: var(--bg); font-size: 12.5px; font-weight: 600; padding: 9px 16px; border-radius: 8px; }
+
+  [data-reveal] { opacity: 0; transform: translateY(8px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  [data-reveal].is-revealed { opacity: 1; transform: translateY(0); }
+
+  @media (min-width: 768px) {
+    .sc-grid { grid-template-columns: 1.25fr 1fr; }
+    .sc-list { border-bottom: none; border-right: 0.5px solid var(--line); }
+  }
+</style>
