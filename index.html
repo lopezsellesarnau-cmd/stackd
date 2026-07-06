@@ -49,6 +49,7 @@
     pointer-events: none;
   }
 
+  body::before { content: ""; position: fixed; top: -180px; left: 50%; transform: translateX(-50%); width: 760px; height: 500px; background: radial-gradient(ellipse at center, rgba(250,199,117,0.07), transparent 70%); z-index: 0; pointer-events: none; }
   section, header, footer { position: relative; z-index: 1; }
 
   /* ---------- NAV ---------- */
@@ -69,7 +70,7 @@
   }
 
   /* ---------- HERO ---------- */
-  .hero { padding: 56px 0 64px; text-align: center; }
+  .hero { padding-top: 56px; padding-bottom: 64px; text-align: center; }
   .hero-badge {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 6px 14px; border: 0.5px solid var(--line-strong);
@@ -134,7 +135,7 @@
   .reveal.in { opacity: 1; transform: translateY(0); filter: blur(0); }
 
   /* ---------- SERVICIOS ---------- */
-  .services { padding: 70px 0; }
+  .services { padding-top: 70px; padding-bottom: 70px; }
   .services-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 32px; }
   .service-card {
     background: var(--bg-raised); border: 0.5px solid var(--line);
@@ -153,8 +154,35 @@
     border: 0.5px solid var(--line); padding: 3px 8px; border-radius: 5px;
   }
 
+  /* ---------- SHOWCASE (mockup estilo Linear) ---------- */
+  .showcase { padding-top: 30px; padding-bottom: 70px; }
+  .showcase-frame { margin-top: 32px; background: var(--bg-raised); border: 0.5px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px -40px rgba(0,0,0,0.8); }
+  .sc-bar { display: flex; align-items: center; gap: 6px; padding: 12px 16px; border-bottom: 0.5px solid var(--line); }
+  .sc-bar .d { width: 9px; height: 9px; border-radius: 50%; }
+  .sc-bar .d.r { background: #E24B4A; } .sc-bar .d.y { background: var(--amber); } .sc-bar .d.g { background: #1D9E75; }
+  .sc-bar .sc-t { font-family: var(--font-mono); font-size: 10.5px; color: var(--cream-faint); margin-left: 8px; }
+  .sc-grid { display: grid; grid-template-columns: 1fr; }
+  .sc-list { padding: 8px; border-bottom: 0.5px solid var(--line); }
+  .sc-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; }
+  .sc-item.active { background: rgba(250,199,117,0.06); }
+  .sc-pill { font-family: var(--font-mono); font-size: 10px; padding: 3px 9px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; }
+  .sc-pill.done { background: rgba(93,202,165,0.14); color: #5dcaa5; }
+  .sc-pill.prog { background: var(--amber-dim); color: var(--amber); }
+  .sc-pill.new { background: rgba(125,179,255,0.14); color: #7db3ff; }
+  .sc-txt .t1 { font-size: 13.5px; font-weight: 500; }
+  .sc-txt .t2 { font-size: 12px; color: var(--cream-dim); }
+  .sc-agent { padding: 18px 16px; }
+  .sc-agent-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .sc-agent-name { font-family: var(--font-display); font-size: 14px; font-weight: 500; }
+  .sc-agent-model { font-family: var(--font-mono); font-size: 10px; color: var(--cream-faint); border: 0.5px solid var(--line); padding: 2px 7px; border-radius: 5px; }
+  .sc-agent-step { font-family: var(--font-mono); font-size: 11px; color: var(--amber); margin-bottom: 13px; }
+  .sc-agent-body p { font-size: 13px; color: var(--cream); margin-bottom: 9px; }
+  .sc-agent-line { font-family: var(--font-mono); font-size: 11.5px; color: var(--cream-dim); padding: 3px 0; }
+  .sc-agent-actions { margin-top: 16px; }
+  .sc-btn { display: inline-block; background: var(--amber); color: var(--bg); font-size: 12.5px; font-weight: 600; padding: 9px 16px; border-radius: 8px; }
+
   /* ---------- COMO TRABAJAMOS ---------- */
-  .process { padding: 30px 0 70px; }
+  .process { padding-top: 30px; padding-bottom: 70px; }
   .process-list { margin-top: 28px; display: flex; flex-direction: column; gap: 0; }
   .process-item {
     display: flex; gap: 16px; padding: 18px 0;
@@ -166,7 +194,7 @@
   .process-text p { font-size: 13.5px; color: var(--cream-dim); }
 
   /* ---------- PROYECTOS ---------- */
-  .projects { padding: 30px 0 70px; }
+  .projects { padding-top: 30px; padding-bottom: 70px; }
   .projects-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 32px; }
   .project-card {
     background: var(--bg-raised); border: 0.5px solid var(--line);
@@ -197,7 +225,7 @@
   .project-info p { font-size: 13.5px; color: var(--cream-dim); }
 
   /* ---------- EQUIPO ---------- */
-  .team { padding: 30px 0 70px; }
+  .team { padding-top: 30px; padding-bottom: 70px; }
   .team-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 32px; }
   .team-card {
     background: var(--bg-raised); border: 0.5px solid var(--line);
@@ -213,7 +241,7 @@
   .team-card p.bio { font-size: 13.5px; color: var(--cream-dim); }
 
   /* ---------- FAQ ---------- */
-  .faq { padding: 30px 0 70px; }
+  .faq { padding-top: 30px; padding-bottom: 70px; }
   .faq-list { margin-top: 28px; }
   .faq-item { border-bottom: 0.5px solid var(--line); padding: 18px 0; }
   .faq-item:first-child { border-top: 0.5px solid var(--line); }
@@ -221,7 +249,7 @@
   .faq-a { font-size: 13.5px; color: var(--cream-dim); }
 
   /* ---------- CTA FINAL ---------- */
-  .cta-final { padding: 60px 0 70px; text-align: center; }
+  .cta-final { padding-top: 60px; padding-bottom: 70px; text-align: center; }
   .cta-final .sec-title { font-size: 30px; margin-bottom: 24px; }
 
   /* ---------- FOOTER ---------- */
@@ -242,7 +270,7 @@
   @media (min-width: 768px) {
     .wrap { padding: 0 40px; }
     .nav-links { display: flex; }
-    .hero { padding: 50px 0 80px; }
+    .hero { padding-top: 50px; padding-bottom: 80px; }
     .hero h1 { font-size: 54px; max-width: 720px; margin: 0 auto 18px; }
     .hero-sub { font-size: 14.5px; max-width: 480px; margin: 0 auto 36px; }
     .hero-ctas { flex-direction: row; max-width: none; justify-content: center; }
@@ -250,6 +278,9 @@
     .terminal { max-width: 480px; }
 
     .services-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .sc-grid { grid-template-columns: 1.25fr 1fr; }
+    .sc-list { border-bottom: none; border-right: 0.5px solid var(--line); }
 
     .projects-grid { grid-template-columns: repeat(2, 1fr); }
 
@@ -295,7 +326,7 @@
     <span class="typed-line" id="typed"></span><span class="cursor" id="cursor">|</span>
   </h1>
 
-  <p class="hero-sub">webs · apps · SaaS · automatización con IA · mantenimiento</p>
+  <p class="hero-sub">automatización con IA · SaaS a medida · apps — para empresas que quieren dejar de perder horas</p>
 
   <div class="hero-ctas">
     <a href="#contacto" class="btn btn-primary">Hablemos de tu proyecto</a>
@@ -312,18 +343,27 @@
 
 <section class="services wrap reveal" id="servicios">
   <span class="sec-eyebrow">// servicios</span>
-  <h2 class="sec-title">Lo que construimos</h2>
-  <p class="sec-desc">Cinco formas de quitarte trabajo manual de encima, con el mismo equipo de principio a fin.</p>
+  <h2 class="sec-title">Software que le quita trabajo a tu empresa</h2>
+  <p class="sec-desc">No hacemos webs de folleto. Construimos lo que de verdad mueve la aguja de un negocio: procesos automatizados, plataformas a medida y apps. Mismo equipo de principio a fin.</p>
 
   <div class="services-grid">
 
     <div class="service-card">
       <div class="service-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 5.5L20 9l-5.5 2.5L12 17l-2.5-5.5L4 9l5.5-1.5L12 2z"/></svg>
       </div>
-      <h3>Páginas web</h3>
-      <p>Diseño y desarrollo a medida, rápidas, pensadas para convertir.</p>
-      <div class="service-stack"><span>Figma</span><span>Framer</span><span>Next.js</span></div>
+      <h3>Automatización con IA</h3>
+      <p>Asistentes que atienden a tus clientes por WhatsApp, correo y teléfono; consultas que se resuelven solas; procesos manuales que dejan de comerte la mañana.</p>
+      <div class="service-stack"><span>Claude</span><span>WhatsApp API</span><span>n8n</span></div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </div>
+      <h3>SaaS a medida</h3>
+      <p>Plataformas con suscripción, panel de gestión y pagos integrados. De la idea a producción en semanas, no en meses.</p>
+      <div class="service-stack"><span>Supabase</span><span>Stripe</span><span>Next.js</span></div>
     </div>
 
     <div class="service-card">
@@ -331,37 +371,39 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       </div>
       <h3>Apps</h3>
-      <p>Aplicaciones móviles nativas para iOS y Android, de la idea a las stores.</p>
+      <p>Aplicaciones móviles iOS y Android para tu negocio, de la idea a las stores.</p>
       <div class="service-stack"><span>Flutter</span><span>Swift</span><span>Firebase</span></div>
     </div>
 
-    <div class="service-card">
-      <div class="service-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-      </div>
-      <h3>SaaS</h3>
-      <p>Plataformas web con suscripción, paneles de gestión y pagos integrados.</p>
-      <div class="service-stack"><span>Supabase</span><span>Stripe</span><span>Vercel</span></div>
-    </div>
+  </div>
+</section>
 
-    <div class="service-card">
-      <div class="service-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 5.5L20 9l-5.5 2.5L12 17l-2.5-5.5L4 9l5.5-1.5L12 2z"/></svg>
-      </div>
-      <h3>Automatización con IA</h3>
-      <p>Procesos manuales convertidos en flujos automáticos.</p>
-      <div class="service-stack"><span>Claude</span><span>n8n</span></div>
-    </div>
+<section class="showcase wrap reveal">
+  <span class="sec-eyebrow">// automatización con IA</span>
+  <h2 class="sec-title">Tu equipo, sin el trabajo repetitivo</h2>
+  <p class="sec-desc">Las consultas entran, la IA las resuelve, y tu equipo solo ve lo que de verdad necesita su criterio.</p>
 
-    <div class="service-card">
-      <div class="service-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  <div class="showcase-frame">
+    <div class="sc-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="sc-t">stackd · flujo automático</span></div>
+    <div class="sc-grid">
+      <div class="sc-list">
+        <div class="sc-item"><span class="sc-pill done">resuelto</span><div class="sc-txt"><div class="t1">Consulta de facturación</div><div class="t2">respondida por IA · 2 min</div></div></div>
+        <div class="sc-item"><span class="sc-pill prog">en curso</span><div class="sc-txt"><div class="t1">Incidencia de un cliente</div><div class="t2">registrada · proveedor avisado</div></div></div>
+        <div class="sc-item active"><span class="sc-pill new">nueva</span><div class="sc-txt"><div class="t1">Solicitud de documento</div><div class="t2">requiere tu aprobación</div></div></div>
+        <div class="sc-item"><span class="sc-pill done">enviado</span><div class="sc-txt"><div class="t1">Recordatorio a 32 clientes</div><div class="t2">enviado por WhatsApp</div></div></div>
       </div>
-      <h3>Mantenimiento</h3>
-      <p>Actualizaciones, seguridad, soporte continuo sin sustos.</p>
-      <div class="service-stack"><span>VS Code</span><span>Next.js</span><span>Sentry</span></div>
+      <div class="sc-agent">
+        <div class="sc-agent-head"><span class="sc-agent-name">Agente StackD</span><span class="sc-agent-model">Opus 4.8</span></div>
+        <div class="sc-agent-step">Analizando la solicitud…</div>
+        <div class="sc-agent-body">
+          <p>He preparado el documento y la respuesta al cliente. Cambios:</p>
+          <div class="sc-agent-line">· documento-solicitado.pdf generado</div>
+          <div class="sc-agent-line">· respuesta redactada en el tono del negocio</div>
+          <div class="sc-agent-line">· pendiente: tu visto bueno</div>
+        </div>
+        <div class="sc-agent-actions"><span class="sc-btn">Aprobar y enviar →</span></div>
+      </div>
     </div>
-
   </div>
 </section>
 
@@ -561,7 +603,7 @@
 </footer>
 
 <script>
-const words = ["que funciona.", "que convierte.", "que tu negocio necesita."];
+const words = ["que te quita trabajo.", "que escala contigo.", "que tu empresa necesita."];
 let wi = 0, ci = 0, deleting = false;
 const typedEl = document.getElementById('typed');
 function tick(){
