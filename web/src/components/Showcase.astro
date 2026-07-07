@@ -1,31 +1,35 @@
 ---
 import '../styles/tokens.css';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <section class="showcase wrap" data-reveal>
-  <span class="sec-eyebrow">// automatización con IA</span>
-  <h2 class="sec-title">Tu equipo, sin el trabajo repetitivo</h2>
-  <p class="sec-desc">Las consultas entran, la IA las resuelve, y tu equipo solo ve lo que de verdad necesita su criterio.</p>
+  <span class="sec-eyebrow">{t('showcase.eyebrow')}</span>
+  <h2 class="sec-title">{t('showcase.title')}</h2>
+  <p class="sec-desc">{t('showcase.desc')}</p>
 
   <div class="showcase-frame">
-    <div class="sc-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="sc-t">stackd · flujo automático</span></div>
+    <div class="sc-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="sc-t">{t('showcase.bar')}</span></div>
     <div class="sc-grid">
       <div class="sc-list">
-        <div class="sc-item"><span class="sc-pill done">resuelto</span><div class="sc-txt"><div class="t1">Consulta de facturación</div><div class="t2">respondida por IA · 2 min</div></div></div>
-        <div class="sc-item"><span class="sc-pill prog">en curso</span><div class="sc-txt"><div class="t1">Incidencia de un cliente</div><div class="t2">registrada · proveedor avisado</div></div></div>
-        <div class="sc-item active"><span class="sc-pill new">nueva</span><div class="sc-txt"><div class="t1">Solicitud de documento</div><div class="t2">requiere tu aprobación</div></div></div>
-        <div class="sc-item"><span class="sc-pill done">enviado</span><div class="sc-txt"><div class="t1">Recordatorio a 32 clientes</div><div class="t2">enviado por WhatsApp</div></div></div>
+        <div class="sc-item"><span class="sc-pill done">{t('showcase.item1.status')}</span><div class="sc-txt"><div class="t1">{t('showcase.item1.t1')}</div><div class="t2">{t('showcase.item1.t2')}</div></div></div>
+        <div class="sc-item"><span class="sc-pill prog">{t('showcase.item2.status')}</span><div class="sc-txt"><div class="t1">{t('showcase.item2.t1')}</div><div class="t2">{t('showcase.item2.t2')}</div></div></div>
+        <div class="sc-item active"><span class="sc-pill new">{t('showcase.item3.status')}</span><div class="sc-txt"><div class="t1">{t('showcase.item3.t1')}</div><div class="t2">{t('showcase.item3.t2')}</div></div></div>
+        <div class="sc-item"><span class="sc-pill done">{t('showcase.item4.status')}</span><div class="sc-txt"><div class="t1">{t('showcase.item4.t1')}</div><div class="t2">{t('showcase.item4.t2')}</div></div></div>
       </div>
       <div class="sc-agent">
-        <div class="sc-agent-head"><span class="sc-agent-name">Agente StackD</span><span class="sc-agent-model">Opus 4.8</span></div>
-        <div class="sc-agent-step">Analizando la solicitud…</div>
+        <div class="sc-agent-head"><span class="sc-agent-name">{t('showcase.agent.name')}</span><span class="sc-agent-model">Opus 4.8</span></div>
+        <div class="sc-agent-step">{t('showcase.agent.step')}</div>
         <div class="sc-agent-body">
-          <p>He preparado el documento y la respuesta al cliente. Cambios:</p>
-          <div class="sc-agent-line">· documento-solicitado.pdf generado</div>
-          <div class="sc-agent-line">· respuesta redactada en el tono del negocio</div>
-          <div class="sc-agent-line">· pendiente: tu visto bueno</div>
+          <p>{t('showcase.agent.p')}</p>
+          <div class="sc-agent-line">· {t('showcase.agent.line1')}</div>
+          <div class="sc-agent-line">· {t('showcase.agent.line2')}</div>
+          <div class="sc-agent-line">· {t('showcase.agent.line3')}</div>
         </div>
-        <div class="sc-agent-actions"><span class="sc-btn">Aprobar y enviar →</span></div>
+        <div class="sc-agent-actions"><span class="sc-btn">{t('showcase.agent.btn')}</span></div>
       </div>
     </div>
   </div>

@@ -1,11 +1,15 @@
 ---
 import '../styles/tokens.css';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <section class="cta-final wrap" id="contacto" data-reveal>
-  <span class="sec-eyebrow">// contacto</span>
-  <h2 class="sec-title cta-title">¿Listo para automatizar tu negocio?</h2>
-  <a href="mailto:info@louvrlabs.com" class="btn btn-primary">Escríbenos</a>
+  <span class="sec-eyebrow">{t('cta.eyebrow')}</span>
+  <h2 class="sec-title cta-title">{t('cta.title')}</h2>
+  <a href="mailto:info@louvrlabs.com" class="btn btn-primary">{t('cta.btn')}</a>
 </section>
 
 <style>

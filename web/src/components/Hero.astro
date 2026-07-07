@@ -1,32 +1,42 @@
 ---
 import '../styles/tokens.css';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <section class="hero wrap" id="inicio">
   <div class="hero-badge">
     <span class="dot"></span>
-    <span>arnau · ezequiel · mateo</span>
+    <span>{t('hero.badge')}</span>
   </div>
 
   <h1>
-    Construimos software<br />
+    {t('hero.h1')}<br />
     <span class="typed-line" id="typed"></span><span class="cursor" id="cursor">|</span>
   </h1>
 
-  <p class="hero-sub">automatización con IA · SaaS a medida · apps — para empresas que quieren dejar de perder horas</p>
+  <p class="hero-sub">{t('hero.sub')}</p>
 
   <div class="hero-ctas">
-    <a href="#contacto" class="btn btn-primary">Hablemos de tu proyecto</a>
-    <a href="#proyectos" class="btn btn-outline">Ver proyectos</a>
+    <a href="#contacto" class="btn btn-primary">{t('hero.cta.primary')}</a>
+    <a href="#proyectos" class="btn btn-outline">{t('hero.cta.secondary')}</a>
   </div>
 
   <div class="terminal">
     <div class="terminal-bar">
       <span class="r"></span><span class="y"></span><span class="g"></span>
     </div>
-    <pre class="terminal-body" id="termtext"></pre>
+    <pre
+      class="terminal-body"
+      id="termtext"
+      data-lines={JSON.stringify([t('hero.terminal.1'), t('hero.terminal.2'), t('hero.terminal.3'), t('hero.terminal.4')])}
+    ></pre>
   </div>
 </section>
+
+<span id="typed-words" data-words={JSON.stringify([t('hero.typed.1'), t('hero.typed.2'), t('hero.typed.3')])} hidden></span>
 
 <style>
   .hero {
@@ -158,7 +168,8 @@ import '../styles/tokens.css';
 </style>
 
 <script>
-  const words = ["que te quita trabajo.", "que escala contigo.", "que tu empresa necesita."];
+  const wordsEl = document.getElementById('typed-words');
+  const words = wordsEl ? JSON.parse(wordsEl.dataset.words || '[]') : [];
   let wi = 0, ci = 0, deleting = false;
   const typedEl = document.getElementById('typed');
 
@@ -182,13 +193,8 @@ import '../styles/tokens.css';
     if (c) c.style.opacity = c.style.opacity === '0' ? '1' : '0';
   }, 500);
 
-  const lines = [
-    "npx stackd init mi-negocio",
-    "analizando proceso manual...",
-    "generando automatizacion con IA",
-    "listo en 1 semana"
-  ];
-  const term = document.getElementById('termtext');
+  const term = document.getElementById('termtext') as HTMLElement | null;
+  const lines = term ? JSON.parse(term.dataset.lines || '[]') : [];
   let li = 0, lc = 0;
 
   function typeLine() {

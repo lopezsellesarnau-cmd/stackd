@@ -1,59 +1,63 @@
 ---
 import '../styles/tokens.css';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <section class="team wrap" id="equipo" data-reveal>
-  <span class="sec-eyebrow">// equipo</span>
-  <h2 class="sec-title">Quiénes somos</h2>
-  <p class="sec-desc">Tres personas, un mismo proyecto cada vez. Sin intermediarios.</p>
+  <span class="sec-eyebrow">{t('team.eyebrow')}</span>
+  <h2 class="sec-title">{t('team.title')}</h2>
+  <p class="sec-desc">{t('team.desc')}</p>
 
   <div class="team-grid">
 
     <div class="team-card">
       <div class="team-whoami">$ whoami<br />&gt; <span class="amber">arnau</span></div>
       <h4>Arnau</h4>
-      <span class="team-role">Diseño y desarrollo</span>
-      <p class="bio">Diseña la interfaz, prepara los mockups y construye el producto de principio a fin — del primer boceto al código en producción.</p>
+      <span class="team-role">{t('team.arnau.role')}</span>
+      <p class="bio">{t('team.arnau.bio')}</p>
     </div>
 
     <div class="team-card">
       <div class="team-whoami">$ whoami<br />&gt; <span class="amber">ezequiel</span></div>
       <h4>Ezequiel</h4>
-      <span class="team-role">Desarrollo</span>
-      <p class="bio">Programa y construye la lógica detrás de cada producto — del backend a la integración final.</p>
+      <span class="team-role">{t('team.ezequiel.role')}</span>
+      <p class="bio">{t('team.ezequiel.bio')}</p>
       <a href="https://ezequielmenor.es" class="team-link" target="_blank" rel="noopener">ezequielmenor.es</a>
     </div>
 
     <div class="team-card">
       <div class="team-whoami">$ whoami<br />&gt; <span class="amber">mateo</span></div>
       <h4>Mateo</h4>
-      <span class="team-role">Captación y clientes</span>
-      <p class="bio">Es quien te llama, te visita y agenda la primera reunión — el primer contacto antes de que el proyecto empiece a construirse.</p>
+      <span class="team-role">{t('team.mateo.role')}</span>
+      <p class="bio">{t('team.mateo.bio')}</p>
     </div>
 
   </div>
 </section>
 
 <section class="faq wrap" id="faq" data-reveal>
-  <span class="sec-eyebrow">// faq</span>
-  <h2 class="sec-title">Preguntas frecuentes</h2>
+  <span class="sec-eyebrow">{t('faq.eyebrow')}</span>
+  <h2 class="sec-title">{t('faq.title')}</h2>
 
   <div class="faq-list">
     <div class="faq-item">
-      <div class="faq-q">¿Cuánto tarda un proyecto en estar listo?</div>
-      <div class="faq-a">Depende del alcance, pero en la mayoría de casos tenéis una demo funcional en pocos días y el proyecto completo en pocas semanas — no meses esperando sin ver nada.</div>
+      <div class="faq-q">{t('faq.1.q')}</div>
+      <div class="faq-a">{t('faq.1.a')}</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">Ya tengo página web, ¿también puedo trabajar con vosotros?</div>
-      <div class="faq-a">Sí. Si ya tienes web, podemos encargarnos del mantenimiento, mejorarla, o automatizar procesos que ahora haces a mano — no hace falta empezar de cero.</div>
+      <div class="faq-q">{t('faq.2.q')}</div>
+      <div class="faq-a">{t('faq.2.a')}</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">¿Qué pasa si no sé muy bien qué necesito, solo que algo no funciona bien?</div>
-      <div class="faq-a">Perfecto, es lo más normal. En la primera llamada o visita analizamos dónde se pierde tiempo en tu negocio y te proponemos la solución concreta — sin compromiso.</div>
+      <div class="faq-q">{t('faq.3.q')}</div>
+      <div class="faq-a">{t('faq.3.a')}</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">¿Trabajáis solo con un tipo de negocio o sector?</div>
-      <div class="faq-a">Trabajamos con cualquier negocio que quiera dejar de perder tiempo en tareas repetitivas — desde clubes deportivos hasta comercios o gestorías. Cada proyecto se adapta al sector, no al revés.</div>
+      <div class="faq-q">{t('faq.4.q')}</div>
+      <div class="faq-a">{t('faq.4.a')}</div>
     </div>
   </div>
 </section>

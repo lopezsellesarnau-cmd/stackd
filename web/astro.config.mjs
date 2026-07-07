@@ -5,6 +5,13 @@ const canonicalURL = import.meta.env.PUBLIC_CANONICAL_URL ?? 'https://TODO.examp
 
 export default defineConfig({
   site: canonicalURL,
+  i18n: {
+    defaultLocale: 'es',
+    locales: ['es', 'en'],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   integrations: [sitemap()],
   vite: {
     resolve: {

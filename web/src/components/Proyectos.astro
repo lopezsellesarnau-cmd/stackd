@@ -1,11 +1,15 @@
 ---
 import '../styles/tokens.css';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <section class="projects wrap" id="proyectos" data-reveal>
-  <span class="sec-eyebrow">// proyectos</span>
-  <h2 class="sec-title">Lo que ya hemos construido</h2>
-  <p class="sec-desc">Producto real, en manos de usuarios reales — no mockups de relleno.</p>
+  <span class="sec-eyebrow">{t('projects.eyebrow')}</span>
+  <h2 class="sec-title">{t('projects.title')}</h2>
+  <p class="sec-desc">{t('projects.desc')}</p>
 
   <div class="projects-grid">
 
@@ -21,7 +25,7 @@ import '../styles/tokens.css';
       </div>
       <div class="project-info">
         <h3>SMASH</h3>
-        <p>La red social hecha por y para jugadores de pádel.</p>
+        <p>{t('projects.smash.desc')}</p>
       </div>
     </div>
 
@@ -37,7 +41,7 @@ import '../styles/tokens.css';
       </div>
       <div class="project-info">
         <h3>NOOK</h3>
-        <p>El Airbnb del trastero: alquila espacio que no usas, encuentra el que necesitas.</p>
+        <p>{t('projects.nook.desc')}</p>
       </div>
     </a>
 
@@ -53,7 +57,7 @@ import '../styles/tokens.css';
       </div>
       <div class="project-info">
         <h3>Volea.io</h3>
-        <p>Gestiona tu club de pádel sin Excel, sin WhatsApp, sin líos.</p>
+        <p>{t('projects.volea.desc')}</p>
       </div>
     </a>
 
@@ -69,7 +73,7 @@ import '../styles/tokens.css';
       </div>
       <div class="project-info">
         <h3>Getflow</h3>
-        <p>Onboarding de clientes sin emails perdidos ni pasos olvidados.</p>
+        <p>{t('projects.getflow.desc')}</p>
       </div>
     </a>
 

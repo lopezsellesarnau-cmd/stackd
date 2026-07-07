@@ -4,14 +4,18 @@ interface Props {
   description?: string;
   canonicalURL?: string;
   ogImage?: string;
+  lang?: string;
 }
 
 const {
-  title = 'StackD — Webs, automatizaciones y software que tu negocio necesita',
-  description = 'Diseño y desarrollo de páginas web, mantenimiento y automatización de procesos con IA para pymes que quieren dejar de perder tiempo en tareas repetitivas.',
+  title = 'StackD — Automatización con IA, SaaS y apps para empresas',
+  description = 'Automatizamos procesos con IA, construimos SaaS a medida y apps para empresas que quieren dejar de perder horas en tareas repetitivas. Mismo equipo de principio a fin.',
   canonicalURL = import.meta.env.PUBLIC_CANONICAL_URL ?? 'https://TODO.example',
   ogImage = import.meta.env.PUBLIC_OG_IMAGE_URL ?? `${canonicalURL}/og.png`,
+  lang = 'es',
 } = Astro.props;
+
+const base = (import.meta.env.PUBLIC_CANONICAL_URL ?? 'https://TODO.example').replace(/\/$/, '');
 ---
 
 <!-- Primary Meta Tags -->
@@ -19,6 +23,11 @@ const {
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalURL} />
+
+<!-- hreflang -->
+<link rel="alternate" hreflang="es" href={base + '/'} />
+<link rel="alternate" hreflang="en" href={base + '/en/'} />
+<link rel="alternate" hreflang="x-default" href={base + '/'} />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />

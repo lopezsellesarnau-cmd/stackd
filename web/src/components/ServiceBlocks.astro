@@ -1,11 +1,15 @@
 ---
 import '../styles/tokens.css';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <section class="services wrap" id="servicios" data-reveal>
-  <span class="sec-eyebrow">// servicios</span>
-  <h2 class="sec-title">Software que le quita trabajo a tu empresa</h2>
-  <p class="sec-desc">No hacemos webs de folleto. Construimos lo que de verdad mueve la aguja de un negocio: procesos automatizados, plataformas a medida y apps. Mismo equipo de principio a fin.</p>
+  <span class="sec-eyebrow">{t('services.eyebrow')}</span>
+  <h2 class="sec-title">{t('services.title')}</h2>
+  <p class="sec-desc">{t('services.desc')}</p>
 
   <div class="services-grid">
 
@@ -13,8 +17,8 @@ import '../styles/tokens.css';
       <div class="service-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 5.5L20 9l-5.5 2.5L12 17l-2.5-5.5L4 9l5.5-1.5L12 2z"/></svg>
       </div>
-      <h3>Automatización con IA</h3>
-      <p>Asistentes que atienden a tus clientes por WhatsApp, correo y teléfono; consultas que se resuelven solas; procesos manuales que dejan de comerte la mañana.</p>
+      <h3>{t('services.ai.title')}</h3>
+      <p>{t('services.ai.desc')}</p>
       <div class="service-stack"><span>Claude</span><span>WhatsApp API</span><span>n8n</span></div>
     </div>
 
@@ -22,8 +26,8 @@ import '../styles/tokens.css';
       <div class="service-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
       </div>
-      <h3>SaaS a medida</h3>
-      <p>Plataformas con suscripción, panel de gestión y pagos integrados. De la idea a producción en semanas, no en meses.</p>
+      <h3>{t('services.saas.title')}</h3>
+      <p>{t('services.saas.desc')}</p>
       <div class="service-stack"><span>Supabase</span><span>Stripe</span><span>Next.js</span></div>
     </div>
 
@@ -31,8 +35,8 @@ import '../styles/tokens.css';
       <div class="service-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       </div>
-      <h3>Apps</h3>
-      <p>Aplicaciones móviles iOS y Android para tu negocio, de la idea a las stores.</p>
+      <h3>{t('services.apps.title')}</h3>
+      <p>{t('services.apps.desc')}</p>
       <div class="service-stack"><span>Flutter</span><span>Swift</span><span>Firebase</span></div>
     </div>
 

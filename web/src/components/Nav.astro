@@ -2,6 +2,12 @@
 import '../styles/tokens.css';
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const otherLang = lang === 'es' ? 'en' : 'es';
+const switchHref = getLocalizedPath(otherLang, '/');
 ---
 
 <header class="nav-wrap wrap">
@@ -11,12 +17,13 @@ import logo from '../assets/logo.png';
       <span>StackD</span>
     </div>
     <div class="nav-links">
-      <a href="#servicios">Servicios</a>
-      <a href="#proyectos">Proyectos</a>
-      <a href="#equipo">Equipo</a>
-      <a href="#faq">FAQ</a>
+      <a href="#servicios">{t('nav.servicios')}</a>
+      <a href="#proyectos">{t('nav.proyectos')}</a>
+      <a href="#equipo">{t('nav.equipo')}</a>
+      <a href="#faq">{t('nav.faq')}</a>
     </div>
-    <a href="#contacto" class="nav-cta">Hablemos</a>
+    <a href={switchHref} class="lang-switch" aria-label="Switch language">{t('lang.switch')}</a>
+    <a href="#contacto" class="nav-cta">{t('nav.cta')}</a>
   </nav>
 </header>
 
@@ -70,6 +77,23 @@ import logo from '../assets/logo.png';
     text-decoration: none;
     font-weight: 500;
     white-space: nowrap;
+  }
+  .lang-switch {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--cream-dim);
+    border: 0.5px solid var(--line-strong);
+    padding: 7px 11px;
+    border-radius: 7px;
+    text-decoration: none;
+    white-space: nowrap;
+    margin-left: auto;
+    margin-right: 10px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .lang-switch:hover {
+    color: var(--amber);
+    border-color: var(--amber);
   }
 
   @media (min-width: 768px) {
