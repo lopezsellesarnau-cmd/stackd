@@ -10,7 +10,6 @@
  * as before.
  */
 
-import { Fragment } from 'react'
 import { HeroMockup } from './hero-mockup'
 import { TILES, WorkImage } from './project-mockups'
 import { useLanguage } from './language-context'
@@ -131,14 +130,16 @@ function MarqueeDivider({ text }: { text: string }) {
 function WorkImageTile({
   which,
   delay,
+  className = '',
 }: {
   which: keyof typeof TILES
   delay: number
+  className?: string
 }) {
   const t = TILES[which]
   return (
     <div
-      className="fade-up relative aspect-[4/3] overflow-hidden border-b border-[rgba(0,0,0,0.08)] sm:border-r"
+      className={`fade-up relative aspect-[4/3] overflow-hidden border-b border-[rgba(0,0,0,0.08)] sm:border-r ${className}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <WorkImage which={which} />
@@ -153,14 +154,16 @@ function WorkTextTile({
   index,
   caption,
   delay,
+  className = '',
 }: {
   index: string
   caption: string
   delay: number
+  className?: string
 }) {
   return (
     <div
-      className="fade-up flex aspect-[4/3] flex-col justify-center gap-3 border-b border-[rgba(0,0,0,0.08)] bg-surface p-8 sm:border-r"
+      className={`fade-up flex aspect-[4/3] flex-col justify-center gap-3 border-b border-[rgba(0,0,0,0.08)] bg-surface p-8 sm:border-r ${className}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <span className="text-[11px] uppercase tracking-[0.14em] text-fg-faint">
@@ -177,23 +180,28 @@ export function WorksGrid() {
   return (
     <section id="work">
       <MarqueeDivider text={t.marquee} />
-      <div className="grid grid-cols-1 sm:grid-cols-2">
-        {t.rows.map((r, i) => (
-          <Fragment key={r.which}>
-            {i % 2 === 0 ? (
-              <>
-                <WorkImageTile which={r.which} delay={i * 100} />
-                <WorkTextTile index={r.index} caption={r.caption} delay={i * 100 + 60} />
-              </>
-            ) : (
-              <>
-                <WorkTextTile index={r.index} caption={r.caption} delay={i * 100} />
-                <WorkImageTile which={r.which} delay={i * 100 + 60} />
-              </>
-            )}
-          </Fragment>
-        ))}
-      </div>
+      {/*
+       * Cada pareja es su propio grid — `order` de CSS reordena TODO el
+       * grid al que pertenece, no solo dos elementos sueltos, así que si
+       * las 8 tiles compartieran un único grid, alternar con `order`
+       * agrupaba las 4 imágenes por un lado y los 4 textos por otro (roto
+       * en mobile Y en escritorio). Grids aislados por pareja = `order`
+       * queda contenido ahí, y el DOM siempre es imagen→texto.
+       */}
+      {t.rows.map((r, i) => {
+        const flip = i % 2 === 1
+        return (
+          <div key={r.which} className="grid grid-cols-1 sm:grid-cols-2">
+            <WorkImageTile which={r.which} delay={i * 100} className={flip ? 'sm:order-2' : ''} />
+            <WorkTextTile
+              index={r.index}
+              caption={r.caption}
+              delay={i * 100 + 60}
+              className={flip ? 'sm:order-1' : ''}
+            />
+          </div>
+        )
+      })}
     </section>
   )
 }
