@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-bg text-fg;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  ::selection {
+    background: rgba(193, 102, 61, 0.25);
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1260px] px-6;
+  }
+  .eyebrow {
+    @apply text-[13px] font-medium tracking-tight text-fg-dim;
+  }
+  .display {
+    @apply font-display leading-[1.0] tracking-display;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-accent px-[18px] py-2.5
+           text-sm font-medium text-white transition-colors hover:bg-accent-hover;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border border-[rgba(0,0,0,0.14)]
+           bg-black/[0.02] px-[18px] py-2.5 text-sm font-medium text-fg-muted
+           transition-colors hover:border-[rgba(0,0,0,0.24)] hover:text-fg;
+  }
+}
+
+/* Animaciones de entrada — sutiles, tipo Linear: fade + subida corta. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes caret-blink {
+  0%, 45%  { opacity: 1; }
+  50%, 95% { opacity: 0; }
+  100%     { opacity: 1; }
+}
+.type-caret {
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up, .float-slow, .pulse-dot, .type-caret, .marquee-track { animation: none; }
+}
