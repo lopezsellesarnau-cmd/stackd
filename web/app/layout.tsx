@@ -14,10 +14,28 @@ const mono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.stackd.codes'),
   title: 'StackD — AI software studio',
   description:
     'We design and build AI software and automations that solve real business problems — shipped to production, not demoed.',
-  robots: { index: false, follow: false },
+  // Indexable desde el 24 jul 2026: el `noindex` era un resto de cuando la web
+  // estaba en desarrollo y dejaba la agencia invisible en buscadores.
+  robots: { index: true, follow: true },
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    url: 'https://www.stackd.codes',
+    siteName: 'StackD',
+    title: 'StackD — AI software studio',
+    description:
+      'We design and build AI software and automations that solve real business problems — shipped to production, not demoed.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'StackD — AI software studio',
+    description:
+      'We design and build AI software and automations that solve real business problems — shipped to production, not demoed.',
+  },
 }
 
 export const viewport: Viewport = { themeColor: '#F0EEE9', colorScheme: 'light' }
