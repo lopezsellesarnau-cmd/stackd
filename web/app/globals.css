@@ -9,14 +9,17 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-bg text-fg;
+    /* Hueso/tinta de la estética "ficha técnica" (no el crema editorial). */
+    background: #f0eee9;
+    color: #111111;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
   ::selection {
     background: rgba(193, 102, 61, 0.25);
   }
   :focus-visible {
-    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg;
+    outline: none;
+    box-shadow: 0 0 0 2px #f0eee9, 0 0 0 4px #111111;
   }
 }
 
@@ -83,6 +86,60 @@
   animation: marquee 22s linear infinite;
 }
 
+/* ── Estética "ficha técnica" ──────────────────────────────────────────── */
+
+/* Trama diagonal muy tenue de fondo: profundidad sin sombras. Los paneles van
+   en hueso sólido para recortarse encima. */
+.ficha-grain {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(17, 17, 17, 0.03) 0 1px,
+    transparent 1px 7px
+  );
+}
+
+/* Botones rectos, mono, versalitas. El ghost invierte a sólido en hover. */
+.btn-solid,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.4rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-solid {
+  background: #111111;
+  color: #f0eee9;
+}
+.btn-solid:hover {
+  opacity: 0.82;
+}
+.btn-ghost {
+  border: 1px solid rgba(17, 17, 17, 0.3);
+  color: #111111;
+}
+.btn-ghost:hover {
+  background: #111111;
+  border-color: #111111;
+  color: #f0eee9;
+}
+
+/* Barra de ticks que se rellena al entrar en viewport (.ficha-live). */
+@keyframes tick-fill {
+  from { transform: scaleX(0); }
+}
+.tick-fill {
+  transform-origin: left;
+}
+.ficha-live .tick-fill {
+  animation: tick-fill 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-up, .float-slow, .pulse-dot, .type-caret, .marquee-track { animation: none; }
+  .ficha-live .tick-fill { animation: none; }
 }

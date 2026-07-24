@@ -52,6 +52,11 @@ const config: Config = {
         // Inter Variable permite pesos intermedios; Linear usa 510 en display.
         display: '510',
       },
+      fontFamily: {
+        // IBM Plex Mono la carga app/layout.tsx y la expone como --font-mono.
+        // Es el lenguaje de etiquetado de la estética "ficha técnica".
+        mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
       backgroundImage: {
         glow: 'radial-gradient(70% 60% at 50% -10%, rgba(193,102,61,0.16) 0%, rgba(245,241,232,0) 70%)',
       },

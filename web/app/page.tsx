@@ -3,6 +3,8 @@ import {
   Hero,
   Services,
   WorksGrid,
+  Agents,
+  Pipeline,
   TrackRecord,
   TechStack,
   Faq,
@@ -12,18 +14,20 @@ import {
 
 export default function Page() {
   return (
-    <>
+    <div className="ficha-grain min-h-screen">
       <Nav />
       <main id="contenido">
         <Hero />
         <Services />
         <WorksGrid />
+        <Agents />
+        <Pipeline />
         <TrackRecord />
         <TechStack />
         <Faq />
         <Contact />
       </main>
       <Footer />
-    </>
+    </div>
   )
 }
