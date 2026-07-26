@@ -141,10 +141,10 @@ const NIVELES = [
 type Pieza = { y: number; tipo: [string, string]; hace: [string, string]; salida: [string, string]; tono: Tono; vol: number }
 // Cada texto va [es, en]; `tx` de abajo elige.
 const PIEZAS: Pieza[] = [
-  { y: 150, tipo: ['ANUNCIO', 'AD'], hace: ['12 variantes · A/B', '12 variants · A/B'], salida: ['PUBLICA SOLO', 'AUTO-PUBLISHED'], tono: 'auto', vol: 6 },
-  { y: 250, tipo: ['EMAIL', 'EMAIL'], hace: ['segmenta · 4 listas', 'segments · 4 lists'], salida: ['ENVÍA SOLO', 'AUTO-SENT'], tono: 'auto', vol: 5 },
-  { y: 350, tipo: ['POST SOCIAL', 'SOCIAL POST'], hace: ['genera · espera ok', 'drafts · waits for ok'], salida: ['APROBACIÓN', 'NEEDS APPROVAL'], tono: 'aprob', vol: 4 },
-  { y: 440, tipo: ['LANDING', 'LANDING'], hace: ['solo el brief', 'brief only'], salida: ['A UNA PERSONA', 'TO A PERSON'], tono: 'humano', vol: 1 },
+  { y: 150, tipo: ['STAGING VIRTUAL', 'VIRTUAL STAGING'], hace: ['3 estancias · misma foto', '3 rooms · same photo'], salida: ['PUBLICA SOLO', 'AUTO-PUBLISHED'], tono: 'auto', vol: 6 },
+  { y: 250, tipo: ['CLIP DE VÍDEO', 'VIDEO CLIP'], hace: ['vertical · 8s', 'vertical · 8s'], salida: ['PUBLICA SOLO', 'AUTO-PUBLISHED'], tono: 'auto', vol: 5 },
+  { y: 350, tipo: ['DESCRIPCIÓN', 'DESCRIPTION'], hace: ['redacta · espera ok', 'drafts · waits for ok'], salida: ['APROBACIÓN', 'NEEDS APPROVAL'], tono: 'aprob', vol: 4 },
+  { y: 440, tipo: ['PRECIO', 'PRICE'], hace: ['solo la sugerencia', 'suggestion only'], salida: ['A UNA PERSONA', 'TO A PERSON'], tono: 'humano', vol: 1 },
 ]
 
 const LEYENDA: { tono: Tono; t: [string, string] }[] = [
@@ -166,14 +166,14 @@ function ArbolMovil({ en }: { en: boolean }) {
       </p>
       <p className="mt-1 flex items-center gap-2 font-mono text-[12px] text-[#111]">
         <span className="h-[7px] w-[7px] shrink-0 bg-[#111]" aria-hidden />
-        {en ? 'CLIENT BRIEF' : 'BRIEF DEL CLIENTE'}
+        {en ? 'PHOTOS UPLOADED' : 'FOTOS SUBIDAS'}
       </p>
-      <p className="ml-[15px] font-mono text-[10px] text-[rgba(17,17,17,0.45)]">Nordic Coffee · Q3</p>
+      <p className="ml-[15px] font-mono text-[10px] text-[rgba(17,17,17,0.45)]">Carrer de Mallorca 42, 3-1</p>
 
       <div className="ml-[3px] flex items-center gap-2 py-1.5">
         <span className="h-6 w-px bg-[rgba(17,17,17,0.3)]" aria-hidden />
         <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[rgba(17,17,17,0.45)]">
-          {en ? 'Brand assets ok' : 'Contexto de marca ok'}
+          {en ? 'Photo quality ok' : 'Calidad de foto ok'}
         </span>
       </div>
 
@@ -211,10 +211,10 @@ export function AgencyTree({ en }: { en: boolean }) {
         style={{ borderColor: 'rgba(17,17,17,0.22)' }}
       >
         <span>{en ? 'Content pipeline' : 'Ruta de una pieza'}</span>
-        <span className="hidden sm:inline">{en ? 'Marketing agency' : 'Agencia de marketing'}</span>
+        <span className="hidden sm:inline">{en ? 'Real estate agency' : 'Agencia inmobiliaria'}</span>
         <span className="flex items-center gap-2">
           <span className="h-1 w-1 rounded-full" style={{ backgroundColor: TERRA }} aria-hidden />
-          16 {en ? 'pieces / week' : 'piezas / semana'}
+          16 {en ? 'listings / week' : 'propiedades / semana'}
         </span>
       </div>
 
@@ -225,7 +225,7 @@ export function AgencyTree({ en }: { en: boolean }) {
           viewBox="0 0 1000 500"
           className="w-full min-w-[860px]"
           role="img"
-          aria-label="Ruta de una pieza de contenido: qué publica el agente solo, qué pide aprobación y qué va a una persona"
+          aria-label="Ruta de una propiedad: qué publica el agente solo, qué pide aprobación y qué va a una persona"
         >
           {/* Cabecera de niveles */}
           <g aria-hidden>
@@ -260,8 +260,8 @@ export function AgencyTree({ en }: { en: boolean }) {
           <Rama d={elbow(63, 250, 164, 250)} />
           {/* Rama descartada: falta contexto */}
           <Rama d={elbow(240, 250, 349, 70)} tono="humano" />
-          <Nodo x={360} y={70} label={en ? 'ASKS FOR DATA' : 'PIDE DATOS'} sub={en ? 'from the client' : 'al cliente'} tono="humano" />
-          <Arista x={349} y={70} label={en ? 'MISSING CONTEXT' : 'FALTA CONTEXTO'} dim />
+          <Nodo x={360} y={70} label={en ? 'ASKS FOR PHOTOS' : 'PIDE MÁS FOTOS'} sub={en ? 'from the agent' : 'al agente inmobiliario'} tono="humano" />
+          <Arista x={349} y={70} label={en ? 'LOW QUALITY' : 'BAJA CALIDAD'} dim />
 
           {/* Del contexto a cada tipo de pieza */}
           {PIEZAS.map((p) => (
@@ -274,8 +274,8 @@ export function AgencyTree({ en }: { en: boolean }) {
           ))}
 
           {/* Nodos */}
-          <Nodo x={20} y={250} label="BRIEF" sub="Nordic Coffee · Q3" />
-          <Nodo x={175} y={250} label={en ? 'CONTEXT' : 'CONTEXTO'} sub={en ? 'tone + history' : 'tono + histórico'} />
+          <Nodo x={20} y={250} label="PHOTOS" sub="Mallorca 42, 3-1" />
+          <Nodo x={175} y={250} label={en ? 'ANALYSIS' : 'ANÁLISIS'} sub={en ? 'rooms + light' : 'estancias + luz'} />
           <Arista x={164} y={250} label={en ? 'ARRIVES' : 'ENTRA'} />
 
           {PIEZAS.map((p) => (

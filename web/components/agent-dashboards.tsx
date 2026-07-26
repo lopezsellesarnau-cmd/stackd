@@ -132,48 +132,48 @@ function Tabla({ cols, children }: { cols: string; children: React.ReactNode }) 
   return <div>{children}</div>
 }
 
-// ── 1. Agente de campañas ───────────────────────────────────────────────
+// ── 1. Agente de contenido (staging + vídeo) ────────────────────────────
 
 function CampanasDash({ en }: { en: boolean }) {
   const filas = [
-    { canal: 'Google Ads', variantes: 12, rend: 78, estado: 'auto', ctr: '2.9%' },
-    { canal: 'Meta', variantes: 9, rend: 64, estado: 'auto', ctr: '2.1%' },
-    { canal: 'LinkedIn', variantes: 8, rend: 41, estado: 'aprob', ctr: '1.4%' },
-    { canal: 'TikTok', variantes: 5, rend: 22, estado: 'humano', ctr: '0.8%' },
+    { canal: 'Carrer de Mallorca 42', variantes: 3, rend: 92, estado: 'auto', ctr: '8s' },
+    { canal: 'Passeig de Gràcia 10', variantes: 3, rend: 85, estado: 'auto', ctr: '8s' },
+    { canal: 'Rambla Catalunya 55', variantes: 3, rend: 64, estado: 'aprob', ctr: '6s' },
+    { canal: 'Carrer Balmes 210', variantes: 2, rend: 30, estado: 'humano', ctr: '—' },
   ]
   const chip = (e: string) =>
     e === 'auto'
-      ? { l: en ? 'Auto-published' : 'Publica solo', c: OKG }
+      ? { l: en ? 'Ready to post' : 'Listo para publicar', c: OKG }
       : e === 'aprob'
         ? { l: en ? 'Needs approval' : 'Pide aprobación', c: TERRA }
         : { l: en ? 'To a human' : 'A una persona', c: 'rgba(17,17,17,0.45)' }
 
   return (
     <Dash
-      titulo="Campaign agent"
+      titulo="Content engine"
       en={en}
-      contexto={en ? 'Client · Nordic Coffee Co.' : 'Cliente · Nordic Coffee Co.'}
+      contexto={en ? 'Client · Aura Real Estate' : 'Cliente · Aura Real Estate'}
       metricas={
         <>
-          <Metric k={en ? 'Drafts' : 'Borradores'} v="34" sub={en ? 'this week' : 'esta semana'} />
-          <Metric k={en ? 'Approved' : 'Aprobados'} v="21" sub="62%" accent={OKG} />
-          <Metric k={en ? 'In queue' : 'En cola'} v="8" sub={en ? 'awaiting client' : 'esperan cliente'} accent={TERRA} />
-          <Metric k="CTR" v="2.4%" sub={en ? '+0.6 vs manual' : '+0,6 vs manual'} />
+          <Metric k={en ? 'Listings' : 'Propiedades'} v="34" sub={en ? 'this week' : 'esta semana'} />
+          <Metric k={en ? 'Staged' : 'Con staging'} v="21" sub="62%" accent={OKG} />
+          <Metric k={en ? 'In queue' : 'En cola'} v="8" sub={en ? 'awaiting photos' : 'esperan fotos'} accent={TERRA} />
+          <Metric k={en ? 'Turnaround' : 'Tiempo medio'} v="14m" sub={en ? 'photo → video' : 'foto → vídeo'} />
         </>
       }
       feed={[
-        { t: en ? 'Decision' : 'Decisión', texto: <>{en ? 'TikTok goes to a person: brand tone doesn\'t have enough approved examples yet.' : 'TikTok se manda a una persona: el tono de marca aún no tiene suficientes ejemplos aprobados.'}</> },
-        { t: en ? 'Generated' : 'Generado', texto: <>{en ? '12 Google Ads variants from the brief and the best-converting history.' : '12 variantes para Google Ads a partir del brief y del histórico que mejor convirtió.'}</> },
-        { t: en ? 'Blocked' : 'Bloqueado', texto: <>{en ? 'One variant dropped on its own: it mentioned a discount that already expired.' : 'Una variante descartada sola: mencionaba un descuento que ya caducó.'}</> },
+        { t: en ? 'Decision' : 'Decisión', texto: <>{en ? 'Carrer Balmes 210 goes to a person: photos are too dark to stage reliably.' : 'Carrer Balmes 210 se manda a una persona: las fotos están demasiado oscuras para un staging fiable.'}</> },
+        { t: en ? 'Generated' : 'Generado', texto: <>{en ? '3 staged rooms and a vertical video clip from the raw photos, in 14 minutes.' : '3 estancias con staging y un clip de vídeo vertical a partir de las fotos originales, en 14 minutos.'}</> },
+        { t: en ? 'Blocked' : 'Bloqueado', texto: <>{en ? 'One staged image dropped on its own: the furniture scale didn\'t match the room.' : 'Una imagen de staging descartada sola: la escala del mueble no encajaba con la habitación.'}</> },
       ]}
     >
       <div
         className="hidden grid-cols-[1fr_58px_92px_130px] gap-3 border-b px-4 py-2 font-mono text-[8.5px] uppercase tracking-[0.12em] text-[rgba(17,17,17,0.42)] md:grid"
         style={{ borderColor: HAIR }}
       >
-        <span>{en ? 'Channel' : 'Canal'}</span>
-        <span>{en ? 'Variants' : 'Variantes'}</span>
-        <span>{en ? 'Performance' : 'Rendimiento'}</span>
+        <span>{en ? 'Listing' : 'Propiedad'}</span>
+        <span>{en ? 'Assets' : 'Piezas'}</span>
+        <span>{en ? 'Progress' : 'Progreso'}</span>
         <span>{en ? 'Status' : 'Estado'}</span>
       </div>
       {filas.map((f) => {
@@ -206,15 +206,15 @@ function CampanasDash({ en }: { en: boolean }) {
 
 function CaptacionDash({ en }: { en: boolean }) {
   const filas = [
-    { id: 'L-2291', fuente: 'Formulario web', score: 92, estado: 'reunion' },
-    { id: 'L-2292', fuente: 'LinkedIn', score: 74, estado: 'nutrir' },
-    { id: 'L-2293', fuente: 'Formulario web', score: 38, estado: 'descarta' },
-    { id: 'L-2294', fuente: 'Referido', score: 88, estado: 'reunion' },
-    { id: 'L-2295', fuente: 'Anuncio', score: 51, estado: 'nutrir' },
+    { id: 'L-2291', fuente: en ? 'Portal · Idealista' : 'Portal · Idealista', score: 92, estado: 'reunion' },
+    { id: 'L-2292', fuente: 'WhatsApp', score: 74, estado: 'nutrir' },
+    { id: 'L-2293', fuente: en ? 'Portal · Idealista' : 'Portal · Idealista', score: 38, estado: 'descarta' },
+    { id: 'L-2294', fuente: en ? 'Referral' : 'Referido', score: 88, estado: 'reunion' },
+    { id: 'L-2295', fuente: en ? 'Agency site' : 'Web de la agencia', score: 51, estado: 'nutrir' },
   ]
   const chip = (e: string) =>
     e === 'reunion'
-      ? { l: en ? 'Meeting booked' : 'Reunión agendada', c: OKG }
+      ? { l: en ? 'Viewing booked' : 'Visita agendada', c: OKG }
       : e === 'nutrir'
         ? { l: en ? 'Nurture' : 'Nutrir', c: TERRA }
         : { l: en ? 'Discarded' : 'Descartado', c: 'rgba(17,17,17,0.45)' }
@@ -229,13 +229,13 @@ function CaptacionDash({ en }: { en: boolean }) {
           <Metric k={en ? 'Inbound' : 'Entrantes'} v="128" sub={en ? 'this week' : 'esta semana'} />
           <Metric k={en ? 'Qualified' : 'Cualificados'} v="41" sub="32%" accent={OKG} />
           <Metric k={en ? 'Discarded' : 'Descartados'} v="71" sub={en ? 'with reason' : 'con motivo'} />
-          <Metric k={en ? 'Meetings' : 'Reuniones'} v="16" sub={en ? 'no human touch' : 'sin tocar nadie'} accent={TERRA} />
+          <Metric k={en ? 'Viewings' : 'Visitas'} v="16" sub={en ? 'no human touch' : 'sin tocar nadie'} accent={TERRA} />
         </>
       }
       feed={[
-        { t: en ? 'Scored' : 'Puntuado', texto: <>{en ? 'L-2291 at 92: size, sector and stated budget all fit.' : 'L-2291 a 92: encaja tamaño, sector y presupuesto declarado.'}</> },
-        { t: en ? 'Discarded' : 'Descartado', texto: <>{en ? 'L-2293 at 38: a vendor trying to sell to you, not a client.' : 'L-2293 a 38: es un proveedor buscando venderte, no un cliente.'}</> },
-        { t: en ? 'Booked' : 'Agendado', texto: <>{en ? 'Meeting proposed and confirmed by email, with nobody stepping in.' : 'Reunión propuesta y confirmada por email, sin que nadie interviniera.'}</> },
+        { t: en ? 'Scored' : 'Puntuado', texto: <>{en ? 'L-2291 at 92: budget, financing and timeline all confirmed.' : 'L-2291 a 92: presupuesto, financiación y plazo confirmados.'}</> },
+        { t: en ? 'Discarded' : 'Descartado', texto: <>{en ? 'L-2293 at 38: a broker fishing for listings, not a buyer.' : 'L-2293 a 38: es un intermediario buscando propiedades, no un comprador.'}</> },
+        { t: en ? 'Booked' : 'Agendado', texto: <>{en ? 'Viewing proposed and confirmed over WhatsApp, with nobody stepping in.' : 'Visita propuesta y confirmada por WhatsApp, sin que nadie interviniera.'}</> },
       ]}
     >
       <div
@@ -360,30 +360,30 @@ function BandejaDash({ en }: { en: boolean }) {
     { t: en ? 'Inbox' : 'Bandeja', on: true },
     { t: en ? 'At risk' : 'En riesgo', on: false },
   ]
-  const carpetas = [en ? 'Nordic Coffee' : 'Nordic Coffee', 'Lumen Studio', 'Atico36']
+  const carpetas = [en ? 'Aura Real Estate' : 'Aura Real Estate', 'Costa Homes', 'Atico36']
 
   const items = [
     {
       ini: 'AG',
       quien: en ? 'Agent' : 'Agente',
-      accion: en ? 'flagged a campaign' : 'marcó una campaña',
-      donde: 'Nordic Coffee · Q3',
+      accion: en ? 'flagged a listing' : 'marcó una propiedad',
+      donde: 'Aura Real Estate · Mallorca 42',
       cuando: en ? '30 min ago' : 'hace 30 min',
-      cambio: ['ACTIVA', 'PAUSADA'] as [string, string],
+      cambio: ['ACTIVE', 'PRICE REVIEW'] as [string, string],
       cuerpo: en
-        ? 'CPA rose 38% in 48h. Paused on its own and left the reasoning attached.'
-        : 'El CPA subió un 38 % en 48 h. La pausó sola y dejó el razonamiento adjunto.',
+        ? '38 days on market, no viewings booked in 2 weeks. Flagged on its own and left the reasoning attached.'
+        : '38 días en el mercado, sin visitas agendadas en 2 semanas. La marcó sola y dejó el razonamiento adjunto.',
     },
     {
       ini: 'AG',
       quien: en ? 'Agent' : 'Agente',
-      accion: en ? 'drafted 12 variants' : 'redactó 12 variantes',
-      donde: 'Lumen Studio',
+      accion: en ? 'staged 3 rooms' : 'hizo staging de 3 estancias',
+      donde: 'Costa Homes',
       cuando: en ? '2h ago' : 'hace 2 h',
       cambio: null,
       cuerpo: en
-        ? 'Ready for review. Two dropped on their own for mentioning an expired offer.'
-        : 'Listas para revisar. Dos descartadas solas por mencionar una oferta caducada.',
+        ? 'Ready for review. One image dropped on its own for a furniture-scale mismatch.'
+        : 'Listas para revisar. Una imagen descartada sola por un desajuste de escala del mueble.',
     },
     {
       ini: 'MV',
@@ -392,7 +392,7 @@ function BandejaDash({ en }: { en: boolean }) {
       donde: 'Atico36',
       cuando: en ? 'Yesterday' : 'Ayer',
       cambio: null,
-      cuerpo: en ? 'Scheduled for Monday 09:00.' : 'Programado para el lunes a las 09:00.',
+      cuerpo: en ? 'Scheduled to post Monday 09:00.' : 'Programado para publicar el lunes a las 09:00.',
     },
   ]
 
@@ -513,8 +513,8 @@ function BandejaDash({ en }: { en: boolean }) {
             </p>
             <p className="mt-1.5 font-mono text-[10px] leading-relaxed text-[rgba(17,17,17,0.65)]">
               {en
-                ? 'Nordic Coffee has burned 68% of the month in 11 days. Want me to rebalance?'
-                : 'Nordic Coffee lleva gastado el 68 % del mes en 11 días. ¿Reequilibro?'}
+                ? 'Mallorca 42 has had 3 viewings but no offers in 2 weeks. Want me to suggest a price review?'
+                : 'Mallorca 42 lleva 3 visitas pero ninguna oferta en 2 semanas. ¿Sugiero revisar el precio?'}
             </p>
             <div className="mt-2.5 flex gap-px">
               {[en ? 'Yes' : 'Sí', en ? 'Show me' : 'Enséñame'].map((b, i) => (
@@ -537,8 +537,8 @@ function BandejaDash({ en }: { en: boolean }) {
             {en ? 'Activity' : 'Actividad'}
           </p>
           {[
-            [en ? 'Budget check via agent' : 'Revisión de gasto', '30 min'],
-            [en ? 'New variants drafted' : 'Nuevas variantes', '2 h'],
+            [en ? 'Price review via agent' : 'Revisión de precio', '30 min'],
+            [en ? 'New rooms staged' : 'Nuevo staging', '2 h'],
           ].map(([t, w]) => (
             <p key={t} className="mt-1.5 flex items-baseline justify-between gap-3">
               <span className="font-mono text-[10px] text-[rgba(17,17,17,0.6)]">{t}</span>
@@ -556,7 +556,7 @@ function BandejaDash({ en }: { en: boolean }) {
 // ── Sección con selector ────────────────────────────────────────────────
 
 const AGENTES = [
-  { id: 'campanas', en: 'Campaigns', es: 'Campañas', C: CampanasDash },
+  { id: 'campanas', en: 'Content', es: 'Contenido', C: CampanasDash },
   { id: 'captacion', en: 'Leads', es: 'Captación', C: CaptacionDash },
   { id: 'soporte', en: 'Support', es: 'Soporte', C: SoporteDash },
   { id: 'bandeja', en: 'Workspace', es: 'Espacio', C: BandejaDash },
