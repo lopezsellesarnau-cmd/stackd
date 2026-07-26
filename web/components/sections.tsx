@@ -253,10 +253,9 @@ export function Services() {
 // ── Works ──────────────────────────────────────────────────────────────────
 
 const WORK_META: Record<string, { nombre: string; tag: string; status: string }> = {
-  volea: { nombre: 'Volea', tag: 'Booking SaaS', status: 'live' },
   blockflow: { nombre: 'BlockFlow', tag: 'AI voice agent', status: 'live' },
-  recruiting: { nombre: 'Screening', tag: 'Screening agent', status: 'build' },
-  marketing: { nombre: 'Campaign', tag: 'Campaign agent', status: 'build' },
+  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live' },
+  leadagent: { nombre: 'Lead Agent', tag: 'Instant lead response', status: 'build' },
 }
 
 function StatusChip({ status, en }: { status: string; en: boolean }) {

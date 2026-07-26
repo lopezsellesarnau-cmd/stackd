@@ -22,58 +22,6 @@ function BrowserChrome({ url, children }: { url: string; children: React.ReactNo
   )
 }
 
-/** Schematic padel court — regulation markings (service boxes + the mid net line), line art. */
-function PadelCourtIllustration() {
-  return (
-    <svg viewBox="0 0 220 120" className="h-auto w-full max-w-[300px]" aria-hidden>
-      <rect x="4" y="4" width="212" height="112" rx="3" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="2" />
-      {/* net */}
-      <line x1="110" y1="4" x2="110" y2="116" stroke="rgba(255,255,255,0.28)" strokeWidth="2" strokeDasharray="3 3" />
-      {/* service lines */}
-      <line x1="40" y1="4" x2="40" y2="116" stroke="rgba(255,255,255,0.16)" strokeWidth="1.5" />
-      <line x1="180" y1="4" x2="180" y2="116" stroke="rgba(255,255,255,0.16)" strokeWidth="1.5" />
-      <line x1="40" y1="60" x2="180" y2="60" stroke="rgba(255,255,255,0.16)" strokeWidth="1.5" />
-      {/* highlighted service box (court 2, booked slot) */}
-      <rect x="110" y="4" width="70" height="56" fill="rgba(193,102,61,0.16)" stroke="rgba(193,102,61,0.5)" strokeWidth="1.5" />
-      {/* players */}
-      <circle cx="70" cy="30" r="4" fill="rgba(255,255,255,0.35)" />
-      <circle cx="70" cy="90" r="4" fill="rgba(255,255,255,0.35)" />
-      <circle cx="150" cy="30" r="4" fill="#C1663D" />
-      <circle cx="150" cy="90" r="4" fill="#C1663D" />
-    </svg>
-  )
-}
-
-function VoleaPreview() {
-  const slots = ['17:00', '17:30', '18:00']
-  return (
-    <div className="flex w-full max-w-[300px] flex-col items-center gap-4">
-      <PadelCourtIllustration />
-      <div className="w-full">
-        <p className="text-[12px] font-medium text-fg-muted">Court 2 · Padel Club Barcelona</p>
-        <div className="mt-2.5 grid grid-cols-3 gap-1.5">
-          {slots.map((s, i) => (
-            <div
-              key={s}
-              className={`rounded-md border py-1.5 text-center text-[10.5px] ${
-                i === 1
-                  ? 'border-accent/50 bg-accent-soft text-accent-hover'
-                  : 'border-[rgba(255,255,255,0.08)] text-fg-faint'
-              }`}
-            >
-              {s}
-            </div>
-          ))}
-        </div>
-        <div className="mt-2.5 flex items-center justify-between rounded-md bg-white/[0.04] px-3 py-2">
-          <span className="text-[11px] text-fg-dim">17:30 · Court 2</span>
-          <span className="text-[11px] font-medium text-risk-minimo">Book — £14</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 /** Animated voice waveform — CSS-only bar heights, ties into "call in progress". */
 function Waveform() {
   const bars = [6, 14, 9, 20, 12, 24, 10, 17, 7, 15, 22, 9, 13, 19, 8]
@@ -121,91 +69,74 @@ function BlockFlowPreview() {
 }
 
 /**
- * Candidate screening agent — recruiters/talent agencies. Funnel of stage
- * counts + a single spotlighted top match, instead of a flat list (that's
- * the marketing preview's shape) — different read at a glance: volume +
- * best result, not "here are 3 rows".
+ * Content engine — real estate listings. A 3-step pipeline (photo → virtual
+ * staging → video clip, last step still rendering) reads as "in progress",
+ * distinct shape from the finished-result card underneath.
  */
-function RecruitingPreview() {
-  const stages = [
-    { label: 'Applied', n: 47 },
-    { label: 'Screened', n: 18 },
-    { label: 'Interview', n: 5 },
+function StagingPreview() {
+  const steps = [
+    { label: 'Photo uploaded', done: true },
+    { label: 'Virtual staging', done: true },
+    { label: 'Video clip', done: false },
   ]
   return (
     <div className="w-full max-w-[300px]">
       <div className="flex items-center gap-2">
         <span className="h-1.5 w-1.5 rounded-full bg-risk-minimo pulse-dot" />
-        <p className="text-[12px] font-medium text-fg-muted">Screening agent</p>
+        <p className="text-[12px] font-medium text-fg-muted">Content engine</p>
       </div>
 
-      <div className="mt-3.5 flex items-center gap-1.5">
-        {stages.map((s, i) => (
-          <div key={s.label} className="flex flex-1 items-center gap-1.5">
-            <div className="min-w-0 flex-1 rounded-md bg-white/[0.04] px-2.5 py-2 text-center">
-              <p className="font-display text-[18px] leading-none text-fg-muted">{s.n}</p>
-              <p className="mt-1 truncate text-[9px] uppercase tracking-[0.06em] text-fg-faint">{s.label}</p>
-            </div>
-            {i < stages.length - 1 && <span className="shrink-0 text-fg-faint">→</span>}
+      <div className="mt-3.5 space-y-1.5">
+        {steps.map((s) => (
+          <div key={s.label} className="flex items-center justify-between rounded-md bg-white/[0.04] px-3 py-2">
+            <span className="text-[11px] text-fg-dim">{s.label}</span>
+            <span className={`text-[10.5px] ${s.done ? 'text-risk-minimo' : 'text-fg-faint'}`}>
+              {s.done ? '✓' : 'Rendering…'}
+            </span>
           </div>
         ))}
       </div>
 
       <div className="mt-2.5 rounded-md border border-accent/25 bg-accent-soft px-3 py-2.5">
-        <div className="flex items-center justify-between">
-          <p className="text-[11.5px] font-medium text-fg-muted">M. Fernández — Backend Eng.</p>
-          <span className="text-[11px] font-medium text-risk-minimo">92% match</span>
-        </div>
-        <p className="mt-0.5 text-[10px] text-fg-faint">Top candidate this week · flagged for interview</p>
+        <p className="text-[11.5px] font-medium text-fg-muted">Carrer de Mallorca 42, 3-1</p>
+        <p className="mt-0.5 text-[10px] text-fg-faint">Ready to post · vertical, 8s</p>
       </div>
     </div>
   )
 }
 
 /**
- * Campaign copy agent — marketing agencies. Compact per-channel status
- * grid instead of a list — reads as a dashboard tile, distinct shape from
- * the recruiting funnel above.
+ * Lead response agent — estate agencies. WhatsApp-thread shape: an inbound
+ * enquiry, a qualifying status, then a booked-viewing card — reads as a
+ * live conversation, distinct from the pipeline shape above.
  */
-function MarketingPreview() {
-  const channels = [
-    { name: 'Instagram', status: 'Scheduled', dot: 'bg-risk-minimo' },
-    { name: 'Google Ads', status: 'Approved', dot: 'bg-accent' },
-    { name: 'LinkedIn', status: 'Draft', dot: 'bg-fg-faint' },
-  ]
+function LeadAgentPreview() {
   return (
     <div className="w-full max-w-[300px]">
       <div className="flex items-center gap-2">
         <span className="h-1.5 w-1.5 rounded-full bg-risk-minimo pulse-dot" />
-        <p className="text-[12px] font-medium text-fg-muted">Content agent</p>
+        <p className="text-[12px] font-medium text-fg-muted">Lead agent — WhatsApp</p>
       </div>
 
-      <div className="mt-3.5 grid grid-cols-3 gap-1.5">
-        {channels.map((c) => (
-          <div key={c.name} className="rounded-md bg-white/[0.04] px-2 py-2.5 text-center">
-            <span className={`mx-auto block h-1.5 w-1.5 rounded-full ${c.dot}`} aria-hidden />
-            <p className="mt-1.5 truncate text-[10px] text-fg-dim">{c.name}</p>
-            <p className="mt-0.5 truncate text-[9px] text-fg-faint">{c.status}</p>
-          </div>
-        ))}
+      <div className="mt-3.5 rounded-md bg-white/[0.04] px-3 py-2.5">
+        <p className="text-[11px] text-fg-dim">&ldquo;Is Carrer de Mallorca 42 still available?&rdquo;</p>
       </div>
 
-      <div className="mt-2.5 rounded-md bg-white/[0.04] px-3 py-2.5">
-        <p className="text-[11px] text-fg-dim">&ldquo;Stop guessing your ad spend.&rdquo;</p>
-        <p className="mt-0.5 text-[10px] text-fg-faint">Instagram · draft #4, awaiting client approval</p>
+      <div className="mt-1.5 flex items-center justify-between rounded-md bg-white/[0.04] px-3 py-2">
+        <span className="text-[11px] text-fg-faint">Qualifying budget &amp; financing…</span>
+      </div>
+
+      <div className="mt-2.5 rounded-md border border-accent/25 bg-accent-soft px-3 py-2.5">
+        <div className="flex items-center justify-between">
+          <p className="text-[11.5px] font-medium text-fg-muted">Viewing booked</p>
+          <span className="text-[11px] font-medium text-risk-minimo">Thu · 17:30</span>
+        </div>
       </div>
     </div>
   )
 }
 
 export const TILES = {
-  volea: {
-    url: 'volea.app',
-    preview: <VoleaPreview />,
-    title: 'Volea',
-    tag: 'Booking SaaS',
-    d: 'Real-time availability and payments for padel clubs.',
-  },
   blockflow: {
     url: 'app.blockflow.co.uk',
     preview: <BlockFlowPreview />,
@@ -213,19 +144,19 @@ export const TILES = {
     tag: 'Property management',
     d: 'AI voice agent handling emergency calls, live.',
   },
-  recruiting: {
-    url: 'app.talent-screen.io',
-    preview: <RecruitingPreview />,
-    title: 'Screening Agent',
-    tag: 'Recruiting',
-    d: 'AI agent that scores and triages inbound applicants automatically.',
+  staging: {
+    url: 'app.stackd.codes/staging',
+    preview: <StagingPreview />,
+    title: 'Content Engine',
+    tag: 'Real estate listings',
+    d: 'Upload photos, get virtual staging and a video clip ready to post, same day.',
   },
-  marketing: {
-    url: 'app.campaign-agent.io',
-    preview: <MarketingPreview />,
-    title: 'Campaign Agent',
-    tag: 'Marketing agencies',
-    d: 'Drafts, tests and queues ad copy across channels — client reviews, agent executes.',
+  leadagent: {
+    url: 'app.stackd.codes/leads',
+    preview: <LeadAgentPreview />,
+    title: 'Lead Agent',
+    tag: 'Estate agencies',
+    d: 'Answers portal enquiries in seconds, qualifies budget and books the viewing.',
   },
 } as const
 

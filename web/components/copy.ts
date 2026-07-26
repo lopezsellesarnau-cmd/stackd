@@ -8,40 +8,35 @@ export const COPY = {
   en: {
     nav: { work: 'Work', services: 'Services', contact: 'Contact' },
     hero: {
-      body: 'We design and build AI software that ships to production — automations, agents and full products for businesses who are tired of slide decks.',
+      body: 'We build AI systems for real estate agencies — instant lead response, virtual staging and video for every listing, generated in minutes, not days.',
       studio: '[ Studio ]',
       location: '[ Barcelona ]',
     },
     services: {
       eyebrow: 'Here is how we help',
       items: [
-        { t: 'Automation', tags: ['Process design', 'Ops workflows', 'Integrations'] },
-        { t: 'AI Agents', tags: ['Voice & chat', 'Custom LLM pipelines', 'Live systems'] },
-        { t: 'Product', tags: ['Full-stack SaaS', 'Design systems', '0 to production'] },
+        { t: 'Lead Response', tags: ['WhatsApp & calls', 'Instant qualification', 'Viewings booked'] },
+        { t: 'Content Engine', tags: ['Virtual staging', 'AI video clips', 'Ready for social'] },
+        { t: 'Growth Retainer', tags: ['Ongoing listings', 'Monthly pipeline', 'One point of contact'] },
       ],
     },
     works: {
       marquee: 'Works',
       rows: [
         {
-          which: 'volea' as const,
-          index: '01',
-          caption: 'A real-time booking flow for padel clubs — availability, payments and confirmations, live.',
-        },
-        {
           which: 'blockflow' as const,
-          index: '02',
+          index: '01',
           caption: 'An AI voice agent for property managers: it answers, triages and creates the ticket, unattended.',
         },
         {
-          which: 'recruiting' as const,
-          index: '03',
-          caption: 'A screening agent for recruiters: scores and triages inbound applicants before a human looks at them.',
+          which: 'staging' as const,
+          index: '02',
+          caption: 'A content engine for listings: upload photos, get virtual staging, a short vertical video clip and copy, same day.',
         },
         {
-          which: 'marketing' as const,
-          index: '04',
-          caption: 'A campaign agent for marketing agencies: drafts and queues ad copy across channels, client just approves.',
+          which: 'leadagent' as const,
+          index: '03',
+          caption: 'An agent that answers portal enquiries in seconds, qualifies budget and books the viewing.',
         },
       ],
     },
@@ -94,40 +89,35 @@ export const COPY = {
   es: {
     nav: { work: 'Trabajo', services: 'Servicios', contact: 'Contacto' },
     hero: {
-      body: 'Diseñamos y construimos software de IA que llega a producción — automatizaciones, agentes y productos completos para negocios cansados de presentaciones que no se usan.',
+      body: 'Construimos sistemas de IA para agencias inmobiliarias — respuesta instantánea a leads, staging virtual y vídeo para cada propiedad, generados en minutos, no en días.',
       studio: '[ Estudio ]',
       location: '[ Barcelona ]',
     },
     services: {
       eyebrow: 'Así ayudamos',
       items: [
-        { t: 'Automatización', tags: ['Diseño de procesos', 'Flujos operativos', 'Integraciones'] },
-        { t: 'Agentes IA', tags: ['Voz y chat', 'Pipelines LLM a medida', 'Sistemas en producción'] },
-        { t: 'Producto', tags: ['SaaS full-stack', 'Sistemas de diseño', 'De 0 a producción'] },
+        { t: 'Lead Response', tags: ['WhatsApp y llamadas', 'Cualificación instantánea', 'Visitas agendadas'] },
+        { t: 'Content Engine', tags: ['Staging virtual', 'Clips de vídeo IA', 'Listo para redes'] },
+        { t: 'Growth Retainer', tags: ['Propiedades continuas', 'Pipeline mensual', 'Un único contacto'] },
       ],
     },
     works: {
       marquee: 'Trabajo',
       rows: [
         {
-          which: 'volea' as const,
-          index: '01',
-          caption: 'Reservas en tiempo real para clubes de pádel — disponibilidad, pagos y confirmaciones, en vivo.',
-        },
-        {
           which: 'blockflow' as const,
-          index: '02',
+          index: '01',
           caption: 'Un agente de voz IA para administradores de fincas: responde, triaje y crea el ticket, sin nadie detrás.',
         },
         {
-          which: 'recruiting' as const,
-          index: '03',
-          caption: 'Un agente de cribado para reclutadoras: puntúa y clasifica candidaturas entrantes antes de que las vea una persona.',
+          which: 'staging' as const,
+          index: '02',
+          caption: 'Un motor de contenido para inmuebles: sube fotos, obtén staging virtual, un clip de vídeo vertical y copy, el mismo día.',
         },
         {
-          which: 'marketing' as const,
-          index: '04',
-          caption: 'Un agente de campañas para agencias de marketing: redacta y encola copys por canal, el cliente solo aprueba.',
+          which: 'leadagent' as const,
+          index: '03',
+          caption: 'Un agente que responde en segundos a consultas del portal, cualifica presupuesto y agenda la visita.',
         },
       ],
     },
