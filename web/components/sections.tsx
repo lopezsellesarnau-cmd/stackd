@@ -14,6 +14,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DotTree } from './dot-tree'
 import { FolderStack } from './folder-stack'
+import type { HalftoneShape } from './halftone-icon'
 import { AgentDashboards } from './agent-dashboards'
 import { AgencyTree } from './agency-tree'
 import { useLanguage } from './language-context'
@@ -252,10 +253,10 @@ export function Services() {
 
 // ── Works ──────────────────────────────────────────────────────────────────
 
-const WORK_META: Record<string, { nombre: string; tag: string; status: string }> = {
-  blockflow: { nombre: 'BlockFlow', tag: 'AI voice agent', status: 'live' },
-  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live' },
-  leadagent: { nombre: 'Lead Agent', tag: 'Instant lead response', status: 'build' },
+const WORK_META: Record<string, { nombre: string; tag: string; status: string; icono: HalftoneShape }> = {
+  blockflow: { nombre: 'BlockFlow', tag: 'AI voice agent', status: 'live', icono: 'house' },
+  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live', icono: 'clapper' },
+  leadagent: { nombre: 'Lead Agent', tag: 'Instant lead response', status: 'build', icono: 'chat' },
 }
 
 function StatusChip({ status, en }: { status: string; en: boolean }) {
@@ -293,6 +294,7 @@ export function WorksGrid() {
               nombre: WORK_META[r.which].nombre,
               tipo: WORK_META[r.which].tag,
               estado: WORK_META[r.which].status as 'live' | 'build',
+              icono: WORK_META[r.which].icono,
               texto: r.caption,
               left: ['6%', '30%', '17%', '46%'][i],
             }))}

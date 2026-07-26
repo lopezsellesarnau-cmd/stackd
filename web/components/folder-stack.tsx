@@ -12,6 +12,8 @@
  *  · la etiqueta larga de la pestaña se oculta por debajo de sm y queda el índice
  */
 
+import { HalftoneIcon, type HalftoneShape } from './halftone-icon'
+
 const TERRA = '#C1663D'
 const INK = '#111111'
 const BONE = '#F0EEE9'
@@ -24,6 +26,7 @@ export type Carpeta = {
   tipo: string
   estado: 'live' | 'build'
   texto: string
+  icono: HalftoneShape
   /** Desplazamiento de la pestaña en desktop. */
   left: string
 }
@@ -69,10 +72,15 @@ export function FolderStack({ carpetas, en }: { carpetas: Carpeta[]; en: boolean
 
           {/* Cuerpo */}
           <div
-            className="rounded-t-[18px] border border-b-0 px-5 pb-10 pt-6 sm:px-7"
+            className="relative overflow-hidden rounded-t-[18px] border border-b-0 px-5 pb-10 pt-6 sm:px-7"
             style={{ borderColor: INK, backgroundColor: BONE }}
           >
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <HalftoneIcon
+              shape={c.icono}
+              seed={i * 97 + 11}
+              className="pointer-events-none absolute -right-2 -top-2 hidden h-[92px] w-[92px] text-[rgba(17,17,17,0.16)] sm:block"
+            />
+            <div className="relative flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
               <div className="min-w-0">
                 <p className="text-[15px] font-medium tracking-[-0.02em] text-[#111]">{c.nombre}</p>
                 <p className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.12em]" style={{ color: TERRA }}>
@@ -81,7 +89,7 @@ export function FolderStack({ carpetas, en }: { carpetas: Carpeta[]; en: boolean
               </div>
               <EstadoChip estado={c.estado} en={en} />
             </div>
-            <p className="mt-3 max-w-[62ch] font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.65)]">
+            <p className="relative mt-3 max-w-[62ch] font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.65)]">
               {c.texto}
             </p>
           </div>

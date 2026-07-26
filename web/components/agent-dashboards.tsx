@@ -13,6 +13,7 @@
  */
 
 import { useState } from 'react'
+import { HalftoneIcon, type HalftoneShape } from './halftone-icon'
 
 const TERRA = '#C1663D'
 const INK = '#111111'
@@ -74,6 +75,7 @@ function Dash({
   children,
   feed,
   en,
+  icono,
 }: {
   titulo: string
   contexto: string
@@ -81,12 +83,19 @@ function Dash({
   children: React.ReactNode
   feed: { t: string; texto: React.ReactNode }[]
   en: boolean
+  icono: HalftoneShape
 }) {
   return (
-    <div className="border" style={{ borderColor: LINE, backgroundColor: BONE }}>
+    <div className="relative overflow-hidden border" style={{ borderColor: LINE, backgroundColor: BONE }}>
+      <HalftoneIcon
+        shape={icono}
+        seed={titulo.length * 131 + 7}
+        className="pointer-events-none absolute -right-3 -top-3 z-0 h-[110px] w-[110px] text-[rgba(17,17,17,0.07)]"
+      />
+
       {/* Cabecera */}
       <div
-        className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b px-4 py-2.5 font-mono text-[9.5px] uppercase tracking-[0.14em]"
+        className="relative z-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b px-4 py-2.5 font-mono text-[9.5px] uppercase tracking-[0.14em]"
         style={{ borderColor: LINE }}
       >
         <span className="text-[#111]">{titulo}</span>
@@ -94,12 +103,12 @@ function Dash({
       </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-2 border-b md:grid-cols-4" style={{ borderColor: LINE }}>
+      <div className="relative z-10 grid grid-cols-2 border-b md:grid-cols-4" style={{ borderColor: LINE, backgroundColor: BONE }}>
         {metricas}
       </div>
 
       {/* Cuerpo */}
-      <div className="grid lg:grid-cols-[1.6fr_1fr]">
+      <div className="relative z-10 grid lg:grid-cols-[1.6fr_1fr]" style={{ backgroundColor: BONE }}>
         <div className="border-b lg:border-b-0 lg:border-r" style={{ borderColor: LINE }}>
           {children}
         </div>
@@ -152,6 +161,7 @@ function CampanasDash({ en }: { en: boolean }) {
     <Dash
       titulo="Content engine"
       en={en}
+      icono="clapper"
       contexto={en ? 'Client · Aura Real Estate' : 'Cliente · Aura Real Estate'}
       metricas={
         <>
@@ -223,6 +233,7 @@ function CaptacionDash({ en }: { en: boolean }) {
     <Dash
       titulo="Lead agent"
       en={en}
+      icono="chat"
       contexto={en ? 'Inbound · last 7 days' : 'Entrantes · últimos 7 días'}
       metricas={
         <>
@@ -290,6 +301,7 @@ function SoporteDash({ en }: { en: boolean }) {
     <Dash
       titulo="Support agent"
       en={en}
+      icono="house"
       contexto={en ? 'Voice · 24/7' : 'Voz · 24/7'}
       metricas={
         <>
@@ -397,9 +409,14 @@ function BandejaDash({ en }: { en: boolean }) {
   ]
 
   return (
-    <div className="border" style={{ borderColor: LINE, backgroundColor: BONE }}>
+    <div className="relative overflow-hidden border" style={{ borderColor: LINE, backgroundColor: BONE }}>
+      <HalftoneIcon
+        shape="key"
+        seed={521}
+        className="pointer-events-none absolute -right-3 -top-3 z-0 h-[110px] w-[110px] text-[rgba(17,17,17,0.07)]"
+      />
       <div
-        className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b px-4 py-2.5 font-mono text-[9.5px] uppercase tracking-[0.14em]"
+        className="relative z-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b px-4 py-2.5 font-mono text-[9.5px] uppercase tracking-[0.14em]"
         style={{ borderColor: LINE }}
       >
         <span className="text-[#111]">{en ? 'Agent workspace' : 'Espacio del agente'}</span>
@@ -408,7 +425,7 @@ function BandejaDash({ en }: { en: boolean }) {
         </span>
       </div>
 
-      <div className="grid md:grid-cols-[150px_1fr] lg:grid-cols-[150px_1.15fr_1fr]">
+      <div className="relative z-10 grid md:grid-cols-[150px_1fr] lg:grid-cols-[150px_1.15fr_1fr]" style={{ backgroundColor: BONE }}>
         {/* Navegación — desde md */}
         <div className="hidden border-r p-3 md:block" style={{ borderColor: LINE }}>
           <button
