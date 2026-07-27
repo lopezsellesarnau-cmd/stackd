@@ -14,7 +14,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DotTree } from './dot-tree'
 import { FolderStack } from './folder-stack'
-import type { HalftoneShape } from './halftone-icon'
+import { AsciiIcon } from './halftone-icon'
 import { AgentDashboards } from './agent-dashboards'
 import { AgencyTree } from './agency-tree'
 import { useLanguage } from './language-context'
@@ -253,10 +253,10 @@ export function Services() {
 
 // ── Works ──────────────────────────────────────────────────────────────────
 
-const WORK_META: Record<string, { nombre: string; tag: string; status: string; icono: HalftoneShape }> = {
-  blockflow: { nombre: 'BlockFlow', tag: 'AI voice agent', status: 'live', icono: 'house' },
-  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live', icono: 'video' },
-  leadagent: { nombre: 'Lead Agent', tag: 'Instant lead response', status: 'build', icono: 'chat' },
+const WORK_META: Record<string, { nombre: string; tag: string; status: string }> = {
+  blockflow: { nombre: 'BlockFlow', tag: 'AI voice agent', status: 'live' },
+  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live' },
+  leadagent: { nombre: 'Lead Agent', tag: 'Instant lead response', status: 'build' },
 }
 
 function StatusChip({ status, en }: { status: string; en: boolean }) {
@@ -294,7 +294,6 @@ export function WorksGrid() {
               nombre: WORK_META[r.which].nombre,
               tipo: WORK_META[r.which].tag,
               estado: WORK_META[r.which].status as 'live' | 'build',
-              icono: WORK_META[r.which].icono,
               texto: r.caption,
               left: ['6%', '30%', '17%', '46%'][i],
             }))}
@@ -349,11 +348,11 @@ export function Pipeline() {
   )
 }
 
-// ── Track record ───────────────────────────────────────────────────────────
+// ── Valores ──────────────────────────────────────────────────────────────
 
-export function TrackRecord() {
+export function Values() {
   const { lang } = useLanguage()
-  const t = COPY[lang].trackRecord
+  const t = COPY[lang].values
   return (
     <section className="border-b py-14 md:py-20" style={{ borderColor: LINE }}>
       <div className="mx-auto max-w-[1260px] px-5 md:px-7">
@@ -362,22 +361,26 @@ export function TrackRecord() {
           {t.body}
         </p>
 
-        <div className="mt-8 border-t" style={{ borderColor: LINE }}>
-          {t.rows.map(([name, detail, year]) => (
-            <div
-              key={name}
-              className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-0.5 border-b py-3.5 md:grid-cols-[180px_1fr_auto] md:gap-8"
-              style={{ borderColor: HAIR }}
-            >
-              <span className="font-mono text-[12px] text-[#111]">{name}</span>
-              <span className="col-span-2 font-mono text-[10.5px] text-[rgba(17,17,17,0.55)] md:col-span-1 md:col-start-2">
-                {detail}
-              </span>
-              <span className="col-start-2 row-start-1 justify-self-end font-mono text-[10px] uppercase tracking-[0.12em] text-[rgba(17,17,17,0.4)] md:col-start-3">
-                {year}
-              </span>
-            </div>
-          ))}
+        <div className="mt-10 grid gap-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-16">
+          <AsciiIcon
+            shape="housemod"
+            seed={2026}
+            cols={64}
+            rows={34}
+            className="mx-auto select-none text-[7px] leading-none text-[#111] sm:text-[8px]"
+          />
+
+          <div className="grid gap-8 sm:grid-cols-3 lg:gap-6">
+            {t.items.map((it, i) => (
+              <div key={it.t}>
+                <p className="font-mono text-[10.5px] text-[rgba(17,17,17,0.4)]">
+                  {String(i + 1).padStart(2, '0')}
+                </p>
+                <h3 className="mt-1 text-[19px] font-medium tracking-[-0.02em] text-[#111]">{it.t}</h3>
+                <p className="mt-2 font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.6)]">{it.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

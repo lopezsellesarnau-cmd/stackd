@@ -12,8 +12,6 @@
  *  · la etiqueta larga de la pestaña se oculta por debajo de sm y queda el índice
  */
 
-import { HalftoneIcon, AsciiIcon, type HalftoneShape } from './halftone-icon'
-
 const TERRA = '#C1663D'
 const INK = '#111111'
 const BONE = '#F0EEE9'
@@ -26,7 +24,6 @@ export type Carpeta = {
   tipo: string
   estado: 'live' | 'build'
   texto: string
-  icono: HalftoneShape
   /** Desplazamiento de la pestaña en desktop. */
   left: string
 }
@@ -72,42 +69,21 @@ export function FolderStack({ carpetas, en }: { carpetas: Carpeta[]; en: boolean
 
           {/* Cuerpo */}
           <div
-            className="flex items-center gap-6 rounded-t-[18px] border border-b-0 px-5 pb-10 pt-6 sm:px-7"
+            className="rounded-t-[18px] border border-b-0 px-5 pb-10 pt-6 sm:px-7"
             style={{ borderColor: INK, backgroundColor: BONE }}
           >
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-                <div className="min-w-0">
-                  <p className="text-[15px] font-medium tracking-[-0.02em] text-[#111]">{c.nombre}</p>
-                  <p className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.12em]" style={{ color: TERRA }}>
-                    {c.tipo}
-                  </p>
-                </div>
-                <EstadoChip estado={c.estado} en={en} />
+            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+              <div className="min-w-0">
+                <p className="text-[15px] font-medium tracking-[-0.02em] text-[#111]">{c.nombre}</p>
+                <p className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.12em]" style={{ color: TERRA }}>
+                  {c.tipo}
+                </p>
               </div>
-              <p className="mt-3 max-w-[62ch] font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.65)]">
-                {c.texto}
-              </p>
+              <EstadoChip estado={c.estado} en={en} />
             </div>
-
-            {/* Ilustración — a tamaño real, sin recortar, no un rincón difuminado.
-                El vídeo va en ASCII (letras/números/símbolos), como las
-                referencias — el resto en cuadraditos, mismo lenguaje. */}
-            {c.icono === 'video' ? (
-              <AsciiIcon
-                shape="video"
-                seed={i * 97 + 11}
-                cols={54}
-                rows={30}
-                className="hidden shrink-0 select-none text-[6px] leading-none text-[#111] sm:block md:text-[7px]"
-              />
-            ) : (
-              <HalftoneIcon
-                shape={c.icono}
-                seed={i * 97 + 11}
-                className="hidden h-[104px] w-[104px] shrink-0 text-[#111] sm:block md:h-[128px] md:w-[128px]"
-              />
-            )}
+            <p className="mt-3 max-w-[62ch] font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.65)]">
+              {c.texto}
+            </p>
           </div>
         </div>
       ))}

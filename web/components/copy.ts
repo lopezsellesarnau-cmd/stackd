@@ -40,14 +40,13 @@ export const COPY = {
         },
       ],
     },
-    trackRecord: {
-      title: 'Track record',
-      body: 'Small studio, shipped repeatedly. Every line below is live or was, end to end.',
-      rows: [
-        ['BlockFlow', 'AI voice agent — live in production', '2026'],
-        ['Volea', 'Booking SaaS — real-time payments', '2026'],
-        ['Fincas Pro', 'Property management platform', '2025'],
-        ['SMASH', 'Social app — App Store review', '2026'],
+    values: {
+      title: 'What we stand for',
+      body: 'Three things that shape every property system we ship, and why we build them at all.',
+      items: [
+        { t: 'Tech', d: 'AI-native, not a chatbot bolted on. Every system we ship learns and improves with data of its own.' },
+        { t: 'Eco', d: 'Less waste, less friction. We help agencies market and manage properties built to weigh less on the planet.' },
+        { t: 'Contemporary', d: "Design and software as of today, not a template from five years ago." },
       ],
     },
     techStack: { eyebrow: 'What we build with' },
@@ -121,14 +120,13 @@ export const COPY = {
         },
       ],
     },
-    trackRecord: {
-      title: 'Trayectoria',
-      body: 'Estudio pequeño, entregas repetidas. Cada línea de abajo está en producción o lo estuvo, de principio a fin.',
-      rows: [
-        ['BlockFlow', 'Agente de voz IA — en producción', '2026'],
-        ['Volea', 'SaaS de reservas — pagos en tiempo real', '2026'],
-        ['Fincas Pro', 'Plataforma de gestión de fincas', '2025'],
-        ['SMASH', 'App social — en revisión de la App Store', '2026'],
+    values: {
+      title: 'Nuestros valores',
+      body: 'Tres cosas que dan forma a cada sistema que entregamos, y el porqué de construirlos.',
+      items: [
+        { t: 'Tech', d: 'IA nativa, no un chatbot pegado encima. Cada sistema que entregamos aprende y mejora con datos propios.' },
+        { t: 'Eco', d: 'Menos residuo, menos fricción. Ayudamos a mostrar y gestionar propiedades pensadas para pesar menos sobre el planeta.' },
+        { t: 'Contemporáneo', d: 'Diseño y software de hoy, no una plantilla de hace cinco años.' },
       ],
     },
     techStack: { eyebrow: 'Con qué construimos' },

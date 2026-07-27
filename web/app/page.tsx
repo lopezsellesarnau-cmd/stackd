@@ -5,7 +5,7 @@ import {
   WorksGrid,
   Agents,
   Pipeline,
-  TrackRecord,
+  Values,
   TechStack,
   Faq,
   Contact,
@@ -22,7 +22,7 @@ export default function Page() {
         <WorksGrid />
         <Agents />
         <Pipeline />
-        <TrackRecord />
+        <Values />
         <TechStack />
         <Faq />
         <Contact />
