@@ -362,9 +362,9 @@ export function Values() {
           {t.body}
         </p>
 
-        <PhotoDots grid={INTERIOR_GRID} seed={2026} className="mx-auto mt-10 block w-full max-w-[720px] text-[#111]" />
+        <PhotoDots grid={INTERIOR_GRID} seed={2026} className="mt-10 block w-full max-w-[780px] text-[#111] md:ml-auto" />
 
-        <div className="mx-auto mt-10 grid max-w-[720px] gap-8 sm:grid-cols-3">
+        <div className="mt-10 grid gap-8 sm:grid-cols-3">
           {t.items.map((it, i) => (
             <div key={it.t}>
               <p className="font-mono text-[10.5px] text-[rgba(17,17,17,0.4)]">

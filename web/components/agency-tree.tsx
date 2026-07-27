@@ -64,13 +64,9 @@ export function AgencyTree({ en }: { en: boolean }) {
       </div>
 
       <div className="p-6 sm:p-10">
-        <PhotoDots
-          grid={EXTERIOR_GRID}
-          seed={733}
-          className="mx-auto block w-full max-w-[720px] text-[#111]"
-        />
+        <PhotoDots grid={EXTERIOR_GRID} seed={733} className="block w-full max-w-[780px] text-[#111]" />
 
-        <div className="mx-auto mt-8 max-w-[720px] divide-y" style={{ borderColor: HAIR }}>
+        <div className="mt-8 max-w-[560px] divide-y" style={{ borderColor: HAIR }}>
           {PIEZAS.map((p) => (
             <div key={p.tipo[0]} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 py-3">
               <div className="min-w-0">

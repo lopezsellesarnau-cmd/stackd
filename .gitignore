@@ -22,3 +22,4 @@ web/next-env.d.ts
 
 # logs
 npm-debug.log*
+__pycache__/
