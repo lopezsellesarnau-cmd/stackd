@@ -72,26 +72,30 @@ export function FolderStack({ carpetas, en }: { carpetas: Carpeta[]; en: boolean
 
           {/* Cuerpo */}
           <div
-            className="relative overflow-hidden rounded-t-[18px] border border-b-0 px-5 pb-10 pt-6 sm:px-7"
+            className="flex items-center gap-6 rounded-t-[18px] border border-b-0 px-5 pb-10 pt-6 sm:px-7"
             style={{ borderColor: INK, backgroundColor: BONE }}
           >
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                <div className="min-w-0">
+                  <p className="text-[15px] font-medium tracking-[-0.02em] text-[#111]">{c.nombre}</p>
+                  <p className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.12em]" style={{ color: TERRA }}>
+                    {c.tipo}
+                  </p>
+                </div>
+                <EstadoChip estado={c.estado} en={en} />
+              </div>
+              <p className="mt-3 max-w-[62ch] font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.65)]">
+                {c.texto}
+              </p>
+            </div>
+
+            {/* Ilustración — a tamaño real, sin recortar, no un rincón difuminado. */}
             <HalftoneIcon
               shape={c.icono}
               seed={i * 97 + 11}
-              className="pointer-events-none absolute -right-2 -top-2 hidden h-[92px] w-[92px] text-[rgba(17,17,17,0.16)] sm:block"
+              className="hidden h-[104px] w-[104px] shrink-0 text-[#111] sm:block md:h-[128px] md:w-[128px]"
             />
-            <div className="relative flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-              <div className="min-w-0">
-                <p className="text-[15px] font-medium tracking-[-0.02em] text-[#111]">{c.nombre}</p>
-                <p className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.12em]" style={{ color: TERRA }}>
-                  {c.tipo}
-                </p>
-              </div>
-              <EstadoChip estado={c.estado} en={en} />
-            </div>
-            <p className="relative mt-3 max-w-[62ch] font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.65)]">
-              {c.texto}
-            </p>
           </div>
         </div>
       ))}

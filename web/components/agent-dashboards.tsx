@@ -90,7 +90,7 @@ function Dash({
       <HalftoneIcon
         shape={icono}
         seed={titulo.length * 131 + 7}
-        className="pointer-events-none absolute -right-3 -top-3 z-0 h-[110px] w-[110px] text-[rgba(17,17,17,0.07)]"
+        className="pointer-events-none absolute -right-4 -top-4 z-0 h-[150px] w-[150px] text-[rgba(17,17,17,0.4)]"
       />
 
       {/* Cabecera */}
@@ -413,7 +413,7 @@ function BandejaDash({ en }: { en: boolean }) {
       <HalftoneIcon
         shape="key"
         seed={521}
-        className="pointer-events-none absolute -right-3 -top-3 z-0 h-[110px] w-[110px] text-[rgba(17,17,17,0.07)]"
+        className="pointer-events-none absolute -right-4 -top-4 z-0 h-[150px] w-[150px] text-[rgba(17,17,17,0.4)]"
       />
       <div
         className="relative z-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b px-4 py-2.5 font-mono text-[9.5px] uppercase tracking-[0.14em]"
