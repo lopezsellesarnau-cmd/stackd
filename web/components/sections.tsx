@@ -316,8 +316,8 @@ export function Agents() {
         <SectionTag n="03" label={en ? 'What we can build for you' : 'Lo que podemos construir'} />
         <p className="mt-6 max-w-[64ch] font-mono text-[11.5px] leading-relaxed text-[rgba(17,17,17,0.6)]">
           {en
-            ? 'Three agents we build over and over. Not chatbots: systems that decide, act and explain why — with a dashboard where you see every decision.'
-            : 'Tres agentes que construimos una y otra vez. No son chatbots: son sistemas que deciden, actúan y explican por qué — con un panel donde se ve cada decisión.'}
+            ? 'Four systems we build over and over. Not chatbots: agents that decide, act and explain why.'
+            : 'Cuatro sistemas que construimos una y otra vez. No son chatbots: son agentes que deciden, actúan y explican por qué.'}
         </p>
         <div className="mt-8">
           <AgentDashboards en={en} />

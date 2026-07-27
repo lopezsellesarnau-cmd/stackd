@@ -8,7 +8,12 @@ La densidad final es el máximo de las dos. Sin bordes, un cielo de atardecer
 con gris medio se leía tan denso como la fachada y todo se volvía ruido; solo
 con tono, la silueta desaparecía en cuanto el fondo no era blanco puro.
 
-Uso: python3 image_to_grid.py <imagen> <cols> <rows> > salida.json
+Uso: python3 image_to_grid.py <imagen> <cols> <rows> [crop_top crop_bottom] > salida.json
+
+`crop_top`/`crop_bottom` recortan filas verticales (en px, sobre la foto
+original) antes de procesar — sin esto, una foto con mucho cielo/suelo vacío
+diluye el sujeto entre demasiado espacio en blanco y dificulta que la
+silueta se lea a resolución de trama.
 """
 import sys, json
 from PIL import Image, ImageFilter
@@ -28,8 +33,11 @@ def histpercentiles(img, ps):
         out[p] = 255
     return out
 
-def grid(path, cols, rows, tone_gamma=1.6, tone_deadzone=0.42, edge_gain=2.4, edge_deadzone=0.10):
+def grid(path, cols, rows, crop=None, tone_gamma=1.6, tone_deadzone=0.42, edge_gain=2.4, edge_deadzone=0.10):
     img = Image.open(path).convert('L')
+    if crop:
+        w0, h0 = img.size
+        img = img.crop((0, crop[0], w0, h0 - crop[1]))
     pts = histpercentiles(img, [0.015, 0.985])
     black, white = pts[0.015], pts[0.985]
 
@@ -67,4 +75,5 @@ def grid(path, cols, rows, tone_gamma=1.6, tone_deadzone=0.42, edge_gain=2.4, ed
 
 if __name__ == '__main__':
     path, cols, rows = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
-    print(json.dumps(grid(path, cols, rows)))
+    crop = (int(sys.argv[4]), int(sys.argv[5])) if len(sys.argv) > 5 else None
+    print(json.dumps(grid(path, cols, rows, crop=crop)))
