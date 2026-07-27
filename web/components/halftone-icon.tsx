@@ -1,12 +1,15 @@
 /**
- * Ilustraciones en trama de puntos o ASCII — mismo lenguaje que la rama del
- * hero (dot-tree.tsx), pero aquí la forma es algo reconocible (una casa, un
- * cartel, un edificio…) en vez de una planta orgánica: silueta con núcleo
- * denso y borde que se deshace, como un halftone o un dibujo hecho de texto.
+ * Ilustraciones en ASCII o trama de puntos — mismo lenguaje que la rama del
+ * hero (dot-tree.tsx): silueta con núcleo denso y borde que se deshace.
  *
- * Cada forma es una unión de piezas (`add`) con huecos opcionales (`sub`) —
- * así una ventana o una puerta son de verdad un hueco en la pared, no una
- * mancha encima.
+ * Dos fuentes de forma:
+ *  · `video` — la única silueta hecha a mano que quedó en pie (un botón de
+ *    play). Las demás (casa, chat, edificio, llave...) se probaron y no se
+ *    entendían — geometría a mano sin detalle real no lee como un icono, solo
+ *    como una mancha. Se quitaron en vez de forzarlas.
+ *  · `PhotoDots` — halftone de verdad a partir de una foto de referencia
+ *    (photo-art-data.ts), esa es la fuente para todo lo que necesite leerse
+ *    de cerca.
  *
  * Determinista (PRNG con semilla) para que sea seguro renderizarlo en
  * servidor sin mismatch de hidratación — no hace falta 'use client'.
@@ -52,10 +55,6 @@ function polyDist(poly: Punto[]): DistFn {
   }
 }
 
-function circleDist(cx: number, cy: number, r: number): DistFn {
-  return (x, y) => r - Math.hypot(x - cx, y - cy)
-}
-
 /** Anillo (círculo hueco) — para un botón de play, no un disco relleno. */
 function ringDist(cx: number, cy: number, rOuter: number, grosor: number): DistFn {
   return (x, y) => {
@@ -64,232 +63,22 @@ function ringDist(cx: number, cy: number, rOuter: number, grosor: number): DistF
   }
 }
 
-/** Rejilla de ventanas — varios rectángulos pequeños de una vez, para huecos. */
-function grid(x0: number, y0: number, x1: number, y1: number, cols: number, rows: number, pad: number): DistFn[] {
-  const w = (x1 - x0) / cols
-  const h = (y1 - y0) / rows
-  const out: DistFn[] = []
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      out.push(
-        polyDist([
-          [x0 + c * w + pad, y0 + r * h + pad],
-          [x0 + (c + 1) * w - pad, y0 + r * h + pad],
-          [x0 + (c + 1) * w - pad, y0 + (r + 1) * h - pad],
-          [x0 + c * w + pad, y0 + (r + 1) * h - pad],
-        ]),
-      )
-    }
-  }
-  return out
-}
+const VIDEO_SHAPE: DistFn[] = [
+  ringDist(50, 50, 44, 11),
+  polyDist([
+    [36, 26],
+    [36, 74],
+    [74, 50],
+  ]),
+]
 
-type Forma = { add: DistFn[]; sub?: DistFn[] }
-
-export const HALFTONE_SHAPES = {
-  house: {
-    add: [
-      polyDist([
-        [50, 10],
-        [15, 48],
-        [85, 48],
-      ]),
-      polyDist([
-        [20, 48],
-        [80, 48],
-        [80, 88],
-        [20, 88],
-      ]),
-    ],
-  },
-  chat: {
-    add: [
-      polyDist([
-        [15, 15],
-        [85, 15],
-        [85, 65],
-        [15, 65],
-      ]),
-      polyDist([
-        [25, 65],
-        [42, 65],
-        [28, 85],
-      ]),
-    ],
-  },
-  key: {
-    add: [
-      circleDist(35, 35, 18),
-      polyDist([
-        [31, 35],
-        [41, 35],
-        [41, 88],
-        [31, 88],
-      ]),
-      polyDist([
-        [41, 68],
-        [53, 68],
-        [53, 75],
-        [41, 75],
-      ]),
-      polyDist([
-        [41, 79],
-        [50, 79],
-        [50, 86],
-        [41, 86],
-      ]),
-    ],
-  },
-  video: {
-    add: [
-      ringDist(50, 50, 44, 11),
-      polyDist([
-        [36, 26],
-        [36, 74],
-        [74, 50],
-      ]),
-    ],
-  },
-  /** Edificio de pisos — fachada con ventanas de verdad huecas. */
-  building: {
-    add: [
-      polyDist([
-        [18, 10],
-        [82, 10],
-        [82, 92],
-        [18, 92],
-      ]),
-    ],
-    sub: [...grid(26, 18, 74, 66, 3, 4, 2.5), polyDist([[42, 78], [58, 78], [58, 92], [42, 92]])],
-  },
-  /** Cartel "SE VENDE" clavado delante de una fachada con tejado a dos aguas. */
-  forsale: {
-    add: [
-      // fachada, detrás
-      polyDist([
-        [46, 14],
-        [20, 34],
-        [80, 34],
-      ]),
-      polyDist([
-        [26, 34],
-        [74, 34],
-        [74, 82],
-        [26, 82],
-      ]),
-      // poste del cartel, delante
-      polyDist([
-        [56, 46],
-        [60, 46],
-        [60, 92],
-        [56, 92],
-      ]),
-      polyDist([
-        [30, 38],
-        [78, 38],
-        [78, 60],
-        [30, 60],
-      ]),
-    ],
-    sub: [
-      polyDist([
-        [34, 44],
-        [58, 44],
-        [58, 54],
-        [34, 54],
-      ]),
-      polyDist([
-        [36, 60],
-        [50, 60],
-        [50, 82],
-        [36, 82],
-      ]),
-    ],
-  },
-  /** Casa nórdica futurista — tejado a un agua, ventanal de suelo a techo. */
-  housemod: {
-    add: [
-      // tejado en pendiente, una sola vertiente
-      polyDist([
-        [8, 46],
-        [92, 28],
-        [92, 36],
-        [8, 54],
-      ]),
-      // cuerpo
-      polyDist([
-        [14, 46],
-        [86, 32],
-        [86, 90],
-        [14, 90],
-      ]),
-      // tronco del árbol junto a la casa — el gesto "eco"
-      polyDist([
-        [92, 60],
-        [95, 60],
-        [95, 90],
-        [92, 90],
-      ]),
-      circleDist(93.5, 48, 13),
-    ],
-    sub: [
-      // ventanal de suelo a techo
-      polyDist([
-        [58, 40],
-        [80, 36],
-        [80, 84],
-        [58, 88],
-      ]),
-      // puerta
-      polyDist([
-        [22, 66],
-        [34, 64],
-        [34, 90],
-        [22, 90],
-      ]),
-    ],
-  },
-} satisfies Record<string, Forma>
-
-export type HalftoneShape = keyof typeof HALFTONE_SHAPES
-
-/** Profundidad dentro de la silueta: dentro de alguna pieza y fuera de todos los huecos. */
-function depthAt(forma: Forma, x: number, y: number): number {
+function depthAt(fns: DistFn[], x: number, y: number): number {
   let depth = -Infinity
-  for (const f of forma.add) {
+  for (const f of fns) {
     const d = f(x, y)
     if (d > depth) depth = d
   }
-  if (depth <= 0) return depth
-  if (forma.sub) {
-    for (const f of forma.sub) {
-      if (f(x, y) > 0) return -1
-    }
-  }
   return depth
-}
-
-function buildDots(shape: HalftoneShape, seed: number) {
-  const forma = HALFTONE_SHAPES[shape]
-  const rand = mulberry32(seed)
-  const cell = 2.4
-  const dots: { x: number; y: number; s: number }[] = []
-  for (let gy = 0; gy < 100 / cell; gy++) {
-    for (let gx = 0; gx < 100 / cell; gx++) {
-      const x = gx * cell + cell / 2
-      const y = gy * cell + cell / 2
-      const depth = depthAt(forma, x, y)
-      if (depth <= 0) continue
-      // Núcleo denso, borde que se deshace: la caída es lo que da el grano
-      // (mismo criterio que cluster() en dot-tree.tsx).
-      const d = Math.min(1, depth / 14)
-      const p = Math.pow(d, 0.55)
-      if (rand() > p) continue
-      const s = cell * (0.3 + 0.55 * d) * (0.75 + rand() * 0.35)
-      dots.push({ x: x - s / 2, y: y - s / 2, s })
-    }
-  }
-  return dots
 }
 
 /**
@@ -300,8 +89,7 @@ function buildDots(shape: HalftoneShape, seed: number) {
 const ASCII_RAMP =
   " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 
-function buildAscii(shape: HalftoneShape, seed: number, cols: number, rows: number) {
-  const forma = HALFTONE_SHAPES[shape]
+function buildAscii(seed: number, cols: number, rows: number) {
   const rand = mulberry32(seed)
   const lines: string[] = []
   for (let gy = 0; gy < rows; gy++) {
@@ -311,7 +99,7 @@ function buildAscii(shape: HalftoneShape, seed: number, cols: number, rows: numb
       // Las celdas de texto son más altas que anchas — se corrige el muestreo
       // en Y para que la silueta no salga achatada.
       const y = ((gy + 0.5) / rows) * 100
-      const depth = depthAt(forma, x, y)
+      const depth = depthAt(VIDEO_SHAPE, x, y)
       if (depth <= 0) {
         line += ' '
         continue
@@ -339,13 +127,13 @@ export function AsciiIcon({
   rows = 40,
   className,
 }: {
-  shape: HalftoneShape
+  shape: 'video'
   seed: number
   cols?: number
   rows?: number
   className?: string
 }) {
-  const art = buildAscii(shape, seed, cols, rows)
+  const art = buildAscii(seed, cols, rows)
   return (
     <pre
       aria-hidden
@@ -357,30 +145,11 @@ export function AsciiIcon({
   )
 }
 
-export function HalftoneIcon({
-  shape,
-  seed,
-  className,
-}: {
-  shape: HalftoneShape
-  seed: number
-  className?: string
-}) {
-  const dots = buildDots(shape, seed)
-  return (
-    <svg viewBox="0 0 100 100" className={className} aria-hidden>
-      {dots.map((d, i) => (
-        <rect key={i} x={d.x} y={d.y} width={d.s} height={d.s} fill="currentColor" />
-      ))}
-    </svg>
-  )
-}
-
 /**
  * Halftone a partir de una foto real (rejilla de densidad precalculada en
- * photo-art-data.ts) — mismos cuadraditos que HalftoneIcon, pero la silueta
- * no sale de geometría a mano, sale de la imagen de referencia de verdad:
- * la luz y la sombra de la foto son la densidad de puntos.
+ * photo-art-data.ts) — cuadraditos cuya silueta no sale de geometría a mano,
+ * sale de la imagen de referencia de verdad: la luz y la sombra de la foto
+ * son la densidad de puntos.
  */
 export function PhotoDots({
   grid,

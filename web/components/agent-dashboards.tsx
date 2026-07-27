@@ -10,17 +10,22 @@
  */
 
 import { useState } from 'react'
-import { AsciiIcon, HalftoneIcon, type HalftoneShape } from './halftone-icon'
+import { AsciiIcon } from './halftone-icon'
 
 const INK = '#111111'
 const BONE = '#F0EEE9'
 const LINE = 'rgba(17,17,17,0.22)'
 
+/**
+ * Solo "Content" lleva ilustración — las otras tres (casa, chat, llave)
+ * salieron mal: geometría a mano sin detalle real, nadie entendía qué eran.
+ * Mejor texto claro que una ilustración que confunde.
+ */
 type Agente = {
   id: string
   en: string
   es: string
-  forma: HalftoneShape
+  ilustrado?: boolean
   titulo: [string, string]
   linea: [string, string]
 }
@@ -30,7 +35,7 @@ const AGENTES: Agente[] = [
     id: 'content',
     en: 'Content',
     es: 'Contenido',
-    forma: 'video',
+    ilustrado: true,
     titulo: ['Content engine', 'Content engine'],
     linea: [
       'Photos in, virtual staging and a vertical video clip out — same day.',
@@ -41,7 +46,6 @@ const AGENTES: Agente[] = [
     id: 'leads',
     en: 'Leads',
     es: 'Captación',
-    forma: 'chat',
     titulo: ['Lead agent', 'Lead agent'],
     linea: [
       'Answers a portal enquiry in seconds, qualifies budget, books the viewing.',
@@ -52,7 +56,6 @@ const AGENTES: Agente[] = [
     id: 'support',
     en: 'Support',
     es: 'Soporte',
-    forma: 'building',
     titulo: ['Support agent', 'Support agent'],
     linea: [
       'Answers, triages and creates the ticket for property managers — unattended.',
@@ -63,7 +66,6 @@ const AGENTES: Agente[] = [
     id: 'workspace',
     en: 'Workspace',
     es: 'Espacio',
-    forma: 'key',
     titulo: ['Agent workspace', 'Espacio del agente'],
     linea: [
       'One inbox for every account — the agent flags what needs you, handles the rest.',
@@ -102,25 +104,19 @@ export function AgentDashboards({ en }: { en: boolean }) {
         >
           {en ? a.titulo[0] : a.titulo[1]}
         </div>
-        <div className="flex flex-col items-center gap-6 px-6 py-10 sm:py-14">
-          {a.forma === 'video' ? (
+        <div className={`flex flex-col items-center gap-6 px-6 ${a.ilustrado ? 'py-10 sm:py-14' : 'py-14 sm:py-20'}`}>
+          {a.ilustrado && (
             <AsciiIcon
-              shape={a.forma}
+              shape="video"
               seed={a.id.length * 191 + i * 37}
               cols={78}
               rows={42}
               className="breathe select-none text-[8px] leading-none text-[#111] sm:text-[9.5px]"
             />
-          ) : (
-            <HalftoneIcon
-              shape={a.forma}
-              seed={a.id.length * 191 + i * 37}
-              className="h-[150px] w-[150px] text-[#111] sm:h-[180px] sm:w-[180px]"
-            />
           )}
           <p
-            className="max-w-[48ch] text-center font-mono text-[11.5px] leading-relaxed"
-            style={{ color: 'rgba(17,17,17,0.65)' }}
+            className={`max-w-[48ch] text-center font-mono leading-relaxed ${a.ilustrado ? 'text-[11.5px]' : 'text-[13px]'}`}
+            style={{ color: a.ilustrado ? 'rgba(17,17,17,0.65)' : '#111' }}
           >
             {en ? a.linea[0] : a.linea[1]}
           </p>
