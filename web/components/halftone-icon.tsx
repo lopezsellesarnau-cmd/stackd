@@ -375,3 +375,43 @@ export function HalftoneIcon({
     </svg>
   )
 }
+
+/**
+ * Halftone a partir de una foto real (rejilla de densidad precalculada en
+ * photo-art-data.ts) — mismos cuadraditos que HalftoneIcon, pero la silueta
+ * no sale de geometría a mano, sale de la imagen de referencia de verdad:
+ * la luz y la sombra de la foto son la densidad de puntos.
+ */
+export function PhotoDots({
+  grid,
+  seed,
+  className,
+}: {
+  grid: number[][]
+  seed: number
+  className?: string
+}) {
+  const rows = grid.length
+  const cols = grid[0]?.length ?? 0
+  const rand = mulberry32(seed)
+  const dots: { x: number; y: number; s: number }[] = []
+  for (let gy = 0; gy < rows; gy++) {
+    for (let gx = 0; gx < cols; gx++) {
+      const d = grid[gy][gx]
+      if (d <= 0) continue
+      // Grano en el borde: a menos densidad, más probable que el punto no
+      // salga — así el contorno se deshace en vez de cortar en seco.
+      const p = Math.pow(d, 0.6)
+      if (rand() > p && d < 0.6) continue
+      const s = (0.3 + 0.62 * d) * (0.8 + rand() * 0.28)
+      dots.push({ x: gx + (1 - s) / 2, y: gy + (1 - s) / 2, s })
+    }
+  }
+  return (
+    <svg viewBox={`0 0 ${cols} ${rows}`} className={className} aria-hidden>
+      {dots.map((d, i) => (
+        <rect key={i} x={d.x} y={d.y} width={d.s} height={d.s} fill="currentColor" />
+      ))}
+    </svg>
+  )
+}

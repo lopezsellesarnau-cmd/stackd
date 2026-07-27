@@ -14,7 +14,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { DotTree } from './dot-tree'
 import { FolderStack } from './folder-stack'
-import { AsciiIcon } from './halftone-icon'
+import { PhotoDots } from './halftone-icon'
+import { INTERIOR_GRID } from './photo-art-data'
 import { AgentDashboards } from './agent-dashboards'
 import { AgencyTree } from './agency-tree'
 import { useLanguage } from './language-context'
@@ -361,26 +362,18 @@ export function Values() {
           {t.body}
         </p>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-16">
-          <AsciiIcon
-            shape="housemod"
-            seed={2026}
-            cols={64}
-            rows={34}
-            className="mx-auto select-none text-[7px] leading-none text-[#111] sm:text-[8px]"
-          />
+        <PhotoDots grid={INTERIOR_GRID} seed={2026} className="mx-auto mt-10 block w-full max-w-[720px] text-[#111]" />
 
-          <div className="grid gap-8 sm:grid-cols-3 lg:gap-6">
-            {t.items.map((it, i) => (
-              <div key={it.t}>
-                <p className="font-mono text-[10.5px] text-[rgba(17,17,17,0.4)]">
-                  {String(i + 1).padStart(2, '0')}
-                </p>
-                <h3 className="mt-1 text-[19px] font-medium tracking-[-0.02em] text-[#111]">{it.t}</h3>
-                <p className="mt-2 font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.6)]">{it.d}</p>
-              </div>
-            ))}
-          </div>
+        <div className="mx-auto mt-10 grid max-w-[720px] gap-8 sm:grid-cols-3">
+          {t.items.map((it, i) => (
+            <div key={it.t}>
+              <p className="font-mono text-[10.5px] text-[rgba(17,17,17,0.4)]">
+                {String(i + 1).padStart(2, '0')}
+              </p>
+              <h3 className="mt-1 text-[19px] font-medium tracking-[-0.02em] text-[#111]">{it.t}</h3>
+              <p className="mt-2 font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.6)]">{it.d}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

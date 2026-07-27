@@ -107,9 +107,9 @@ export function AgentDashboards({ en }: { en: boolean }) {
             <AsciiIcon
               shape={a.forma}
               seed={a.id.length * 191 + i * 37}
-              cols={64}
-              rows={34}
-              className="select-none text-[7px] leading-none text-[#111] sm:text-[8px]"
+              cols={78}
+              rows={42}
+              className="breathe select-none text-[8px] leading-none text-[#111] sm:text-[9.5px]"
             />
           ) : (
             <HalftoneIcon

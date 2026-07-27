@@ -7,7 +7,8 @@
  * aprobación y lo que va a una persona sigue siendo el argumento real.
  */
 
-import { AsciiIcon } from './halftone-icon'
+import { PhotoDots } from './halftone-icon'
+import { EXTERIOR_GRID } from './photo-art-data'
 
 const TERRA = '#C1663D'
 const OKG = '#3F7A4E'
@@ -62,16 +63,14 @@ export function AgencyTree({ en }: { en: boolean }) {
         </span>
       </div>
 
-      <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[auto_1fr] lg:items-center">
-        <AsciiIcon
-          shape="forsale"
+      <div className="p-6 sm:p-10">
+        <PhotoDots
+          grid={EXTERIOR_GRID}
           seed={733}
-          cols={58}
-          rows={34}
-          className="mx-auto select-none text-[7px] leading-none text-[#111] sm:text-[8px]"
+          className="mx-auto block w-full max-w-[720px] text-[#111]"
         />
 
-        <div className="divide-y" style={{ borderColor: HAIR }}>
+        <div className="mx-auto mt-8 max-w-[720px] divide-y" style={{ borderColor: HAIR }}>
           {PIEZAS.map((p) => (
             <div key={p.tipo[0]} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 py-3">
               <div className="min-w-0">
