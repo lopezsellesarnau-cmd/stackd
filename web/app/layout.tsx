@@ -15,9 +15,9 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.stackd.codes'),
-  title: 'StackD — AI software studio',
+  title: 'StackD — AI systems for real estate agencies',
   description:
-    'We design and build AI software and automations that solve real business problems — shipped to production, not demoed.',
+    'Instant lead response, virtual staging and video for every listing — generated in minutes, not days. Shipped to production, not demoed.',
   // Indexable desde el 24 jul 2026: el `noindex` era un resto de cuando la web
   // estaba en desarrollo y dejaba la agencia invisible en buscadores.
   robots: { index: true, follow: true },
@@ -26,15 +26,15 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://www.stackd.codes',
     siteName: 'StackD',
-    title: 'StackD — AI software studio',
+    title: 'StackD — AI systems for real estate agencies',
     description:
-      'We design and build AI software and automations that solve real business problems — shipped to production, not demoed.',
+      'Instant lead response, virtual staging and video for every listing — generated in minutes, not days.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StackD — AI software studio',
+    title: 'StackD — AI systems for real estate agencies',
     description:
-      'We design and build AI software and automations that solve real business problems — shipped to production, not demoed.',
+      'Instant lead response, virtual staging and video for every listing — generated in minutes, not days.',
   },
 }
 
