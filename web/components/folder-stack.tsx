@@ -12,7 +12,7 @@
  *  · la etiqueta larga de la pestaña se oculta por debajo de sm y queda el índice
  */
 
-import { HalftoneIcon, type HalftoneShape } from './halftone-icon'
+import { HalftoneIcon, AsciiIcon, type HalftoneShape } from './halftone-icon'
 
 const TERRA = '#C1663D'
 const INK = '#111111'
@@ -90,12 +90,24 @@ export function FolderStack({ carpetas, en }: { carpetas: Carpeta[]; en: boolean
               </p>
             </div>
 
-            {/* Ilustración — a tamaño real, sin recortar, no un rincón difuminado. */}
-            <HalftoneIcon
-              shape={c.icono}
-              seed={i * 97 + 11}
-              className="hidden h-[104px] w-[104px] shrink-0 text-[#111] sm:block md:h-[128px] md:w-[128px]"
-            />
+            {/* Ilustración — a tamaño real, sin recortar, no un rincón difuminado.
+                El vídeo va en ASCII (letras/números/símbolos), como las
+                referencias — el resto en cuadraditos, mismo lenguaje. */}
+            {c.icono === 'video' ? (
+              <AsciiIcon
+                shape="video"
+                seed={i * 97 + 11}
+                cols={54}
+                rows={30}
+                className="hidden shrink-0 select-none text-[6px] leading-none text-[#111] sm:block md:text-[7px]"
+              />
+            ) : (
+              <HalftoneIcon
+                shape={c.icono}
+                seed={i * 97 + 11}
+                className="hidden h-[104px] w-[104px] shrink-0 text-[#111] sm:block md:h-[128px] md:w-[128px]"
+              />
+            )}
           </div>
         </div>
       ))}

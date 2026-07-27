@@ -52,6 +52,14 @@ function circleDist(cx: number, cy: number, r: number): DistFn {
   return (x, y) => r - Math.hypot(x - cx, y - cy)
 }
 
+/** Anillo (círculo hueco) — para un botón de play, no un disco relleno. */
+function ringDist(cx: number, cy: number, rOuter: number, grosor: number): DistFn {
+  return (x, y) => {
+    const d = Math.hypot(x - cx, y - cy)
+    return Math.min(rOuter - d, d - (rOuter - grosor))
+  }
+}
+
 export const HALFTONE_SHAPES = {
   house: [
     polyDist([
@@ -114,6 +122,14 @@ export const HALFTONE_SHAPES = {
       [41, 86],
     ]),
   ],
+  video: [
+    ringDist(50, 50, 44, 11),
+    polyDist([
+      [36, 26],
+      [36, 74],
+      [74, 50],
+    ]),
+  ],
 } satisfies Record<string, DistFn[]>
 
 export type HalftoneShape = keyof typeof HALFTONE_SHAPES
@@ -143,6 +159,75 @@ function buildDots(shape: HalftoneShape, seed: number) {
     }
   }
   return dots
+}
+
+/**
+ * Rampa clásica de ASCII art (Paul Bourke, dominio público) — mezcla letras,
+ * números y símbolos de teclado ordenados de "vacío" a "denso", igual que las
+ * imágenes de referencia. Nada de cuadraditos aquí: es texto monoespaciado.
+ */
+const ASCII_RAMP =
+  " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+
+function buildAscii(shape: HalftoneShape, seed: number, cols: number, rows: number) {
+  const fns = HALFTONE_SHAPES[shape]
+  const rand = mulberry32(seed)
+  const lines: string[] = []
+  for (let gy = 0; gy < rows; gy++) {
+    let line = ''
+    for (let gx = 0; gx < cols; gx++) {
+      const x = ((gx + 0.5) / cols) * 100
+      // Las celdas de texto son más altas que anchas — se corrige el muestreo
+      // en Y para que la silueta no salga achatada.
+      const y = ((gy + 0.5) / rows) * 100
+      let depth = -Infinity
+      for (const f of fns) {
+        const d = f(x, y)
+        if (d > depth) depth = d
+      }
+      if (depth <= 0) {
+        line += ' '
+        continue
+      }
+      const d = Math.min(1, depth / 6)
+      // Borde que se deshace: por debajo de cierta densidad, cae por dados —
+      // así el contorno se disgrega en vez de cortar en seco.
+      if (d < 0.25 && rand() > (d / 0.25) * 0.75) {
+        line += ' '
+        continue
+      }
+      const jitter = (rand() - 0.5) * 0.22
+      const idx = Math.max(0, Math.min(ASCII_RAMP.length - 1, Math.round((d + jitter) * (ASCII_RAMP.length - 1))))
+      line += ASCII_RAMP[idx]
+    }
+    lines.push(line)
+  }
+  return lines.join('\n')
+}
+
+export function AsciiIcon({
+  shape,
+  seed,
+  cols = 72,
+  rows = 40,
+  className,
+}: {
+  shape: HalftoneShape
+  seed: number
+  cols?: number
+  rows?: number
+  className?: string
+}) {
+  const art = buildAscii(shape, seed, cols, rows)
+  return (
+    <pre
+      aria-hidden
+      className={className}
+      style={{ fontFamily: 'var(--font-mono, monospace)', lineHeight: 1, margin: 0, whiteSpace: 'pre' }}
+    >
+      {art}
+    </pre>
+  )
 }
 
 export function HalftoneIcon({

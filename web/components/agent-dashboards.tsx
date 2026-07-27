@@ -13,7 +13,7 @@
  */
 
 import { useState } from 'react'
-import { HalftoneIcon, type HalftoneShape } from './halftone-icon'
+import { HalftoneIcon, AsciiIcon, type HalftoneShape } from './halftone-icon'
 
 const TERRA = '#C1663D'
 const INK = '#111111'
@@ -87,11 +87,21 @@ function Dash({
 }) {
   return (
     <div className="relative overflow-hidden border" style={{ borderColor: LINE, backgroundColor: BONE }}>
-      <HalftoneIcon
-        shape={icono}
-        seed={titulo.length * 131 + 7}
-        className="pointer-events-none absolute -right-4 -top-4 z-0 h-[150px] w-[150px] text-[rgba(17,17,17,0.4)]"
-      />
+      {icono === 'video' ? (
+        <AsciiIcon
+          shape="video"
+          seed={titulo.length * 131 + 7}
+          cols={46}
+          rows={26}
+          className="pointer-events-none absolute -right-2 -top-2 z-0 select-none text-[5.5px] leading-none text-[rgba(17,17,17,0.55)]"
+        />
+      ) : (
+        <HalftoneIcon
+          shape={icono}
+          seed={titulo.length * 131 + 7}
+          className="pointer-events-none absolute -right-4 -top-4 z-0 h-[150px] w-[150px] text-[rgba(17,17,17,0.4)]"
+        />
+      )}
 
       {/* Cabecera */}
       <div
@@ -161,7 +171,7 @@ function CampanasDash({ en }: { en: boolean }) {
     <Dash
       titulo="Content engine"
       en={en}
-      icono="clapper"
+      icono="video"
       contexto={en ? 'Client · Aura Real Estate' : 'Cliente · Aura Real Estate'}
       metricas={
         <>

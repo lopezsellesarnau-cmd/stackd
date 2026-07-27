@@ -255,7 +255,7 @@ export function Services() {
 
 const WORK_META: Record<string, { nombre: string; tag: string; status: string; icono: HalftoneShape }> = {
   blockflow: { nombre: 'BlockFlow', tag: 'AI voice agent', status: 'live', icono: 'house' },
-  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live', icono: 'clapper' },
+  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live', icono: 'video' },
   leadagent: { nombre: 'Lead Agent', tag: 'Instant lead response', status: 'build', icono: 'chat' },
 }
 
