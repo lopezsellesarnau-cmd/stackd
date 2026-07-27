@@ -12,11 +12,27 @@ export const COPY = {
       studio: '[ Studio ]',
       location: '[ Barcelona ]',
     },
+    stats: {
+      items: [
+        { v: '78%', l: 'of buyers go with whoever responds first' },
+        { v: '21×', l: 'more likely to convert in 5 min vs. 30' },
+        { v: '$7,500+', l: 'lost commission per missed lead' },
+      ],
+      source: 'NAR & industry lead-response studies, 2025–26',
+    },
     services: {
       eyebrow: 'Here is how we help',
       items: [
-        { t: 'Lead Response', tags: ['WhatsApp & calls', 'Instant qualification', 'Viewings booked'] },
-        { t: 'Content Engine', tags: ['Virtual staging', 'AI video clips', 'Ready for social'] },
+        {
+          t: 'Lead Response',
+          tags: ['WhatsApp & calls', 'Instant qualification', 'Viewings booked'],
+          stat: '62% of enquiries arrive outside business hours — the average agent still takes 47 minutes to reply.',
+        },
+        {
+          t: 'Content Engine',
+          tags: ['Virtual staging', 'AI video clips', 'Ready for social'],
+          stat: "Agencies already pay $16–75 per photo for staging. Same spend, same day, done for you.",
+        },
         { t: 'Growth Retainer', tags: ['Ongoing listings', 'Monthly pipeline', 'One point of contact'] },
       ],
     },
@@ -92,11 +108,27 @@ export const COPY = {
       studio: '[ Estudio ]',
       location: '[ Barcelona ]',
     },
+    stats: {
+      items: [
+        { v: '78%', l: 'de compradores va con quien responde primero' },
+        { v: '21×', l: 'más probable cerrar en 5 min vs. 30' },
+        { v: '7.500 €+', l: 'de comisión perdida por cada lead sin responder' },
+      ],
+      source: 'NAR y estudios de sector sobre tiempo de respuesta, 2025–26',
+    },
     services: {
       eyebrow: 'Así ayudamos',
       items: [
-        { t: 'Lead Response', tags: ['WhatsApp y llamadas', 'Cualificación instantánea', 'Visitas agendadas'] },
-        { t: 'Content Engine', tags: ['Staging virtual', 'Clips de vídeo IA', 'Listo para redes'] },
+        {
+          t: 'Lead Response',
+          tags: ['WhatsApp y llamadas', 'Cualificación instantánea', 'Visitas agendadas'],
+          stat: 'El 62% de las consultas llegan fuera de horario — la media de un agente sigue siendo 47 minutos para responder.',
+        },
+        {
+          t: 'Content Engine',
+          tags: ['Staging virtual', 'Clips de vídeo IA', 'Listo para redes'],
+          stat: 'Las agencias ya pagan 16–75€ por foto de staging. Mismo gasto, mismo día, sin que muevas un dedo.',
+        },
         { t: 'Growth Retainer', tags: ['Propiedades continuas', 'Pipeline mensual', 'Un único contacto'] },
       ],
     },

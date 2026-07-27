@@ -197,7 +197,34 @@ export function Hero() {
           ['Status', en ? 'Taking work' : 'Con hueco'],
         ]}
       />
+
+      <StatStrip />
     </section>
+  )
+}
+
+/** Lo que le cuesta a una agencia NO hacer esto — cifras reales, no promesa. */
+function StatStrip() {
+  const { lang } = useLanguage()
+  const t = COPY[lang].stats
+  return (
+    <div className="border-b" style={{ borderColor: LINE, backgroundColor: INK }}>
+      <div className="mx-auto grid max-w-[1260px] grid-cols-1 gap-px px-5 py-8 sm:grid-cols-3 md:px-7">
+        {t.items.map((s) => (
+          <div key={s.l} className="px-2 py-2 sm:px-6">
+            <p className="font-display text-[clamp(1.8rem,3.4vw,2.6rem)] leading-none tracking-[-0.02em]" style={{ color: TERRA }}>
+              {s.v}
+            </p>
+            <p className="mt-2 max-w-[26ch] font-mono text-[10.5px] leading-relaxed text-[rgba(240,238,233,0.75)]">
+              {s.l}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="mx-auto max-w-[1260px] px-5 pb-5 font-mono text-[9px] uppercase tracking-[0.14em] text-[rgba(240,238,233,0.4)] md:px-7">
+        {t.source}
+      </p>
+    </div>
   )
 }
 
@@ -243,6 +270,11 @@ export function Services() {
                 <div className="mt-3">
                   <TickBar pct={load[i]} delay={i * 120} />
                 </div>
+                {'stat' in it && it.stat && (
+                  <p className="mt-3 max-w-[46ch] font-mono text-[10.5px] leading-relaxed text-[rgba(17,17,17,0.6)]">
+                    {it.stat}
+                  </p>
+                )}
               </div>
             </div>
           ))}
