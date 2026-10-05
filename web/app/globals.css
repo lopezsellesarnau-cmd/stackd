@@ -9,146 +9,35 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    /* Hueso/tinta de la estética "ficha técnica" (no el crema editorial). */
-    background: #f0eee9;
-    color: #111111;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    background: #fcfcfb;
+    color: #141310;
+    overflow-x: clip;
+    font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
   }
   ::selection {
-    background: rgba(193, 102, 61, 0.25);
+    background: rgba(193, 102, 61, 0.16);
   }
   :focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px #f0eee9, 0 0 0 4px #111111;
+    outline: 2px solid #c1663d;
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 }
 
 @layer components {
-  .container-page {
-    @apply mx-auto w-full max-w-[1260px] px-6;
+  /* Un solo marco de 6 columnas para todas las secciones. */
+  .frame {
+    @apply mx-auto w-full max-w-[75rem] px-4 md:px-8;
   }
-  .eyebrow {
-    @apply text-[13px] font-medium tracking-tight text-fg-dim;
+  .mono {
+    font-family: var(--font-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.01em;
   }
-  .display {
-    @apply font-display leading-[1.0] tracking-display;
-  }
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-accent px-[18px] py-2.5
-           text-sm font-medium text-white transition-colors hover:bg-accent-hover;
-  }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg border border-[rgba(0,0,0,0.14)]
-           bg-black/[0.02] px-[18px] py-2.5 text-sm font-medium text-fg-muted
-           transition-colors hover:border-[rgba(0,0,0,0.24)] hover:text-fg;
-  }
-}
-
-/* Animaciones de entrada — sutiles, tipo Linear: fade + subida corta. */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.fade-up {
-  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-6px); }
-}
-.float-slow {
-  animation: float-slow 6s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.35; }
-}
-.pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-@keyframes caret-blink {
-  0%, 45%  { opacity: 1; }
-  50%, 95% { opacity: 0; }
-  100%     { opacity: 1; }
-}
-.type-caret {
-  animation: caret-blink 1s steps(1) infinite;
-}
-
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.marquee-track {
-  animation: marquee 22s linear infinite;
-}
-
-/* ── Estética "ficha técnica" ──────────────────────────────────────────── */
-
-/* Trama diagonal muy tenue de fondo: profundidad sin sombras. Los paneles van
-   en hueso sólido para recortarse encima. */
-.ficha-grain {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(17, 17, 17, 0.03) 0 1px,
-    transparent 1px 7px
-  );
-}
-
-/* Botones rectos, mono, versalitas. El ghost invierte a sólido en hover. */
-.btn-solid,
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.7rem 1.4rem;
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition: opacity 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
-}
-.btn-solid {
-  background: #111111;
-  color: #f0eee9;
-}
-.btn-solid:hover {
-  opacity: 0.82;
-}
-.btn-ghost {
-  border: 1px solid rgba(17, 17, 17, 0.3);
-  color: #111111;
-}
-.btn-ghost:hover {
-  background: #111111;
-  border-color: #111111;
-  color: #f0eee9;
-}
-
-/* Barra de ticks que se rellena al entrar en viewport (.ficha-live). */
-@keyframes tick-fill {
-  from { transform: scaleX(0); }
-}
-.tick-fill {
-  transform-origin: left;
-}
-.ficha-live .tick-fill {
-  animation: tick-fill 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* Respiración lenta — botón de play, invita a mirar sin distraer. */
-@keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%      { transform: scale(1.025); opacity: 0.92; }
-}
-.breathe {
-  animation: breathe 3.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fade-up, .float-slow, .pulse-dot, .type-caret, .marquee-track, .breathe { animation: none; }
-  .ficha-live .tick-fill { animation: none; }
+  html { scroll-behavior: auto; }
 }

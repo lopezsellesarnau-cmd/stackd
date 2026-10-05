@@ -1,309 +1,284 @@
 'use client'
 
 /**
- * StackD landing — estética "ficha técnica" (misma que el /lab de Aithority;
- * el manual del lenguaje está en el vault, carpeta Sistema-UI):
- * hueso #F0EEE9, tinta #111, terracota #C1663D como único acento, IBM Plex Mono
- * como lenguaje de etiquetado, retícula visible con hairlines y grano de píxel.
+ * StackD landing — lenguaje "minimal espacio abierto" (5 oct 2026), el mismo
+ * que arnau-lopez.com (vault: Diseño/10-minimal-espacio-abierto): papel casi
+ * blanco, Helvetica pequeña, mono para números, rejilla invisible de 6
+ * columnas, una pantalla por sección con etiquetas en las esquinas.
  *
- * El contenido (bilingüe EN/ES) no cambia — sale de components/copy.ts. Lo que
- * cambia es el lenguaje visual. La planta de puntos del hero se porta tal cual
- * desde Aithority (components/dot-tree.tsx).
+ * Coherente con el portfolio pero no un espejo:
+ *   - acento terracota de StackD (#C1663D) y el punto del logotipo
+ *   - Services en tres columnas, Process como fila de pasos (no hitos)
+ *   - contacto con formulario dentro del bloque gris, y selector EN/ES
+ * El contenido (bilingüe EN/ES) sale de components/copy.ts.
  */
 
-import { useEffect, useRef, useState } from 'react'
-import { DotTree } from './dot-tree'
-import { FolderStack } from './folder-stack'
-import { PhotoDots } from './halftone-icon'
-import { INTERIOR_GRID } from './photo-art-data'
-import { AgentDashboards } from './agent-dashboards'
-import { AgencyTree } from './agency-tree'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from './language-context'
 import { COPY } from './copy'
 
-const TERRA = '#C1663D'
-const INK = '#111111'
-const BONE = '#F0EEE9'
-const LINE = 'rgba(17,17,17,0.22)'
-const HAIR = 'rgba(17,17,17,0.14)'
+const EMAIL = 'hello@stackd.dev'
+const PORTFOLIO = 'https://arnau-lopez.com'
+const LINKEDIN = 'https://www.linkedin.com/in/arnau-lopez-selles/'
 
-// ── Piezas compartidas ──────────────────────────────────────────────────
+const ext = (href: string) =>
+  href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
-/** Etiqueta de sección numerada. */
-function SectionTag({ n, label }: { n: string; label: string }) {
+/** Logotipo: el punto terracota es la marca de StackD. */
+function Wordmark() {
   return (
-    <p className="flex items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.18em]">
-      <span style={{ color: TERRA }}>{n}</span>
-      <span className="text-[rgba(17,17,17,0.5)]">{label}</span>
-    </p>
+    <>
+      StackD<span className="text-accent">.</span>
+    </>
   )
 }
 
-/** Barra de ticks — cada tick es una unidad, no un píxel de porcentaje. */
-function TickBar({ pct, ticks = 40, delay = 0 }: { pct: number; ticks?: number; delay?: number }) {
-  const filled = Math.round((pct / 100) * ticks)
+/** Fila etiqueta/valor del bloque gris (popup y contacto). */
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex w-full items-stretch gap-[2px]" aria-hidden>
-      {Array.from({ length: ticks }).map((_, i) => (
-        <span
-          key={i}
-          className={`h-[18px] flex-1 ${i < filled ? 'tick-fill' : ''}`}
-          style={{
-            backgroundColor: i < filled ? INK : 'rgba(17,17,17,0.13)',
-            animationDelay: `${delay + i * 12}ms`,
-          }}
-        />
-      ))}
+    <div className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
+      <span className="text-right text-fg-faint">{label}</span>
+      <div className="text-ink">{children}</div>
     </div>
   )
 }
 
-/** Reveal por viewport: añade .ficha-live cuando entra en pantalla. */
-function useLive() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [live, setLive] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setLive(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.25 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-  return { ref, live }
-}
+// ── Menu ─────────────────────────────────────────────────────────────────
 
-// ── Nav ──────────────────────────────────────────────────────────────────
+const LINKS = ['work', 'services', 'process', 'contact'] as const
 
 export function Nav() {
   const { lang, setLang } = useLanguage()
   const t = COPY[lang].nav
-  return (
-    <header className="sticky top-0 z-40 border-b bg-[#F0EEE9]" style={{ borderColor: LINE }}>
-      <nav className="flex items-center justify-between px-5 py-3.5 md:px-7" aria-label="Primary">
-        <a href="#top" className="text-[15px] font-medium tracking-[-0.02em] text-[#111]">
-          StackD
-        </a>
+  const en = lang === 'en'
+  const labels: Record<(typeof LINKS)[number], string> = {
+    work: t.work,
+    services: t.services,
+    process: en ? 'Process' : 'Proceso',
+    contact: t.contact,
+  }
+  const [active, setActive] = useState('')
 
-        <div className="flex items-center gap-5">
-          {[
-            [t.work, '#work'],
-            [t.services, '#services'],
-            [t.contact, '#contact'],
-          ].map(([label, href]) => (
+  useEffect(() => {
+    const els = LINKS.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[]
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: '-45% 0px -50% 0px' },
+    )
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <header className="fixed inset-x-0 top-0 z-40 bg-paper/85 backdrop-blur-[2px]">
+      <div className="frame grid grid-cols-3 py-5 text-[12px] leading-[1.45] md:grid-cols-6">
+        <a href="#top" className="pl-2 text-ink">
+          <Wordmark />
+        </a>
+        <p className="hidden pl-2 text-fg-faint md:block">
+          {en ? 'Freelance software' : 'Software freelance'}
+          <br />
+          {en ? 'by Arnau López' : 'por Arnau López'}
+        </p>
+        <nav className="col-span-2 flex items-start justify-end gap-5 pr-2 md:col-span-4" aria-label="Primary">
+          {LINKS.map((id) => (
             <a
-              key={href}
-              href={href}
-              className="hidden font-mono text-[10.5px] uppercase tracking-[0.12em] text-[rgba(17,17,17,0.55)] transition-colors hover:text-[#111] sm:inline"
+              key={id}
+              href={`#${id}`}
+              className={`hidden transition-colors hover:text-accent sm:inline ${active === id ? 'text-ink underline decoration-1 underline-offset-[6px]' : 'text-fg-muted'}`}
             >
-              {label}
+              {labels[id]}
             </a>
           ))}
-          <div className="flex items-center gap-px border" style={{ borderColor: HAIR }}>
+          <span className="flex gap-2 uppercase">
             {(['en', 'es'] as const).map((l) => (
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className="px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors"
-                style={lang === l ? { backgroundColor: INK, color: BONE } : { color: 'rgba(17,17,17,0.5)' }}
                 aria-pressed={lang === l}
+                className={`transition-colors hover:text-accent ${lang === l ? 'text-ink' : 'text-fg-ghost'}`}
               >
                 {l}
               </button>
             ))}
-          </div>
-        </div>
-      </nav>
+          </span>
+        </nav>
+      </div>
     </header>
   )
 }
 
 // ── Hero ─────────────────────────────────────────────────────────────────
 
-function MetaRow({ items }: { items: [string, string][] }) {
-  return (
-    <div
-      className="grid grid-cols-2 border-y font-mono text-[10.5px] uppercase tracking-[0.14em] md:grid-cols-4"
-      style={{ borderColor: LINE }}
-    >
-      {items.map(([k, v], i) => (
-        <div
-          key={k}
-          className={`px-5 py-3 md:px-7 ${i % 2 === 0 ? 'border-r' : ''} ${i < 2 ? 'border-b md:border-b-0' : ''} md:border-r md:last:border-r-0`}
-          style={{ borderColor: LINE }}
-        >
-          <span className="text-[rgba(17,17,17,0.45)]">{k}</span>
-          <span className="ml-2 text-[#111]">{v}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export function Hero() {
   const { lang } = useLanguage()
   const t = COPY[lang].hero
   const en = lang === 'en'
+  const notes: { n: string; lines: string[]; pos: string }[] = [
+    { n: '1', lines: ['BlockFlow', en ? 'SaaS · in production' : 'SaaS · en producción'], pos: 'md:col-start-1 md:row-start-1' },
+    { n: '2', lines: ['Kiblo · TRACE', en ? 'iOS · live on the App Store' : 'iOS · en la App Store'], pos: 'md:col-start-2 md:row-start-2' },
+    { n: '3', lines: ['Dross', en ? 'Mac app · notarized' : 'App Mac · notarizada'], pos: 'md:col-start-1 md:row-start-3' },
+    { n: '4', lines: [en ? 'Status' : 'Estado', en ? 'Taking work' : 'Con hueco'], pos: 'md:col-start-2 md:row-start-4' },
+  ]
+
   return (
-    <section id="top" className="border-b" style={{ borderColor: LINE }}>
-      {/* La planta se queda encerrada aquí para no desbordar la sección. */}
-      <div className="relative overflow-hidden">
-        <DotTree />
-        <div className="relative mx-auto max-w-[1260px] px-5 pb-14 pt-16 md:px-7 md:pt-24">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-[rgba(17,17,17,0.5)]">
-            <span>{en ? 'Type: studio / ai software' : 'Tipo: estudio / software ia'}</span>
-            <span className="hidden sm:inline">Est. 2026</span>
-            <span className="border px-2 py-0.5 text-[#111]" style={{ borderColor: 'rgba(17,17,17,0.3)' }}>
-              {t.location.replace(/[[\]]/g, '').trim()}
-            </span>
-          </div>
-
-          <h1 className="mt-8 max-w-4xl font-display text-[clamp(3rem,10vw,7rem)] leading-[0.92] tracking-[-0.04em] text-[#111]">
-            StackD<span style={{ color: TERRA }}>.</span>
-          </h1>
-
-          <p className="mt-7 max-w-xl font-mono text-[12.5px] leading-relaxed text-[rgba(17,17,17,0.65)]">
-            {t.body}
-          </p>
-
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a href="#work" className="btn-solid">
-              {en ? 'See work →' : 'Ver trabajos →'}
-            </a>
-            <a href="#contact" className="btn-ghost">
-              {en ? "Let's talk →" : 'Hablar →'}
-            </a>
-          </div>
-
-          {/* En móvil la planta baja como franja propia (no cabe al lado). */}
-          <div className="mt-10 md:hidden">
-            <DotTree variant="band" />
-          </div>
-        </div>
+    <section id="top" className="relative flex min-h-[100svh] flex-col pt-28">
+      <div className="frame text-center">
+        <h1 className="text-[clamp(1.25rem,2.6vw,1.75rem)] font-normal uppercase leading-[1.15] tracking-[-0.01em] text-ink">
+          <Wordmark />
+          <br />
+          {en ? 'Freelance software development' : 'Desarrollo de software freelance'}
+        </h1>
+        <p className="mt-3 text-[12px] uppercase tracking-[0.04em] text-fg-dim">
+          {en ? 'Web · Mobile · AI · ' : 'Web · Móvil · IA · '}
+          {t.location.replace(/[[\]]/g, '').trim()}
+        </p>
       </div>
 
-      <MetaRow
-        items={[
-          [en ? 'Clients' : 'Clientes', '4'],
-          [en ? 'Delivery' : 'Entrega', en ? '~1 week start' : '~1 sem inicio'],
-          [en ? 'Ownership' : 'Propiedad', en ? 'Full IP → you' : 'IP → tuya'],
-          ['Status', en ? 'Taking work' : 'Con hueco'],
-        ]}
-      />
-
-      <StatStrip />
+      <div className="frame mt-16 grid grid-cols-2 content-start gap-y-10 pb-16 md:mt-20 md:grid-cols-6 md:gap-y-12">
+        {notes.map((h) => (
+          <p key={h.n} className={`mono pl-2 text-[11px] uppercase leading-[1.55] text-fg-muted ${h.pos}`}>
+            <span className="mr-3 text-accent">{h.n}</span>
+            {h.lines.map((l, i) => (
+              <span key={i} className="block">
+                {l}
+              </span>
+            ))}
+          </p>
+        ))}
+        <div className="col-span-2 max-w-[36ch] pl-2 md:col-span-2 md:col-start-5 md:row-start-3">
+          <p className="text-[12px] leading-[1.6] text-fg-muted">{t.body}</p>
+          <p className="mt-4 flex gap-5 text-[12px] uppercase">
+            <a href="#work" className="text-ink underline decoration-fg-ghost underline-offset-4 hover:text-accent">
+              {en ? 'See work' : 'Ver trabajo'}
+            </a>
+            <a href="#contact" className="text-ink underline decoration-fg-ghost underline-offset-4 hover:text-accent">
+              {en ? "Let's talk" : 'Hablemos'}
+            </a>
+          </p>
+        </div>
+      </div>
     </section>
   )
 }
 
-/** Lo que le cuesta a una agencia NO hacer esto — cifras reales, no promesa. */
-function StatStrip() {
-  const { lang } = useLanguage()
-  const t = COPY[lang].stats
-  return (
-    <div className="border-b" style={{ borderColor: LINE, backgroundColor: INK }}>
-      <div className="mx-auto grid max-w-[1260px] grid-cols-1 gap-px px-5 py-8 sm:grid-cols-3 md:px-7">
-        {t.items.map((s) => (
-          <div key={s.l} className="px-2 py-2 sm:px-6">
-            <p className="font-display text-[clamp(1.8rem,3.4vw,2.6rem)] leading-none tracking-[-0.02em]" style={{ color: TERRA }}>
-              {s.v}
-            </p>
-            <p className="mt-2 max-w-[26ch] font-mono text-[10.5px] leading-relaxed text-[rgba(240,238,233,0.75)]">
-              {s.l}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="mx-auto max-w-[1260px] px-5 pb-5 font-mono text-[9px] uppercase tracking-[0.14em] text-[rgba(240,238,233,0.4)] md:px-7">
-        {t.source}
-      </p>
-    </div>
-  )
-}
-
-// ── Services ───────────────────────────────────────────────────────────────
+// ── Services ─────────────────────────────────────────────────────────────
 
 export function Services() {
   const { lang } = useLanguage()
   const t = COPY[lang].services
-  const { ref, live } = useLive()
-  // "Madurez" de cada línea de servicio — da lectura de instrumento a la sección.
-  const load = [92, 80, 96]
-
+  const s = COPY[lang].stats
   return (
-    <section id="services" className="border-b py-14 md:py-20" style={{ borderColor: LINE }}>
-      <div ref={ref} className={`mx-auto max-w-[1260px] px-5 md:px-7 ${live ? 'ficha-live' : ''}`}>
-        <SectionTag n="01" label={t.eyebrow} />
+    <section id="services" className="relative flex min-h-[100svh] flex-col justify-between py-24">
+      <p className="frame text-[12px] uppercase text-ink">
+        <span className="pl-2">{t.eyebrow}</span>
+      </p>
 
-        <div className="mt-8 border-t" style={{ borderColor: LINE }}>
-          {t.items.map((it, i) => (
-            <div
-              key={it.t}
-              className="grid gap-4 border-b py-6 md:grid-cols-[1fr_1.1fr] md:items-center md:gap-10"
-              style={{ borderColor: HAIR }}
-            >
-              <div className="flex items-baseline gap-4">
-                <span className="font-mono text-[11px] text-[rgba(17,17,17,0.4)]">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <h2 className="font-display text-[clamp(1.8rem,5vw,3rem)] leading-[0.95] tracking-[-0.03em] text-[#111]">
-                  {it.t}
-                </h2>
-              </div>
+      <div className="frame my-16 grid gap-y-12 md:grid-cols-6">
+        {t.items.map((it, i) => (
+          <div key={it.t} className="pl-2 pr-6 md:col-span-2">
+            <p className="mono text-[10px] text-fg-faint">{String(i + 1).padStart(2, '0')}</p>
+            <h2 className="mt-2 text-[13px] font-normal uppercase text-ink">{it.t}</h2>
+            <p className="mono mt-3 text-[10px] uppercase leading-[1.6] text-fg-dim">{it.tags.join(' · ')}</p>
+            <p className="mt-3 max-w-[34ch] text-[11px] leading-[1.55] text-fg-muted">{it.stat}</p>
+          </div>
+        ))}
+      </div>
 
-              <div>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[rgba(17,17,17,0.55)]">
-                  {it.tags.map((tag) => (
-                    <span key={tag} className="flex items-center gap-1.5">
-                      <span className="h-1 w-1" style={{ backgroundColor: TERRA }} aria-hidden />
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-3">
-                  <TickBar pct={load[i]} delay={i * 120} />
-                </div>
-                {'stat' in it && it.stat && (
-                  <p className="mt-3 max-w-[46ch] font-mono text-[10.5px] leading-relaxed text-[rgba(17,17,17,0.6)]">
-                    {it.stat}
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="frame grid gap-y-4 text-[12px] uppercase md:grid-cols-6">
+        {s.items.map((x) => (
+          <p key={x.l} className="pl-2 pr-6 text-fg-dim md:col-span-2">
+            <span className="mr-2 text-ink">{x.v}</span>
+            {x.l}
+          </p>
+        ))}
       </div>
     </section>
   )
 }
 
-// ── Works ──────────────────────────────────────────────────────────────────
+// ── Work ─────────────────────────────────────────────────────────────────
 
-const WORK_META: Record<string, { nombre: string; tag: string; status: string }> = {
-  blockflow: { nombre: 'BlockFlow', tag: 'AI voice agent', status: 'live' },
-  staging: { nombre: 'Content Engine', tag: 'Virtual staging & video', status: 'live' },
-  leadagent: { nombre: 'Lead Agent', tag: 'Instant lead response', status: 'build' },
+const WORK_META: Record<string, { name: string; kind: string; stack: string[]; year: string; link?: string; linkLabel?: string }> = {
+  blockflow: { name: 'BlockFlow', kind: 'SaaS · AI voice agent', stack: ['Next.js', 'Supabase', 'LLM', 'Voice AI'], year: '2026' },
+  kiblo: {
+    name: 'Kiblo',
+    kind: 'iOS app',
+    stack: ['React Native', 'Expo', 'TypeScript', 'Firebase'],
+    year: '2026',
+    link: 'https://apps.apple.com/app/id6802237827',
+    linkLabel: 'App Store',
+  },
+  trace: {
+    name: 'TRACE',
+    kind: 'iOS app · privacy',
+    stack: ['React Native', 'TypeScript', 'Firebase'],
+    year: '2026',
+    link: 'https://github.com/lopezsellesarnau-cmd/trace-app',
+    linkLabel: 'Repository',
+  },
+  dross: {
+    name: 'Dross',
+    kind: 'Mac app · dev tool',
+    stack: ['SwiftUI', 'macOS', 'TypeScript'],
+    year: '2026',
+    link: 'https://github.com/lopezsellesarnau-cmd/dross',
+    linkLabel: 'Repository',
+  },
 }
 
-function StatusChip({ status, en }: { status: string; en: boolean }) {
-  const live = status === 'live'
-  const label = live ? (en ? 'In production' : 'En producción') : en ? 'In build' : 'En desarrollo'
-  const color = live ? '#3F7A4E' : TERRA
+type Caso = { which: string; index: string; caption: string }
+
+function ProjectCard({ caso, en, onClose }: { caso: Caso; en: boolean; onClose: () => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const m = WORK_META[caso.which]
+
+  useEffect(() => {
+    ref.current?.focus()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return (
-    <span
-      className="inline-flex shrink-0 items-center gap-1.5 border px-1.5 py-[1px] font-mono text-[9px] uppercase tracking-[0.1em]"
-      style={{ borderColor: color, color }}
-    >
-      <span className="h-1 w-1" style={{ backgroundColor: color }} aria-hidden />
-      {label}
-    </span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-paper/70 px-4" onClick={onClose}>
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-label={m.name}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className="relative max-h-[78vh] w-[min(470px,100%)] overflow-y-auto bg-card px-5 py-5 text-[11px] uppercase leading-[1.45] tracking-[0.01em] outline-none"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-3 top-3 uppercase text-fg-faint transition-colors hover:text-ink"
+        >
+          {en ? 'Close' : 'Cerrar'}
+        </button>
+        <Row label={caso.index}>
+          {m.name}
+          <span className="block text-fg-dim">{m.kind}</span>
+        </Row>
+        <Row label={en ? 'Status' : 'Estado'}>{en ? 'In production' : 'En producción'}</Row>
+        <div className="h-3" />
+        <Row label={en ? 'What' : 'Qué'}>
+          <span className="normal-case">{caso.caption}</span>
+        </Row>
+        <div className="h-3" />
+        <Row label="Stack">{m.stack.join(', ')}</Row>
+        <Row label={en ? 'Year' : 'Año'}>{m.year}</Row>
+        {m.link && (
+          <Row label="Link">
+            <a href={m.link} {...ext(m.link)} className="underline decoration-fg-ghost underline-offset-2 hover:text-accent">
+              {m.linkLabel} ↗
+            </a>
+          </Row>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -311,171 +286,113 @@ export function WorksGrid() {
   const { lang } = useLanguage()
   const t = COPY[lang].works
   const en = lang === 'en'
+  const [openKey, setOpenKey] = useState<string | null>(null)
+  const close = useCallback(() => setOpenKey(null), [])
+  const open = t.rows.find((r) => r.which === openKey) ?? null
+
   return (
-    <section id="work" className="border-b py-14 md:py-20" style={{ borderColor: LINE }}>
-      <div className="mx-auto max-w-[1260px] px-5 md:px-7">
-        <SectionTag n="02" label={t.marquee} />
+    <section id="work" className="relative flex min-h-[100svh] flex-col justify-between py-24">
+      <p className="frame text-[12px] uppercase text-ink">
+        <span className="pl-2">{en ? 'Selected work' : 'Trabajo seleccionado'}</span>
+      </p>
 
-        {/* Los trabajos SON las carpetas del archivador. Antes cada uno llevaba
-            su mockup pequeño, pero desde que la sección 03 enseña dashboards
-            completos aquellos restaban en vez de sumar. */}
-        <div className="mt-10">
-          <FolderStack
-            en={en}
-            carpetas={t.rows.map((r, i) => ({
-              n: r.index,
-              nombre: WORK_META[r.which].nombre,
-              tipo: WORK_META[r.which].tag,
-              estado: WORK_META[r.which].status as 'live' | 'build',
-              texto: r.caption,
-              left: ['6%', '30%', '17%', '46%'][i],
-            }))}
-          />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Agentes: qué podemos construir ─────────────────────────────────────────
-
-export function Agents() {
-  const { lang } = useLanguage()
-  const en = lang === 'en'
-  return (
-    <section id="agents" className="border-b py-14 md:py-20" style={{ borderColor: LINE }}>
-      <div className="mx-auto max-w-[1260px] px-5 md:px-7">
-        <SectionTag n="03" label={en ? 'What we can build for you' : 'Lo que podemos construir'} />
-        <p className="mt-6 max-w-[64ch] font-mono text-[11.5px] leading-relaxed text-[rgba(17,17,17,0.6)]">
-          {en
-            ? 'Four systems we build over and over. Not chatbots: agents that decide, act and explain why.'
-            : 'Cuatro sistemas que construimos una y otra vez. No son chatbots: son agentes que deciden, actúan y explican por qué.'}
-        </p>
-        <div className="mt-8">
-          <AgentDashboards en={en} />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Árbol: qué se automatiza y qué no ──────────────────────────────────────
-
-export function Pipeline() {
-  const { lang } = useLanguage()
-  const en = lang === 'en'
-  return (
-    <section className="border-b py-14 md:py-20" style={{ borderColor: LINE }}>
-      <div className="mx-auto max-w-[1260px] px-5 md:px-7">
-        <SectionTag n="04" label={en ? 'Where we stop' : 'Dónde paramos'} />
-        <p className="mt-6 max-w-[64ch] font-mono text-[11.5px] leading-relaxed text-[rgba(17,17,17,0.6)]">
-          {en
-            ? 'A real pipeline, drawn honestly: what the agent publishes on its own, what waits for approval, and what goes to a person. The dotted branch is the point.'
-            : 'Un flujo real, dibujado con honestidad: qué publica el agente solo, qué espera aprobación y qué va a una persona. La rama punteada es justo lo importante.'}
-        </p>
-        <div className="mt-8">
-          <AgencyTree en={en} />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Valores ──────────────────────────────────────────────────────────────
-
-export function Values() {
-  const { lang } = useLanguage()
-  const t = COPY[lang].values
-  return (
-    <section className="border-b py-14 md:py-20" style={{ borderColor: LINE }}>
-      <div className="mx-auto max-w-[1260px] px-5 md:px-7">
-        <SectionTag n="05" label={t.title} />
-        <p className="mt-6 max-w-md font-mono text-[11.5px] leading-relaxed text-[rgba(17,17,17,0.6)]">
-          {t.body}
-        </p>
-
-        <PhotoDots grid={INTERIOR_GRID} seed={2026} className="mt-10 block w-full max-w-[780px] text-[#111] md:ml-auto" />
-
-        <div className="mt-10 grid gap-8 sm:grid-cols-3">
-          {t.items.map((it, i) => (
-            <div key={it.t}>
-              <p className="font-mono text-[10.5px] text-[rgba(17,17,17,0.4)]">
-                {String(i + 1).padStart(2, '0')}
-              </p>
-              <h3 className="mt-1 text-[19px] font-medium tracking-[-0.02em] text-[#111]">{it.t}</h3>
-              <p className="mt-2 font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.6)]">{it.d}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Tech stack ─────────────────────────────────────────────────────────────
-
-export function TechStack() {
-  const { lang } = useLanguage()
-  const t = COPY[lang].techStack
-  const stack = [
-    'Next.js', 'TypeScript', 'Supabase', 'Postgres', 'OpenAI', 'Anthropic',
-    'Twilio', 'Stripe', 'Vercel', 'n8n',
-  ]
-  return (
-    <section className="border-b py-12 md:py-16" style={{ borderColor: LINE }}>
-      <div className="mx-auto max-w-[1260px] px-5 md:px-7">
-        <SectionTag n="06" label={t.eyebrow} />
-        <div className="mt-6 flex flex-wrap gap-x-2 gap-y-2">
-          {stack.map((s) => (
-            <span
-              key={s}
-              className="border px-2.5 py-1 font-mono text-[10.5px] tracking-[0.02em] text-[rgba(17,17,17,0.7)]"
-              style={{ borderColor: HAIR }}
+      <ul className="mx-auto my-16 flex flex-col items-center gap-[6px] text-center text-[12px] font-medium uppercase leading-[1.3] tracking-[0.01em]">
+        {t.rows.map((r) => (
+          <li key={r.which}>
+            <button
+              type="button"
+              onClick={() => setOpenKey(r.which)}
+              className={`relative inline-block font-medium uppercase transition-colors hover:text-accent ${openKey && openKey !== r.which ? 'text-fg-ghost' : 'text-ink'}`}
             >
-              {s}
-            </span>
-          ))}
-        </div>
+              <span className="mono absolute right-full top-[1px] mr-3 text-[10px] font-normal text-fg-faint">{r.index}</span>
+              {WORK_META[r.which].name}
+              <span className="ml-3 font-normal text-fg-faint">{WORK_META[r.which].kind}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="frame flex justify-between text-[12px] uppercase">
+        <span className="pl-2 text-ink">
+          {String(t.rows.length).padStart(2, '0')} {en ? 'projects' : 'proyectos'}
+          <span className="ml-4 text-fg-dim">2024–2026</span>
+        </span>
+        <span className="pr-2 text-fg-dim">{en ? 'Press a project' : 'Pulsa un proyecto'}</span>
+      </div>
+
+      {open && <ProjectCard caso={open} en={en} onClose={close} />}
+    </section>
+  )
+}
+
+// ── Process + valores ────────────────────────────────────────────────────
+
+export function Process() {
+  const { lang } = useLanguage()
+  const p = COPY[lang].process
+  const v = COPY[lang].values
+  return (
+    <section id="process" className="relative flex min-h-[100svh] flex-col justify-between py-24">
+      <p className="frame text-[12px] uppercase text-ink">
+        <span className="pl-2">{p.title}</span>
+      </p>
+
+      <ol className="frame my-16 grid gap-y-8 md:grid-cols-4">
+        {p.steps.map((s, i) => (
+          <li key={s.t} className="pl-2 pr-6">
+            <p className="text-[13px] text-ink">
+              <span className="mono mr-2 text-[11px] text-accent">{String(i + 1).padStart(2, '0')}</span>
+              {s.t} <span className="ml-1 text-fg-faint">)</span>
+            </p>
+            <p className="mt-2 max-w-[26ch] text-[11px] leading-[1.45] text-fg-dim">{s.d}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div className="frame grid gap-y-8 md:grid-cols-6">
+        {v.items.map((it) => (
+          <div key={it.t} className="pl-2 pr-6 md:col-span-2">
+            <p className="text-[12px] uppercase text-ink">{it.t}</p>
+            <p className="mt-2 max-w-[34ch] text-[11px] leading-[1.5] text-fg-muted">{it.d}</p>
+          </div>
+        ))}
       </div>
     </section>
   )
 }
 
-// ── FAQ ────────────────────────────────────────────────────────────────────
+// ── Stack + FAQ ──────────────────────────────────────────────────────────
+
+const STACK = [
+  'TypeScript', 'Next.js', 'React', 'React Native', 'Expo', 'Python', 'FastAPI',
+  'Node.js', 'Postgres', 'Supabase', 'Firebase', 'SwiftUI', 'OpenAI', 'Anthropic', 'Vercel',
+]
 
 export function Faq() {
   const { lang } = useLanguage()
   const t = COPY[lang].faq
+  const s = COPY[lang].techStack
   return (
-    <section id="faq" className="border-b py-14 md:py-20" style={{ borderColor: LINE }}>
-      <div className="mx-auto max-w-[1260px] px-5 md:px-7">
-        <SectionTag n="07" label={t.eyebrow} />
-        <h2 className="mt-6 font-display text-[clamp(1.6rem,4vw,2.4rem)] tracking-[-0.03em] text-[#111]">
-          {t.title}
-        </h2>
+    <section id="faq" className="relative py-32">
+      <div className="frame grid gap-y-16 md:grid-cols-6">
+        <h2 className="pl-2 text-[clamp(1.1rem,2vw,1.4rem)] font-normal uppercase text-ink md:col-span-2">Stack</h2>
+        <div className="pl-2 pr-6 md:col-span-4">
+          <p className="mono text-[10px] uppercase text-fg-faint">{s.eyebrow}</p>
+          <p className="mono mt-2 max-w-[60ch] text-[11px] uppercase leading-[1.6] text-ink">{STACK.join(', ')}</p>
+        </div>
 
-        <div className="mt-8 border-t" style={{ borderColor: LINE }}>
+        <h2 className="pl-2 text-[clamp(1.1rem,2vw,1.4rem)] font-normal uppercase text-ink md:col-span-2">{t.eyebrow}</h2>
+        <div className="md:col-span-4">
           {t.items.map((it, i) => (
-            <details key={it.q} className="group border-b py-4" style={{ borderColor: HAIR }}>
-              <summary className="flex cursor-pointer list-none items-start justify-between gap-6">
-                <span className="flex items-baseline gap-3">
-                  <span className="font-mono text-[10px] text-[rgba(17,17,17,0.4)]">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="font-mono text-[12.5px] text-[rgba(17,17,17,0.85)] transition-colors group-hover:text-[#111]">
-                    {it.q}
-                  </span>
-                </span>
-                <span
-                  aria-hidden
-                  className="mt-0.5 shrink-0 font-mono text-[rgba(17,17,17,0.4)] transition-transform duration-200 group-open:rotate-45"
-                >
+            <details key={it.q} className="group pl-2 pr-6 [&:not(:first-child)]:mt-3">
+              <summary className="flex cursor-pointer list-none items-baseline gap-3 text-[12px] uppercase text-ink transition-colors hover:text-accent">
+                <span className="mono text-[10px] text-fg-faint">{String(i + 1).padStart(2, '0')}</span>
+                {it.q}
+                <span aria-hidden className="text-fg-faint transition-transform group-open:rotate-45">
                   +
                 </span>
               </summary>
-              <p className="mt-2.5 max-w-2xl pl-[26px] font-mono text-[11px] leading-relaxed text-[rgba(17,17,17,0.6)]">
-                {it.a}
-              </p>
+              <p className="mt-2 max-w-[52ch] pl-[26px] text-[11px] leading-[1.55] text-fg-muted">{it.a}</p>
             </details>
           ))}
         </div>
@@ -484,97 +401,84 @@ export function Faq() {
   )
 }
 
-// ── Contact ────────────────────────────────────────────────────────────────
+// ── Contact ──────────────────────────────────────────────────────────────
 
 export function Contact() {
   const { lang } = useLanguage()
   const t = COPY[lang].contact
   const en = lang === 'en'
   const [sent, setSent] = useState(false)
+  const field = 'w-full bg-transparent text-ink outline-none placeholder:text-fg-ghost'
 
   return (
-    <section id="contact" className="border-b py-16 md:py-24" style={{ borderColor: LINE }}>
-      <div className="mx-auto max-w-[1260px] px-5 md:px-7">
-        <SectionTag n="08" label={t.eyebrow} />
-        <h2 className="mt-6 font-display text-[clamp(2.4rem,8vw,5rem)] tracking-[-0.04em] text-[#111]">
-          {t.title}
-        </h2>
+    <section id="contact" className="relative flex min-h-[90svh] flex-col justify-between py-24">
+      <p className="frame text-[12px] uppercase text-ink">
+        <span className="pl-2">
+          {t.eyebrow} {t.title}
+        </span>
+      </p>
 
+      <div className="mx-auto my-16 w-[min(380px,calc(100%-2rem))] bg-card px-3 py-3 text-[11px] uppercase leading-[1.45]">
         {sent ? (
-          <div
-            className="mt-10 max-w-xl border p-5 font-mono text-[11.5px] leading-relaxed text-[rgba(17,17,17,0.7)]"
-            style={{ borderColor: LINE }}
-          >
-            {en
-              ? 'Your mail client should have opened. If not, write us at hello@stackd.dev.'
-              : 'Se habrá abierto tu cliente de correo. Si no, escríbenos a hello@stackd.dev.'}
-          </div>
+          <p className="px-2 py-1 normal-case text-fg-muted">
+            {en ? `Your mail client should have opened. If not, write me at ${EMAIL}.` : `Se habrá abierto tu correo. Si no, escríbeme a ${EMAIL}.`}
+          </p>
         ) : (
           <form
-            className="mt-10 max-w-xl border"
-            style={{ borderColor: LINE, backgroundColor: BONE }}
             onSubmit={(e) => {
               e.preventDefault()
               const data = new FormData(e.currentTarget)
-              const subject = encodeURIComponent(`StackD — ${data.get('name') || ''}`)
-              const body = encodeURIComponent(`${data.get('message') || ''}\n\n— ${data.get('email') || ''}`)
-              window.location.href = `mailto:hello@stackd.dev?subject=${subject}&body=${body}`
+              const subject = encodeURIComponent(`StackD | ${data.get('name') || ''}`)
+              const body = encodeURIComponent(`${data.get('message') || ''}\n\n${data.get('email') || ''}`)
+              window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`
               setSent(true)
             }}
           >
-            {[
-              ['name', t.name, 'text'],
-              ['email', t.email, 'email'],
-            ].map(([name, label, type]) => (
-              <label key={name} className="flex items-center border-b" style={{ borderColor: HAIR }}>
-                <span className="w-24 shrink-0 px-4 py-3 font-mono text-[9.5px] uppercase tracking-[0.12em] text-[rgba(17,17,17,0.4)]">
-                  {label}
-                </span>
-                <input
-                  name={name}
-                  type={type}
-                  required
-                  className="w-full bg-transparent px-2 py-3 font-mono text-[12px] text-[#111] outline-none placeholder:text-[rgba(17,17,17,0.25)]"
-                />
-              </label>
-            ))}
-            <label className="flex border-b" style={{ borderColor: HAIR }}>
-              <span className="w-24 shrink-0 px-4 py-3 font-mono text-[9.5px] uppercase tracking-[0.12em] text-[rgba(17,17,17,0.4)]">
-                {t.message}
-              </span>
-              <textarea
-                name="message"
-                rows={3}
-                required
-                className="w-full resize-none bg-transparent px-2 py-3 font-mono text-[12px] text-[#111] outline-none placeholder:text-[rgba(17,17,17,0.25)]"
-              />
+            <label className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
+              <span className="text-right text-fg-faint">{t.name}</span>
+              <input name="name" required className={field} />
             </label>
-            <button type="submit" className="btn-solid w-full">
-              {t.send} →
-            </button>
+            <label className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
+              <span className="text-right text-fg-faint">{t.email}</span>
+              <input name="email" type="email" required className={`${field} normal-case`} />
+            </label>
+            <label className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
+              <span className="text-right text-fg-faint">{t.message}</span>
+              <textarea name="message" rows={3} required className={`${field} resize-none normal-case`} />
+            </label>
+            <div className="grid grid-cols-[5.5rem_1fr] gap-x-4 pt-2">
+              <span />
+              <button type="submit" className="text-left uppercase text-ink transition-colors hover:text-accent">
+                {t.send} →
+              </button>
+            </div>
           </form>
         )}
-      </div>
-    </section>
-  )
-}
-
-// ── Footer ─────────────────────────────────────────────────────────────────
-
-export function Footer() {
-  return (
-    <footer className="border-t" style={{ borderColor: LINE }}>
-      <div className="mx-auto flex max-w-[1260px] flex-col items-start justify-between gap-4 px-5 py-10 sm:flex-row sm:items-center md:px-7">
-        <span className="text-[15px] font-medium tracking-[-0.02em] text-[#111]">
-          StackD<span style={{ color: TERRA }}>.</span>
-        </span>
-        <div className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[rgba(17,17,17,0.45)]">
-          <a href="mailto:hello@stackd.dev" className="transition-colors hover:text-[#111]">
-            hello@stackd.dev
-          </a>
-          <span>© 2026</span>
+        <div className="mt-3 border-t border-paper pt-3">
+          <Row label="Email">
+            <a href={`mailto:${EMAIL}`} className="hover:text-accent">
+              {EMAIL}
+            </a>
+          </Row>
+          <Row label="LinkedIn">
+            <a href={LINKEDIN} {...ext(LINKEDIN)} className="hover:text-accent">
+              arnau-lopez-selles
+            </a>
+          </Row>
+          <Row label="Portfolio">
+            <a href={PORTFOLIO} {...ext(PORTFOLIO)} className="hover:text-accent">
+              arnau-lopez.com
+            </a>
+          </Row>
         </div>
       </div>
-    </footer>
+
+      <div className="frame flex justify-between text-[11px] uppercase text-fg-dim">
+        <span className="pl-2">
+          <Wordmark /> · Arnau López
+        </span>
+        <span className="pr-2">© 2026</span>
+      </div>
+    </section>
   )
 }

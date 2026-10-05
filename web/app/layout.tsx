@@ -1,23 +1,22 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, IBM_Plex_Mono } from 'next/font/google'
+import { IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/components/language-context'
 
-// Inter para titulares; IBM Plex Mono como lenguaje de etiquetado (estética
-// "ficha técnica", igual que el /lab de Aithority — ver vault Sistema-UI).
-const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
+// Sans = Helvetica (globals.css); IBM Plex Mono solo para números, índices y
+// stacks. Mismo lenguaje que arnau-lopez.com (vault Diseño/10-minimal-espacio-abierto).
 const mono = IBM_Plex_Mono({
   subsets: ['latin'],
-  weight: ['400', '500'],
+  weight: ['400'],
   display: 'swap',
   variable: '--font-mono',
 })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.stackd.codes'),
-  title: 'StackD — AI systems for real estate agencies',
+  title: 'StackD | Arnau López, freelance software developer',
   description:
-    'Instant lead response, virtual staging and video for every listing — generated in minutes, not days. Shipped to production, not demoed.',
+    'Freelance full-stack development by Arnau López. Web apps, mobile apps and AI features, built and shipped to production.',
   // Indexable desde el 24 jul 2026: el `noindex` era un resto de cuando la web
   // estaba en desarrollo y dejaba la agencia invisible en buscadores.
   robots: { index: true, follow: true },
@@ -26,27 +25,27 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://www.stackd.codes',
     siteName: 'StackD',
-    title: 'StackD — AI systems for real estate agencies',
+    title: 'StackD | Arnau López, freelance software developer',
     description:
-      'Instant lead response, virtual staging and video for every listing — generated in minutes, not days.',
+      'Freelance full-stack development by Arnau López. Web apps, mobile apps and AI features, built and shipped to production.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StackD — AI systems for real estate agencies',
+    title: 'StackD | Arnau López, freelance software developer',
     description:
-      'Instant lead response, virtual staging and video for every listing — generated in minutes, not days.',
+      'Freelance full-stack development by Arnau López. Web apps, mobile apps and AI features, built and shipped to production.',
   },
 }
 
-export const viewport: Viewport = { themeColor: '#F0EEE9', colorScheme: 'light' }
+export const viewport: Viewport = { themeColor: '#FCFCFB', colorScheme: 'light' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
-      <body className={inter.className}>
+    <html lang="en" className={mono.variable}>
+      <body>
         <a
           href="#contenido"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-[#111] focus:px-4 focus:py-2 focus:font-mono focus:text-[11px] focus:uppercase focus:tracking-[0.12em] focus:text-[#F0EEE9]"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-ink focus:px-4 focus:py-2 focus:text-[11px] focus:uppercase focus:text-paper"
         >
           Skip to content
         </a>

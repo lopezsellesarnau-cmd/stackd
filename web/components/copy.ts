@@ -1,99 +1,117 @@
 /**
- * Copy EN/ES de la landing. Sin mención a "UK" en ninguna de las dos —
- * quitado a petición explícita (el posicionamiento ya no es "small studio
- * in the UK", se deja genérico).
+ * Copy EN/ES de la landing. StackD es la práctica freelance de Arnau
+ * (reposicionado el 5 oct 2026: antes era "estudio de IA para inmobiliarias").
+ * Primera persona y solo trabajo real, para que cuadre con LinkedIn.
  */
 
 export const COPY = {
   en: {
     nav: { work: 'Work', services: 'Services', contact: 'Contact' },
     hero: {
-      body: 'We build AI systems for real estate agencies — instant lead response, virtual staging and video for every listing, generated in minutes, not days.',
-      studio: '[ Studio ]',
-      location: '[ Barcelona ]',
+      body: "StackD is the freelance practice of Arnau López, a full-stack software developer. I design, build and ship web apps, mobile apps and AI features, from the first screen to production.",
+      studio: '[ Freelance ]',
+      location: '[ Spain / Remote EU ]',
     },
     stats: {
       items: [
-        { v: '78%', l: 'of buyers go with whoever responds first' },
-        { v: '21×', l: 'more likely to convert in 5 min vs. 30' },
-        { v: '$7,500+', l: 'lost commission per missed lead' },
+        { v: '2', l: 'apps live on the App Store' },
+        { v: '1', l: 'B2B SaaS running in production' },
+        { v: '1', l: 'person on the whole stack: design, backend, release' },
       ],
-      source: 'NAR & industry lead-response studies, 2025–26',
+      source: 'Counted from the shipped work below',
     },
     services: {
-      eyebrow: 'Here is how we help',
+      eyebrow: 'What I do',
       items: [
         {
-          t: 'Lead Response',
-          tags: ['WhatsApp & calls', 'Instant qualification', 'Viewings booked'],
-          stat: '62% of enquiries arrive outside business hours — the average agent still takes 47 minutes to reply.',
+          t: 'Web apps',
+          tags: ['Next.js & TypeScript', 'APIs & databases', 'Deployed & monitored'],
+          stat: 'From the first screen to the production database: auth, payments, admin panels, the parts that make it real.',
         },
         {
-          t: 'Content Engine',
-          tags: ['Virtual staging', 'AI video clips', 'Ready for social'],
-          stat: "Agencies already pay $16–75 per photo for staging. Same spend, same day, done for you.",
+          t: 'Mobile apps',
+          tags: ['React Native & Expo', 'iOS release', 'App Store review'],
+          stat: 'Two apps taken through App Store review and live in the store.',
         },
-        { t: 'Growth Retainer', tags: ['Ongoing listings', 'Monthly pipeline', 'One point of contact'] },
+        {
+          t: 'AI features',
+          tags: ['LLM integrations', 'Voice & agents', 'Human in the loop'],
+          stat: 'Agents that act inside your product, with a clear line between what runs on its own and what waits for a person.',
+        },
       ],
     },
     works: {
-      marquee: 'Works',
+      marquee: 'Work',
       rows: [
         {
           which: 'blockflow' as const,
           index: '01',
-          caption: 'An AI voice agent for property managers: it answers, triages and creates the ticket, unattended.',
+          caption: 'SaaS for UK property managers. An AI voice agent answers out-of-hours calls, triages them and opens the ticket.',
         },
         {
-          which: 'staging' as const,
+          which: 'kiblo' as const,
           index: '02',
-          caption: 'A content engine for listings: upload photos, get virtual staging, a short vertical video clip and copy, same day.',
+          caption: 'iOS app for dog owners: scan a food, get a grade and the exact daily portion. Live on the App Store.',
         },
         {
-          which: 'leadagent' as const,
+          which: 'trace' as const,
           index: '03',
-          caption: 'An agent that answers portal enquiries in seconds, qualifies budget and books the viewing.',
+          caption: 'Privacy app that finds where your data is exposed and sends the GDPR/CCPA deletion requests for you. Live on the App Store.',
+        },
+        {
+          which: 'dross' as const,
+          index: '04',
+          caption: 'Native Mac app and CLI that checks a repo before deploy and catches drift between frontend and backend.',
         },
       ],
     },
     values: {
-      title: 'What we stand for',
-      body: 'Three things that shape every property system we ship, and why we build them at all.',
+      title: 'How I work',
+      body: 'Three rules for every project I take on.',
       items: [
-        { t: 'Tech', d: 'AI-native, not a chatbot bolted on. Every system we ship learns and improves with data of its own.' },
-        { t: 'Eco', d: 'Less waste, less friction. We help agencies market and manage properties built to weigh less on the planet.' },
-        { t: 'Contemporary', d: "Design and software as of today, not a template from five years ago." },
+        { t: 'Production, not demos', d: "If it doesn't run with real users, it isn't done. I ship it, deploy it and stay on to fix what breaks." },
+        { t: 'One person, whole stack', d: 'Design, frontend, backend and release. You talk to the person writing the code, no handoffs.' },
+        { t: 'You own it', d: 'Full code and IP transfer when we finish. A clean, documented repo and no lock-in.' },
       ],
     },
-    techStack: { eyebrow: 'What we build with' },
+    process: {
+      title: 'How a project runs',
+      steps: [
+        { t: 'Call', d: 'We talk about the problem, not the feature list.' },
+        { t: 'Scope & price', d: 'A short written scope and a fixed price, or a retainer.' },
+        { t: 'Build', d: 'Weekly builds you can open and use, not status reports.' },
+        { t: 'Launch', d: 'Deployed, store review handled, code and IP handed over.' },
+      ],
+    },
+    techStack: { eyebrow: 'What I build with' },
     faq: {
       eyebrow: 'FAQ',
       title: 'Questions clients ask',
       items: [
         {
           q: 'How fast can you start?',
-          a: 'Usually within a week of the discovery call. We keep a small client roster on purpose so we can move fast when a new project starts.',
+          a: 'Usually within a week of the first call. I take a small number of projects at a time so each one gets full attention.',
         },
         {
           q: 'Who owns the code?',
-          a: "You do — full IP transfer on completion, no exceptions. It's your product, we're the ones building it.",
+          a: 'You do. Full IP transfer when the project ends, no exceptions.',
         },
         {
-          q: "What's the engagement model?",
-          a: "Either project-based (fixed scope, fixed price) or a monthly retainer for ongoing build and maintenance. We'll recommend one after the discovery call.",
+          q: 'How do you charge?',
+          a: "A fixed price for a defined scope, or a monthly retainer for ongoing work. I'll suggest one after we talk.",
         },
         {
           q: 'Do you sign NDAs?',
-          a: 'Yes, happy to sign yours or use ours. Standard practice before we look at anything sensitive.',
+          a: 'Yes. Happy to sign yours before you share anything sensitive.',
         },
         {
-          q: 'Do you work with non-technical founders?',
-          a: "Most of our clients are. We handle the full stack — product, design, engineering and AI — so you don't need an in-house technical team to ship.",
+          q: 'Is it just you?',
+          a: 'Yes. StackD is my freelance practice, so you work directly with me from the first call to launch.',
         },
       ],
     },
     contact: {
-      eyebrow: 'Have an idea?',
+      eyebrow: 'Have a project?',
       title: "Let's talk!",
       name: 'Name',
       email: 'Email',
@@ -104,32 +122,36 @@ export const COPY = {
   es: {
     nav: { work: 'Trabajo', services: 'Servicios', contact: 'Contacto' },
     hero: {
-      body: 'Construimos sistemas de IA para agencias inmobiliarias — respuesta instantánea a leads, staging virtual y vídeo para cada propiedad, generados en minutos, no en días.',
-      studio: '[ Estudio ]',
-      location: '[ Barcelona ]',
+      body: 'StackD es la práctica freelance de Arnau López, desarrollador de software full-stack. Diseño, construyo y lanzo aplicaciones web, apps móviles y funciones de IA, desde la primera pantalla hasta producción.',
+      studio: '[ Freelance ]',
+      location: '[ España / Remoto UE ]',
     },
     stats: {
       items: [
-        { v: '78%', l: 'de compradores va con quien responde primero' },
-        { v: '21×', l: 'más probable cerrar en 5 min vs. 30' },
-        { v: '7.500 €+', l: 'de comisión perdida por cada lead sin responder' },
+        { v: '2', l: 'apps publicadas en la App Store' },
+        { v: '1', l: 'SaaS B2B funcionando en producción' },
+        { v: '1', l: 'persona en todo el stack: diseño, backend, lanzamiento' },
       ],
-      source: 'NAR y estudios de sector sobre tiempo de respuesta, 2025–26',
+      source: 'Contado a partir del trabajo publicado más abajo',
     },
     services: {
-      eyebrow: 'Así ayudamos',
+      eyebrow: 'Qué hago',
       items: [
         {
-          t: 'Lead Response',
-          tags: ['WhatsApp y llamadas', 'Cualificación instantánea', 'Visitas agendadas'],
-          stat: 'El 62% de las consultas llegan fuera de horario — la media de un agente sigue siendo 47 minutos para responder.',
+          t: 'Aplicaciones web',
+          tags: ['Next.js y TypeScript', 'APIs y bases de datos', 'Desplegado y monitorizado'],
+          stat: 'De la primera pantalla a la base de datos en producción: login, pagos, paneles de administración, lo que hace que sea real.',
         },
         {
-          t: 'Content Engine',
-          tags: ['Staging virtual', 'Clips de vídeo IA', 'Listo para redes'],
-          stat: 'Las agencias ya pagan 16–75€ por foto de staging. Mismo gasto, mismo día, sin que muevas un dedo.',
+          t: 'Apps móviles',
+          tags: ['React Native y Expo', 'Lanzamiento iOS', 'Revisión de App Store'],
+          stat: 'Dos apps que han pasado la revisión de Apple y están publicadas.',
         },
-        { t: 'Growth Retainer', tags: ['Propiedades continuas', 'Pipeline mensual', 'Un único contacto'] },
+        {
+          t: 'Funciones de IA',
+          tags: ['Integración de LLMs', 'Voz y agentes', 'Persona en el circuito'],
+          stat: 'Agentes que actúan dentro de tu producto, con una línea clara entre lo que hacen solos y lo que espera a una persona.',
+        },
       ],
     },
     works: {
@@ -138,58 +160,72 @@ export const COPY = {
         {
           which: 'blockflow' as const,
           index: '01',
-          caption: 'Un agente de voz IA para administradores de fincas: responde, triaje y crea el ticket, sin nadie detrás.',
+          caption: 'SaaS para administradores de fincas en Reino Unido. Un agente de voz IA atiende las llamadas fuera de horario, hace triaje y abre el ticket.',
         },
         {
-          which: 'staging' as const,
+          which: 'kiblo' as const,
           index: '02',
-          caption: 'Un motor de contenido para inmuebles: sube fotos, obtén staging virtual, un clip de vídeo vertical y copy, el mismo día.',
+          caption: 'App iOS para dueños de perros: escanea un pienso, obtén su nota y la ración diaria exacta. Publicada en la App Store.',
         },
         {
-          which: 'leadagent' as const,
+          which: 'trace' as const,
           index: '03',
-          caption: 'Un agente que responde en segundos a consultas del portal, cualifica presupuesto y agenda la visita.',
+          caption: 'App de privacidad que encuentra dónde están expuestos tus datos y envía por ti las solicitudes de borrado GDPR/CCPA. Publicada en la App Store.',
+        },
+        {
+          which: 'dross' as const,
+          index: '04',
+          caption: 'App nativa de Mac y CLI que revisa un repo antes de desplegar y detecta desajustes entre frontend y backend.',
         },
       ],
     },
     values: {
-      title: 'Nuestros valores',
-      body: 'Tres cosas que dan forma a cada sistema que entregamos, y el porqué de construirlos.',
+      title: 'Cómo trabajo',
+      body: 'Tres reglas para cada proyecto que acepto.',
       items: [
-        { t: 'Tech', d: 'IA nativa, no un chatbot pegado encima. Cada sistema que entregamos aprende y mejora con datos propios.' },
-        { t: 'Eco', d: 'Menos residuo, menos fricción. Ayudamos a mostrar y gestionar propiedades pensadas para pesar menos sobre el planeta.' },
-        { t: 'Contemporáneo', d: 'Diseño y software de hoy, no una plantilla de hace cinco años.' },
+        { t: 'Producción, no demos', d: 'Si no funciona con usuarios reales, no está terminado. Lo lanzo, lo despliego y sigo ahí para arreglar lo que falle.' },
+        { t: 'Una persona, todo el stack', d: 'Diseño, frontend, backend y lanzamiento. Hablas con quien escribe el código, sin intermediarios.' },
+        { t: 'Es tuyo', d: 'Cesión completa del código y la propiedad intelectual al terminar. Un repo limpio, documentado y sin ataduras.' },
       ],
     },
-    techStack: { eyebrow: 'Con qué construimos' },
+    process: {
+      title: 'Cómo va un proyecto',
+      steps: [
+        { t: 'Llamada', d: 'Hablamos del problema, no de la lista de funciones.' },
+        { t: 'Alcance y precio', d: 'Un alcance corto por escrito y precio cerrado, o un retainer.' },
+        { t: 'Construcción', d: 'Versiones semanales que puedes abrir y usar, no informes de estado.' },
+        { t: 'Lanzamiento', d: 'Desplegado, revisión de la tienda hecha, código y propiedad entregados.' },
+      ],
+    },
+    techStack: { eyebrow: 'Con qué construyo' },
     faq: {
       eyebrow: 'FAQ',
       title: 'Preguntas frecuentes de clientes',
       items: [
         {
-          q: '¿Con qué rapidez podéis empezar?',
-          a: 'Normalmente en una semana desde la llamada inicial. Mantenemos pocos clientes a propósito para movernos rápido cuando arranca un proyecto nuevo.',
+          q: '¿Con qué rapidez puedes empezar?',
+          a: 'Normalmente en una semana desde la primera llamada. Llevo pocos proyectos a la vez para que cada uno tenga toda mi atención.',
         },
         {
           q: '¿De quién es el código?',
-          a: 'Tuyo — cesión completa de la propiedad intelectual al terminar, sin excepciones. Es tu producto, nosotros lo construimos.',
+          a: 'Tuyo. Cesión completa de la propiedad intelectual al terminar, sin excepciones.',
         },
         {
-          q: '¿Cuál es el modelo de colaboración?',
-          a: 'Por proyecto (alcance y precio cerrados) o retainer mensual para desarrollo y mantenimiento continuo. Te recomendamos uno tras la llamada inicial.',
+          q: '¿Cómo cobras?',
+          a: 'Precio cerrado para un alcance definido, o un retainer mensual para trabajo continuo. Te recomiendo uno después de hablar.',
         },
         {
-          q: '¿Firmáis NDA?',
-          a: 'Sí, con gusto firmamos el tuyo o usamos el nuestro. Práctica estándar antes de ver cualquier cosa sensible.',
+          q: '¿Firmas NDA?',
+          a: 'Sí. Firmo el tuyo antes de que compartas nada sensible.',
         },
         {
-          q: '¿Trabajáis con fundadores no técnicos?',
-          a: 'La mayoría de nuestros clientes lo son. Cubrimos todo el stack — producto, diseño, ingeniería e IA — para que no necesites equipo técnico propio para lanzar.',
+          q: '¿Eres solo tú?',
+          a: 'Sí. StackD es mi práctica freelance, así que trabajas directamente conmigo desde la primera llamada hasta el lanzamiento.',
         },
       ],
     },
     contact: {
-      eyebrow: '¿Tienes una idea?',
+      eyebrow: '¿Tienes un proyecto?',
       title: '¡Hablemos!',
       name: 'Nombre',
       email: 'Email',
