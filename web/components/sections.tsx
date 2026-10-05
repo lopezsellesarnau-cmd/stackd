@@ -17,7 +17,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from './language-context'
 import { COPY } from './copy'
 
-const EMAIL = 'hello@stackd.dev'
+const EMAIL = 'lopezsellesarnau@gmail.com'
 const PORTFOLIO = 'https://arnau-lopez.com'
 const LINKEDIN = 'https://www.linkedin.com/in/arnau-lopez-selles/'
 
