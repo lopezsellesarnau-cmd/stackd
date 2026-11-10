@@ -8,6 +8,10 @@ const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      keyframes: {
+        shimmer: { from: { backgroundPosition: '100% 0' }, to: { backgroundPosition: '-100% 0' } },
+      },
+      animation: { shimmer: 'shimmer 1.6s linear infinite' },
       colors: {
         paper: '#FFFFFF',
         card: '#F2F2F0',

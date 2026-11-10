@@ -14,6 +14,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Bot, EYES, SHAPES, type BotEyes, type BotShape } from './kit/bot'
+import { PromptBar } from './kit/prompt-bar'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -34,9 +35,15 @@ const COPY = {
     color: 'Colour',
     botAbout: 'A bot whose eyes follow the cursor. The eyes sit on a sphere, so it looks round as it turns. Four shapes, four kinds of eyes, any colour.',
     includes: ['Figma file with every pose', 'React + Tailwind code, no other libraries', 'Respects reduced motion'],
+    promptAbout: 'A chat input for AI products. It grows as you write, takes files, lets you pick a model, shows a thinking shimmer and streams the answer. The Bot can sit beside it as the assistant\'s face. Try it here.',
+    promptIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Works with any AI: Claude, GPT, your own', 'A ready /api/chat route for Next.js'],
+    bot: 'Bot',
+    on: 'On',
+    off: 'Off',
+    soonGet: 'Coming soon',
     get: 'Get it free',
     emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
-    cats: { characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards' },
+    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards' },
   },
   es: {
     title: 'Componentes',
@@ -53,9 +60,15 @@ const COPY = {
     color: 'Color',
     botAbout: 'Un bot cuyos ojos siguen al cursor. Los ojos van sobre una esfera, así que se ve redondo al girar. Cuatro formas, cuatro tipos de ojos y cualquier color.',
     includes: ['Archivo de Figma con todas las poses', 'Código en React + Tailwind, sin otras librerías', 'Respeta el movimiento reducido'],
+    promptAbout: 'Un campo de chat para productos con IA. Crece al escribir, acepta archivos, deja elegir el modelo, muestra un brillo mientras piensa y escribe la respuesta palabra a palabra. El Bot puede ir al lado como la cara del asistente. Pruébalo aquí.',
+    promptIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier IA: Claude, GPT o la tuya', 'Una ruta /api/chat lista para Next.js'],
+    bot: 'Bot',
+    on: 'Sí',
+    off: 'No',
+    soonGet: 'Próximamente',
     get: 'Consíguelo gratis',
     emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
-    cats: { characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas' },
+    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas' },
   },
 }
 
@@ -63,7 +76,10 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-const ITEMS: { id: string; cat: Cat }[] = [{ id: 'bot', cat: 'characters' }]
+const ITEMS: { id: 'bot' | 'prompt'; cat: Cat }[] = [
+  { id: 'bot', cat: 'characters' },
+  { id: 'prompt', cat: 'ai' },
+]
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
@@ -79,7 +95,10 @@ const COLORS = [
 ]
 
 // Where each component is delivered
-const GUMROAD = { bot: 'https://arnolop.gumroad.com/l/stackd?wanted=true' }
+const GUMROAD: Record<'bot' | 'prompt', string> = {
+  bot: 'https://arnolop.gumroad.com/l/stackd?wanted=true',
+  prompt: '', // waiting for the Gumroad product
+}
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
 
@@ -165,9 +184,7 @@ export function Shop() {
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {cells.map((c) =>
               c.kind === 'item' ? (
-                <li key={c.key}>
-                  <BotTile t={t} />
-                </li>
+                <li key={c.key}>{c.item.id === 'bot' ? <BotTile t={t} /> : <PromptTile t={t} />}</li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
                   <span className="absolute bottom-4 left-4 text-paper/35">{t.soon}</span>
@@ -234,23 +251,42 @@ function BotTile({ t }: { t: T }) {
   )
 }
 
-/** The big pop-up: the bot on the left, details, options and the Gumroad button on the right. */
-function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c: Config) => void; onClose: () => void }) {
+/** The big pop-up: the live component on the left; details, options, code and the Gumroad button on the right. */
+function Detail({
+  t,
+  cat,
+  name,
+  about,
+  includes,
+  usage,
+  href,
+  stage,
+  dark,
+  options,
+  onClose,
+}: {
+  t: T
+  cat: string
+  name: string
+  about: string
+  includes: string[]
+  usage: string
+  href: string
+  stage: React.ReactNode
+  dark?: boolean
+  options: React.ReactNode
+  onClose: () => void
+}) {
   const ref = useRef<HTMLDialogElement>(null)
-  const { shape, eyes, color } = cfg
-  const dark = color.name === 'White'
 
   // A native dialog: it traps focus, closes on Escape, and the page behind stops scrolling
   useEffect(() => {
-    const d = ref.current
-    d?.showModal()
+    ref.current?.showModal()
     document.documentElement.style.overflow = 'hidden'
     return () => {
       document.documentElement.style.overflow = ''
     }
   }, [])
-
-  const usage = `<Bot shape="${shape}" eyes="${eyes}" color="${color.body}" eyeColor="${color.eyes}" />`
 
   return (
     <dialog
@@ -260,16 +296,18 @@ function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c:
       className="m-0 h-[100svh] max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-ink/40 backdrop:backdrop-blur-[2px] sm:m-auto sm:h-[min(640px,calc(100svh-48px))] sm:w-[min(1040px,calc(100vw-48px))]"
       style={{ fontFamily: SANS }}
     >
-      <div className="grid h-full grid-cols-[minmax(0,1fr)] grid-rows-[auto_1fr] overflow-y-auto bg-card p-3 text-[13px] leading-[1.45] text-ink sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:grid-rows-1 sm:gap-3 sm:rounded-[24px] sm:overflow-hidden">
+      <div className="grid h-full grid-cols-[minmax(0,1fr)] grid-rows-[auto_1fr] overflow-y-auto bg-card p-3 text-[13px] leading-[1.45] text-ink sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:grid-rows-1 sm:gap-3 sm:overflow-hidden sm:rounded-[24px]">
         {/* The stage */}
-        <div className={`kit-stage relative flex aspect-square items-center justify-center rounded-[18px] transition-colors duration-300 sm:aspect-auto ${dark ? 'bg-ink' : 'bg-paper'}`}>
-          <Bot size={200} shape={shape} eyes={eyes} color={color.body} eyeColor={color.eyes} within=".kit-stage" />
+        <div
+          className={`kit-stage relative flex min-h-[360px] items-center justify-center rounded-[18px] p-5 transition-colors duration-300 sm:min-h-0 ${dark ? 'bg-ink' : 'bg-paper'}`}
+        >
+          {stage}
           {/* On a phone the details scroll away, so the close button also sits on the stage */}
           <button
             type="button"
             onClick={() => ref.current?.close()}
             aria-label={t.close}
-            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-paper/90 text-ink sm:hidden"
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-ink sm:hidden"
           >
             ✕
           </button>
@@ -279,8 +317,8 @@ function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c:
         <div className="mt-3 flex flex-col rounded-[18px] bg-paper p-5 sm:mt-0 sm:overflow-y-auto">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-fg-faint">{t.cats.characters}</p>
-              <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em]">Bot</h2>
+              <p className="text-fg-faint">{cat}</p>
+              <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em]">{name}</h2>
             </div>
             <button
               type="button"
@@ -291,38 +329,16 @@ function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c:
               ✕
             </button>
           </div>
-          <p className="mt-3 max-w-[44ch] text-fg-muted">{t.botAbout}</p>
+          <p className="mt-3 max-w-[44ch] text-fg-muted">{about}</p>
 
-          <div className="mt-5 space-y-3">
-            <Choice label={t.shape}>
-              {shapes.map((s) => (
-                <Pick key={s} on={shape === s} label={s} onClick={() => setCfg({ ...cfg, shape: s })}>
-                  <ShapeIcon shape={s} />
-                </Pick>
-              ))}
-            </Choice>
-            <Choice label={t.eyes}>
-              {eyeKinds.map((e) => (
-                <Pick key={e} on={eyes === e} label={e} onClick={() => setCfg({ ...cfg, eyes: e })}>
-                  <EyesIcon eyes={e} />
-                </Pick>
-              ))}
-            </Choice>
-            <Choice label={t.color}>
-              {COLORS.map((c) => (
-                <Pick key={c.name} on={color.name === c.name} label={c.name} onClick={() => setCfg({ ...cfg, color: c })}>
-                  <Swatch color={c.body} />
-                </Pick>
-              ))}
-            </Choice>
-          </div>
+          <div className="mt-5 space-y-3">{options}</div>
 
           <pre className="mt-5 overflow-x-auto rounded-[12px] bg-card px-3 py-2.5 text-[11px] leading-[1.6] text-fg-muted">
             <code>{usage}</code>
           </pre>
 
           <ul className="mt-5 space-y-1 text-fg-muted">
-            {t.includes.map((i) => (
+            {includes.map((i) => (
               <li key={i} className="flex gap-2">
                 <span className="text-fg-ghost">✓</span>
                 {i}
@@ -332,19 +348,125 @@ function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c:
 
           <div className="mt-auto pt-6">
             {/* Gumroad asks for the email and sends the files; it is also where paid components will sell */}
-            <a
-              href={GUMROAD.bot}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-full items-center justify-center rounded-full bg-ink px-4 font-medium text-paper transition-opacity hover:opacity-85"
-            >
-              {t.get}
-            </a>
+            {href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-full items-center justify-center rounded-full bg-ink px-4 font-medium text-paper transition-opacity hover:opacity-85"
+              >
+                {t.get}
+              </a>
+            ) : (
+              <span className="flex h-10 w-full items-center justify-center rounded-full bg-card px-4 text-fg-dim">{t.soonGet}</span>
+            )}
             <p className="mt-2 text-[11px] text-fg-faint">{t.emailNote}</p>
           </div>
         </div>
       </div>
     </dialog>
+  )
+}
+
+function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c: Config) => void; onClose: () => void }) {
+  const { shape, eyes, color } = cfg
+  return (
+    <Detail
+      t={t}
+      cat={t.cats.characters}
+      name="Bot"
+      about={t.botAbout}
+      includes={t.includes}
+      usage={`<Bot shape="${shape}" eyes="${eyes}" color="${color.body}" eyeColor="${color.eyes}" />`}
+      href={GUMROAD.bot}
+      dark={color.name === 'White'}
+      onClose={onClose}
+      stage={<Bot size={200} shape={shape} eyes={eyes} color={color.body} eyeColor={color.eyes} within=".kit-stage" />}
+      options={<BotOptions t={t} cfg={cfg} setCfg={setCfg} />}
+    />
+  )
+}
+
+/** Shape, eyes and colour: in the Bot's pop-up, and for the bot in the prompt bar's */
+function BotOptions({ t, cfg, setCfg, eyesToo = true }: { t: T; cfg: Config; setCfg: (c: Config) => void; eyesToo?: boolean }) {
+  const { shape, eyes, color } = cfg
+  return (
+    <>
+      <Choice label={t.shape}>
+        {shapes.map((s) => (
+          <Pick key={s} on={shape === s} label={s} onClick={() => setCfg({ ...cfg, shape: s })}>
+            <ShapeIcon shape={s} />
+          </Pick>
+        ))}
+      </Choice>
+      {eyesToo ? (
+        <Choice label={t.eyes}>
+          {eyeKinds.map((e) => (
+            <Pick key={e} on={eyes === e} label={e} onClick={() => setCfg({ ...cfg, eyes: e })}>
+              <EyesIcon eyes={e} />
+            </Pick>
+          ))}
+        </Choice>
+      ) : null}
+      <Choice label={t.color}>
+        {COLORS.map((c) => (
+          <Pick key={c.name} on={color.name === c.name} label={c.name} onClick={() => setCfg({ ...cfg, color: c })}>
+            <Swatch color={c.body} />
+          </Pick>
+        ))}
+      </Choice>
+    </>
+  )
+}
+
+/** 02 · AI prompt bar, live and small in the tile; the empty part of the tile opens the details */
+function PromptTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [withBot, setWithBot] = useState(true)
+  const [cfg, setCfg] = useState<Config>({ shape: 'pill', eyes: 'tall', color: COLORS[1] })
+  const botProps = { shape: cfg.shape, eyes: cfg.eyes, color: cfg.color.body, eyeColor: cfg.color.eyes }
+
+  return (
+    <>
+      <article className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} AI prompt bar`} className="absolute inset-0 cursor-pointer" />
+        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-card px-2 py-0.5 text-[11px] text-fg-dim">{t.free}</span>
+        <div className="pointer-events-none absolute inset-x-3 bottom-3 [&_*]:pointer-events-auto">
+          <PromptBar compact bot={withBot ? botProps : false} placeholder="Ask anything" />
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.ai}
+          name="AI prompt bar"
+          about={t.promptAbout}
+          includes={t.promptIncludes}
+          usage={withBot ? `<PromptBar bot={{ shape: "${cfg.shape}", color: "${cfg.color.body}" }} onSend={yourAI} />` : '<PromptBar onSend={yourAI} />'}
+          href={GUMROAD.prompt}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="flex h-full w-full items-end justify-center">
+              <PromptBar bot={withBot ? botProps : false} />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.bot}>
+                <Pick on={withBot} label={t.on} onClick={() => setWithBot(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+                <Pick on={!withBot} label={t.off} onClick={() => setWithBot(false)}>
+                  <span className="px-1">{t.off}</span>
+                </Pick>
+              </Choice>
+              {withBot ? <BotOptions t={t} cfg={cfg} setCfg={setCfg} eyesToo={false} /> : null}
+            </>
+          }
+        />
+      ) : null}
+    </>
   )
 }
 
