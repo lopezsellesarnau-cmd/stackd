@@ -36,7 +36,7 @@ const COPY = {
     botAbout: 'A bot whose eyes follow the cursor. The eyes sit on a sphere, so it looks round as it turns. Four shapes, four kinds of eyes, any colour.',
     includes: ['Figma file with every pose', 'React + Tailwind code, no other libraries', 'Respects reduced motion'],
     promptAbout: 'A chat input for AI products. It grows as you write, takes files, lets you pick a model, shows a thinking shimmer and streams the answer. The Bot can sit beside it as the assistant\'s face. Try it here.',
-    promptIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Works with any AI: Claude, GPT, your own', 'A ready /api/chat route for Next.js'],
+    promptIncludes: ['React + Tailwind code, with the Bot', 'Works with any AI: Claude, GPT, your own', 'A ready /api/chat route for Next.js'],
     bot: 'Bot',
     on: 'On',
     off: 'Off',
@@ -61,7 +61,7 @@ const COPY = {
     botAbout: 'Un bot cuyos ojos siguen al cursor. Los ojos van sobre una esfera, así que se ve redondo al girar. Cuatro formas, cuatro tipos de ojos y cualquier color.',
     includes: ['Archivo de Figma con todas las poses', 'Código en React + Tailwind, sin otras librerías', 'Respeta el movimiento reducido'],
     promptAbout: 'Un campo de chat para productos con IA. Crece al escribir, acepta archivos, deja elegir el modelo, muestra un brillo mientras piensa y escribe la respuesta palabra a palabra. El Bot puede ir al lado como la cara del asistente. Pruébalo aquí.',
-    promptIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier IA: Claude, GPT o la tuya', 'Una ruta /api/chat lista para Next.js'],
+    promptIncludes: ['Código en React + Tailwind, con el Bot', 'Funciona con cualquier IA: Claude, GPT o la tuya', 'Una ruta /api/chat lista para Next.js'],
     bot: 'Bot',
     on: 'Sí',
     off: 'No',
@@ -97,7 +97,7 @@ const COLORS = [
 // Where each component is delivered
 const GUMROAD: Record<'bot' | 'prompt', string> = {
   bot: 'https://arnolop.gumroad.com/l/stackd?wanted=true',
-  prompt: '', // waiting for the Gumroad product
+  prompt: 'https://arnolop.gumroad.com/l/prompt_bar?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
