@@ -5,7 +5,8 @@
  * Full screen: a filter panel on the left, and a 4-column grid of rounded tiles with empty
  * cells between them (Flow reference). Each tile is a live component you can try before
  * opening it. On a phone: the filters scroll across the top and the tiles are a full-width list.
- * Its own type, system sans in sentence case, not the studio's editorial mono.
+ * Its own type, system sans in sentence case, not the editorial mono of the old studio page.
+ * Since 10 nov 2026 this shop is the whole of stackd.codes; the developer side lives on arnau-lopez.com.
  * The dark tiles are stand-ins until there are more components.
  */
 
@@ -25,7 +26,7 @@ const COPY = {
     all: 'All',
     free: 'Free',
     soon: 'Coming soon',
-    studio: 'StackD studio',
+    by: 'Made by Arnau López',
     open: 'Open',
     close: 'Close',
     shape: 'Shape',
@@ -46,7 +47,7 @@ const COPY = {
     all: 'Todos',
     free: 'Gratis',
     soon: 'Próximamente',
-    studio: 'Estudio StackD',
+    by: 'Hecho por Arnau López',
     open: 'Abrir',
     close: 'Cerrar',
     shape: 'Forma',
@@ -133,10 +134,19 @@ export function Shop() {
             ))}
           </nav>
 
-          <div className="mt-auto hidden items-center justify-between pt-6 text-fg-dim lg:flex">
-            <Link href="/" className="transition-colors hover:text-ink">
-              {t.studio} ↗
-            </Link>
+          {/* Who is behind it: the portfolio and LinkedIn carry the developer side */}
+          <div className="mt-5 flex items-end justify-between gap-4 text-fg-dim lg:mt-auto lg:pt-6">
+            <div>
+              <p className="text-fg-faint">{t.by}</p>
+              <p className="mt-0.5 flex gap-3">
+                <a href="https://arnau-lopez.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-ink">
+                  Portfolio ↗
+                </a>
+                <a href="https://www.linkedin.com/in/arnau-lopez-selles/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-ink">
+                  LinkedIn ↗
+                </a>
+              </p>
+            </div>
             <span className="flex gap-2">
               {(['en', 'es'] as const).map((l) => (
                 <button

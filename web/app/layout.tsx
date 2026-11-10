@@ -14,9 +14,9 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.stackd.codes'),
-  title: 'StackD | Software and AI studio by Arnau López',
+  title: 'StackD | Interface components with Figma and code',
   description:
-    'StackD is the studio of Arnau López in Amsterdam. Web apps, mobile apps and AI features, designed, built and taken to production.',
+    'Interface components with the Figma file and the React code. Try them right here. Made by Arnau López.',
   // Indexable desde el 24 jul 2026: el `noindex` era un resto de cuando la web
   // estaba en desarrollo y dejaba la agencia invisible en buscadores.
   robots: { index: true, follow: true },
@@ -25,19 +25,19 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://www.stackd.codes',
     siteName: 'StackD',
-    title: 'StackD | Software and AI studio by Arnau López',
+    title: 'StackD | Interface components with Figma and code',
     description:
-      'StackD is the studio of Arnau López in Amsterdam. Web apps, mobile apps and AI features, designed, built and taken to production.',
+      'Interface components with the Figma file and the React code. Try them right here. Made by Arnau López.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StackD | Software and AI studio by Arnau López',
+    title: 'StackD | Interface components with Figma and code',
     description:
-      'StackD is the studio of Arnau López in Amsterdam. Web apps, mobile apps and AI features, designed, built and taken to production.',
+      'Interface components with the Figma file and the React code. Try them right here. Made by Arnau López.',
   },
 }
 
-export const viewport: Viewport = { themeColor: '#FFFFFF', colorScheme: 'light' }
+export const viewport: Viewport = { themeColor: '#F2F2F0', colorScheme: 'light' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
