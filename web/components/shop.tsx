@@ -12,7 +12,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Bot, EYES, SHAPES, type BotEyes, type BotShape } from './kit/bot'
 import { useLanguage } from './language-context'
 
@@ -34,10 +34,8 @@ const COPY = {
     color: 'Colour',
     botAbout: 'A bot whose eyes follow the cursor. The eyes sit on a sphere, so it looks round as it turns. Four shapes, four kinds of eyes, any colour.',
     includes: ['Figma file with every pose', 'React + Tailwind code, no other libraries', 'Respects reduced motion'],
-    emailPh: 'Your email',
     get: 'Get it free',
-    emailNote: 'We send the Figma file and the code to your inbox.',
-    sent: (e: string) => `Thanks! It is on its way to ${e}.`,
+    emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
     cats: { characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards' },
   },
   es: {
@@ -55,10 +53,8 @@ const COPY = {
     color: 'Color',
     botAbout: 'Un bot cuyos ojos siguen al cursor. Los ojos van sobre una esfera, así que se ve redondo al girar. Cuatro formas, cuatro tipos de ojos y cualquier color.',
     includes: ['Archivo de Figma con todas las poses', 'Código en React + Tailwind, sin otras librerías', 'Respeta el movimiento reducido'],
-    emailPh: 'Tu email',
     get: 'Consíguelo gratis',
-    emailNote: 'Te enviamos el archivo de Figma y el código a tu correo.',
-    sent: (e: string) => `¡Gracias! Va de camino a ${e}.`,
+    emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
     cats: { characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas' },
   },
 }
@@ -81,6 +77,9 @@ const COLORS = [
   { name: 'Ochre', body: '#BE9344', eyes: '#FFFFFF' },
   { name: 'Lilac', body: '#C9B8FF', eyes: '#141310' },
 ]
+
+// Where each component is delivered
+const GUMROAD = { bot: 'https://arnolop.gumroad.com/l/stackd?wanted=true' }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
 
@@ -235,11 +234,9 @@ function BotTile({ t }: { t: T }) {
   )
 }
 
-/** The big pop-up: the bot on the left, details, options and the email form on the right. */
+/** The big pop-up: the bot on the left, details, options and the Gumroad button on the right. */
 function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c: Config) => void; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null)
-  const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
   const { shape, eyes, color } = cfg
   const dark = color.name === 'White'
 
@@ -254,12 +251,6 @@ function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c:
   }, [])
 
   const usage = `<Bot shape="${shape}" eyes="${eyes}" color="${color.body}" eyeColor="${color.eyes}" />`
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault()
-    // TODO: send the email to Lemon Squeezy / the mailing list and deliver the files. Not connected yet.
-    setSent(true)
-  }
 
   return (
     <dialog
@@ -340,30 +331,15 @@ function BotDetail({ t, cfg, setCfg, onClose }: { t: T; cfg: Config; setCfg: (c:
           </ul>
 
           <div className="mt-auto pt-6">
-            {sent ? (
-              <p role="status" className="rounded-[12px] bg-card px-3 py-3 text-ink">
-                {t.sent(email)}
-              </p>
-            ) : (
-              <form onSubmit={submit} className="flex gap-2">
-                <label htmlFor="get-email" className="sr-only">
-                  Email
-                </label>
-                <input
-                  id="get-email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.emailPh}
-                  className="h-10 min-w-0 flex-1 rounded-full bg-card px-4 outline-none transition-shadow placeholder:text-fg-faint focus:shadow-[0_0_0_1px_rgba(20,19,16,0.3)]"
-                />
-                <button type="submit" className="h-10 shrink-0 rounded-full bg-ink px-4 font-medium text-paper transition-opacity hover:opacity-85">
-                  {t.get}
-                </button>
-              </form>
-            )}
+            {/* Gumroad asks for the email and sends the files; it is also where paid components will sell */}
+            <a
+              href={GUMROAD.bot}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-10 w-full items-center justify-center rounded-full bg-ink px-4 font-medium text-paper transition-opacity hover:opacity-85"
+            >
+              {t.get}
+            </a>
             <p className="mt-2 text-[11px] text-fg-faint">{t.emailNote}</p>
           </div>
         </div>
