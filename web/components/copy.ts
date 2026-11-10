@@ -64,7 +64,7 @@ export const QUOTE = {
 
 export const COPY = {
   en: {
-    nav: { plans: 'Plans', work: 'Work', process: 'Process', contact: 'Contact' },
+    nav: { plans: 'Plans', work: 'Work', process: 'Process', contact: 'Contact', components: 'Components' },
     hero: {
       title: 'Software and AI for companies that need it to work.',
       body: 'StackD is the studio of Arnau López. I design and build web apps, mobile apps and AI features, and take them all the way to production.',
@@ -198,7 +198,7 @@ export const COPY = {
     },
   },
   es: {
-    nav: { plans: 'Planes', work: 'Trabajo', process: 'Proceso', contact: 'Contacto' },
+    nav: { plans: 'Planes', work: 'Trabajo', process: 'Proceso', contact: 'Contacto', components: 'Componentes' },
     hero: {
       title: 'Software e IA para empresas que necesitan que funcione.',
       body: 'StackD es el estudio de Arnau López. Diseño y construyo aplicaciones web, apps móviles y funciones de IA, y las llevo hasta producción.',

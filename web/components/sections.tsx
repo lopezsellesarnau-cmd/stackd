@@ -84,6 +84,9 @@ export function Nav() {
               {label}
             </a>
           ))}
+          <a href="/components" className="text-ink transition-colors hover:text-accent">
+            {t.components}
+          </a>
           <span className="flex gap-2">
             {(['en', 'es'] as const).map((l) => (
               <button
