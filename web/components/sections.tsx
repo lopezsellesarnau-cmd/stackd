@@ -72,7 +72,10 @@ export function Nav() {
         <a href="#top" className="flex items-center gap-2 pl-2 normal-case text-ink">
           {/* Same mark as arnau-lopez.com: StackD is his brand too */}
           <Image src="/logo.png" alt="" width={16} height={16} className="h-4 w-4" />
-          <Wordmark />
+          {/* In a span: as two flex items, the gap split the dot from the name */}
+          <span>
+            <Wordmark />
+          </span>
         </a>
         <p className="hidden pl-2 text-fg-faint md:block">{en ? 'Studio of Arnau López' : 'Estudio de Arnau López'}</p>
         <nav className="col-span-2 flex justify-end gap-5 pr-2 md:col-span-4" aria-label="Primary">
