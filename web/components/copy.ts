@@ -1,236 +1,336 @@
 /**
- * Copy EN/ES de la landing. StackD es la práctica freelance de Arnau
- * (reposicionado el 5 oct 2026: antes era "estudio de IA para inmobiliarias").
- * Primera persona y solo trabajo real, para que cuadre con LinkedIn.
+ * Copy EN/ES de la landing. 10 nov 2026: StackD pasa de "práctica freelance" a estudio
+ * (enfoque agencia), pero en primera persona: lo lleva Arnau solo y no se finge un equipo.
+ * Trabajo principal (con experiencia): Hilo, Aithority, Casa. Otros proyectos: Kiblo, Dross.
+ * BlockFlow y TRACE fuera, como en el CV y el portfolio. Solo hechos ciertos.
  */
+
+export type ProjectId = 'hilo' | 'aithority' | 'casa' | 'kiblo' | 'dross'
+
+/** Image and link per project: the same in both languages */
+export const PROJECTS: Record<
+  ProjectId,
+  { name: string; image: string; w: number; h: number; link: string; certificate?: string; stack: string[] }
+> = {
+  hilo: {
+    name: 'Hilo',
+    image: '/work/hilo.webp',
+    w: 2400,
+    h: 1552,
+    link: 'https://hilo-web.vercel.app',
+    stack: ['React Native', 'TypeScript', 'Supabase', 'Claude API', 'Azure Speech'],
+  },
+  aithority: {
+    name: 'Aithority',
+    image: '/work/aithority.webp',
+    w: 1600,
+    h: 1142,
+    link: 'https://www.aithority.com.es',
+    stack: ['Next.js', 'Node', 'Turso', 'Microsoft Graph', 'Claude Haiku'],
+  },
+  casa: {
+    name: 'Casa',
+    image: '/work/casa.webp',
+    w: 1600,
+    h: 1143,
+    link: 'https://github.com/lopezsellesarnau-cmd/before-you-pay',
+    certificate: '/certificates/open-agent-hackathon-2026.pdf',
+    stack: ['TypeScript', 'Node', 'NVIDIA Nemotron', 'Zetaris', 'Catastro API'],
+  },
+  kiblo: {
+    name: 'Kiblo',
+    image: '/work/kiblo.webp',
+    w: 2400,
+    h: 1552,
+    link: 'https://apps.apple.com/app/id6802237827',
+    stack: ['React Native', 'Expo', 'Firebase', 'RevenueCat'],
+  },
+  dross: {
+    name: 'Dross',
+    image: '/work/dross.webp',
+    w: 1600,
+    h: 1142,
+    link: 'https://github.com/lopezsellesarnau-cmd/dross',
+    stack: ['SwiftUI', 'TypeScript', 'TS compiler API'],
+  },
+}
+
+/** From his Y Combinator co-founder matching profile (10 nov 2026) */
+export const QUOTE = {
+  text: 'Arnau has an impressive CV of products, all built & shipped solo!',
+  who: 'Alistair Stafford',
+  where: 'Y Combinator · co-founder matching',
+}
 
 export const COPY = {
   en: {
-    nav: { work: 'Work', services: 'Services', contact: 'Contact' },
+    nav: { plans: 'Plans', work: 'Work', process: 'Process', contact: 'Contact' },
     hero: {
-      body: "StackD is the freelance practice of Arnau López, a full-stack software developer. I design, build and ship web apps, mobile apps and AI features, from the first screen to production.",
-      studio: '[ Freelance ]',
-      location: '[ Spain / Remote EU ]',
+      title: 'Software and AI for companies that need it to work.',
+      body: 'StackD is the studio of Arnau López. I design and build web apps, mobile apps and AI features, and take them all the way to production.',
+      cta: 'Start a project',
+      plans: 'See the plans',
+      meta: ['Amsterdam, Netherlands', 'Remote across the EU', 'Taking new projects'],
     },
-    stats: {
-      items: [
-        { v: '2', l: 'apps live on the App Store' },
-        { v: '1', l: 'B2B SaaS running in production' },
-        { v: '1', l: 'person on the whole stack: design, backend, release' },
-      ],
-      source: 'Counted from the shipped work below',
-    },
-    services: {
-      eyebrow: 'What I do',
+    work: {
+      label: 'Selected work',
+      did: 'What I did',
+      open: 'Open',
+      certificate: 'Certificate',
       items: [
         {
-          t: 'Web apps',
-          tags: ['Next.js & TypeScript', 'APIs & databases', 'Deployed & monitored'],
-          stat: 'From the first screen to the production database: auth, payments, admin panels, the parts that make it real.',
+          id: 'hilo' as const,
+          role: 'Cofounder · Product Engineer',
+          when: '2026, now',
+          kind: 'iPhone, iPad and web app · AI voice',
+          summary:
+            'A voice app for older people who live alone. It talks with them every day, reminds them about their pills and turns their stories into a book for the family. Care organisations get a web app that shows who to call today.',
+          did: [
+            'Product design in Figma and the whole build: iPhone, iPad and two web apps',
+            'The daily voice talk with Claude and Azure Speech, on Supabase in the EU',
+            'Subscriptions on iPhone and web, now in App Store review',
+          ],
         },
         {
-          t: 'Mobile apps',
-          tags: ['React Native & Expo', 'iOS release', 'App Store review'],
-          stat: 'Two apps taken through App Store review and live in the store.',
+          id: 'aithority' as const,
+          role: 'Cofounder · Product Engineer',
+          when: 'May to Oct 2026',
+          kind: 'B2B SaaS · EU AI Act',
+          summary:
+            'EU AI Act compliance for companies that use AI in hiring, credit or biometrics: an inventory of their AI systems, the risk class of each one and dated evidence. Accepted into the Lanzadera accelerator.',
+          did: [
+            'Backend, frontend and the integrations with Microsoft 365, Google Workspace and AI provider APIs',
+            'Onboarding cut from over seven minutes to three steps',
+            'A PDF report the customer can send to their own clients',
+          ],
         },
         {
-          t: 'AI features',
-          tags: ['LLM integrations', 'Voice & agents', 'Human in the loop'],
-          stat: 'Agents that act inside your product, with a clear line between what runs on its own and what waits for a person.',
+          id: 'casa' as const,
+          role: 'Backend & AI · team of three',
+          when: 'Oct 2026',
+          kind: 'AI agents · Open Agent Hackathon',
+          summary:
+            'Agents that check a rental listing in Spain before you pay: the size against Catastro, the price against the official rent index, the fees against the law, and signs of a scam. Built in six days.',
+          did: [
+            'The backend, the data and the agents, in a remote team across countries',
+            'A planner, specialist agents and a critic that drops any finding without a source',
+            'Live data from Catastro and the official SERPAVI rent index',
+          ],
         },
       ],
     },
-    works: {
-      marquee: 'Work',
-      rows: [
-        {
-          which: 'blockflow' as const,
-          index: '01',
-          caption: 'SaaS for UK property managers. An AI voice agent answers out-of-hours calls, triages them and opens the ticket.',
-        },
-        {
-          which: 'kiblo' as const,
-          index: '02',
-          caption: 'iOS app for dog owners: scan a food, get a grade and the exact daily portion. Live on the App Store.',
-        },
-        {
-          which: 'trace' as const,
-          index: '03',
-          caption: 'Privacy app that finds where your data is exposed and sends the GDPR/CCPA deletion requests for you. Live on the App Store.',
-        },
-        {
-          which: 'dross' as const,
-          index: '04',
-          caption: 'Native Mac app and CLI that checks a repo before deploy and catches drift between frontend and backend.',
-        },
-      ],
-    },
-    values: {
-      title: 'How I work',
-      body: 'Three rules for every project I take on.',
+    other: {
+      label: 'Other projects',
       items: [
-        { t: 'Production, not demos', d: "If it doesn't run with real users, it isn't done. I ship it, deploy it and stay on to fix what breaks." },
-        { t: 'One person, whole stack', d: 'Design, frontend, backend and release. You talk to the person writing the code, no handoffs.' },
-        { t: 'You own it', d: 'Full code and IP transfer when we finish. A clean, documented repo and no lock-in.' },
+        {
+          id: 'kiblo' as const,
+          kind: 'iOS app',
+          summary: 'Scan the dog food bag, portion the meal from the dog’s weight and reorder before it runs out. Live on the App Store in the US and Canada.',
+        },
+        {
+          id: 'dross' as const,
+          kind: 'Mac app and CLI',
+          summary: 'Catches the moment a frontend and its backend stop agreeing, before deploy. Notarized and open source.',
+        },
       ],
+    },
+    plans: {
+      label: 'Plans',
+      note: 'Fixed price after a first call',
+      intro: 'Three ways to work together, from the first screen to a product live with real users.',
+      includes: 'Includes',
+      get: 'You get',
+      items: [
+        {
+          t: 'Design',
+          for: 'For when the product needs to be figured out before anyone writes code.',
+          includes: ['User flows and UX', 'Screens in Figma', 'A clickable prototype', 'A small design system with components'],
+          get: 'A Figma file any developer can build from',
+        },
+        {
+          t: 'Design + Build',
+          for: 'Product engineering: I design it and I write the code.',
+          includes: ['Everything in Design', 'Web app or iPhone app in code', 'Backend, database and sign in', 'AI features: voice, agents, LLMs', 'Weekly versions you can open and use'],
+          get: 'A working product and the full repo',
+        },
+        {
+          t: 'Launch',
+          for: 'Designed, built and live with real users.',
+          includes: [
+            'Everything in Design + Build',
+            'App Store release through the Apple Developer Program',
+            'SaaS live on your own domain',
+            'Subscriptions and payments',
+            'Hosting, monitoring and store review handled',
+          ],
+          get: 'A live product, with code and IP handed over',
+        },
+      ],
+      after: 'After launch: support and new features as a monthly retainer.',
     },
     process: {
-      title: 'How a project runs',
+      label: 'How a project runs',
       steps: [
         { t: 'Call', d: 'We talk about the problem, not the feature list.' },
-        { t: 'Scope & price', d: 'A short written scope and a fixed price, or a retainer.' },
-        { t: 'Build', d: 'Weekly builds you can open and use, not status reports.' },
+        { t: 'Scope and price', d: 'A short written scope and a fixed price, or a monthly retainer.' },
+        { t: 'Build', d: 'Weekly versions you can open and use, not status reports.' },
         { t: 'Launch', d: 'Deployed, store review handled, code and IP handed over.' },
       ],
     },
-    techStack: { eyebrow: 'What I build with' },
     faq: {
-      eyebrow: 'FAQ',
-      title: 'Questions clients ask',
+      label: 'Questions',
       items: [
-        {
-          q: 'How fast can you start?',
-          a: 'Usually within a week of the first call. I take a small number of projects at a time so each one gets full attention.',
-        },
-        {
-          q: 'Who owns the code?',
-          a: 'You do. Full IP transfer when the project ends, no exceptions.',
-        },
-        {
-          q: 'How do you charge?',
-          a: "A fixed price for a defined scope, or a monthly retainer for ongoing work. I'll suggest one after we talk.",
-        },
-        {
-          q: 'Do you sign NDAs?',
-          a: 'Yes. Happy to sign yours before you share anything sensitive.',
-        },
-        {
-          q: 'Is it just you?',
-          a: 'Yes. StackD is my freelance practice, so you work directly with me from the first call to launch.',
-        },
+        { q: 'Is it just you?', a: 'Yes. StackD is my studio, so you work directly with the person who writes the code, from the first call to launch.' },
+        { q: 'How fast can you start?', a: 'Usually within a week of the first call. I take a small number of projects at a time.' },
+        { q: 'How do you charge?', a: 'A fixed price for a defined scope, or a monthly retainer for ongoing work. I suggest one after we talk.' },
+        { q: 'Who owns the code?', a: 'You do. Full code and IP transfer when the project ends.' },
+        { q: 'Where are you based?', a: 'In Amsterdam. I work remotely with companies across the EU, in English or Spanish.' },
       ],
     },
     contact: {
-      eyebrow: 'Have a project?',
-      title: "Let's talk!",
+      title: 'Have a project?',
+      body: 'Tell me what you need to build, and we set up a first call.',
       name: 'Name',
       email: 'Email',
-      message: 'Message',
+      message: 'What do you need?',
       send: 'Send',
+      sent: (email: string) => `Your mail app should have opened. If not, write to ${email}.`,
     },
   },
   es: {
-    nav: { work: 'Trabajo', services: 'Servicios', contact: 'Contacto' },
+    nav: { plans: 'Planes', work: 'Trabajo', process: 'Proceso', contact: 'Contacto' },
     hero: {
-      body: 'StackD es la práctica freelance de Arnau López, desarrollador de software full-stack. Diseño, construyo y lanzo aplicaciones web, apps móviles y funciones de IA, desde la primera pantalla hasta producción.',
-      studio: '[ Freelance ]',
-      location: '[ España / Remoto UE ]',
+      title: 'Software e IA para empresas que necesitan que funcione.',
+      body: 'StackD es el estudio de Arnau López. Diseño y construyo aplicaciones web, apps móviles y funciones de IA, y las llevo hasta producción.',
+      cta: 'Empezar un proyecto',
+      plans: 'Ver los planes',
+      meta: ['Ámsterdam, Países Bajos', 'En remoto en toda la UE', 'Con hueco para proyectos'],
     },
-    stats: {
-      items: [
-        { v: '2', l: 'apps publicadas en la App Store' },
-        { v: '1', l: 'SaaS B2B funcionando en producción' },
-        { v: '1', l: 'persona en todo el stack: diseño, backend, lanzamiento' },
-      ],
-      source: 'Contado a partir del trabajo publicado más abajo',
-    },
-    services: {
-      eyebrow: 'Qué hago',
+    work: {
+      label: 'Trabajo destacado',
+      did: 'Qué hice',
+      open: 'Abrir',
+      certificate: 'Certificado',
       items: [
         {
-          t: 'Aplicaciones web',
-          tags: ['Next.js y TypeScript', 'APIs y bases de datos', 'Desplegado y monitorizado'],
-          stat: 'De la primera pantalla a la base de datos en producción: login, pagos, paneles de administración, lo que hace que sea real.',
+          id: 'hilo' as const,
+          role: 'Cofundador · Product Engineer',
+          when: '2026, ahora',
+          kind: 'App iPhone, iPad y web · voz con IA',
+          summary:
+            'Una app de voz para personas mayores que viven solas. Charla con ellas cada día, les recuerda las pastillas y convierte sus historias en un libro para la familia. Las organizaciones de cuidado tienen una web que les dice a quién llamar hoy.',
+          did: [
+            'Diseño del producto en Figma y todo el desarrollo: iPhone, iPad y dos webs',
+            'La charla diaria por voz con Claude y Azure Speech, sobre Supabase en la UE',
+            'Suscripciones en iPhone y web, ahora en revisión de la App Store',
+          ],
         },
         {
-          t: 'Apps móviles',
-          tags: ['React Native y Expo', 'Lanzamiento iOS', 'Revisión de App Store'],
-          stat: 'Dos apps que han pasado la revisión de Apple y están publicadas.',
+          id: 'aithority' as const,
+          role: 'Cofundador · Product Engineer',
+          when: 'Mayo a oct 2026',
+          kind: 'SaaS B2B · AI Act de la UE',
+          summary:
+            'Cumplimiento del AI Act para empresas que usan IA en selección, crédito o biometría: inventario de sus sistemas de IA, la clase de riesgo de cada uno y evidencias con fecha. Aceptada en la aceleradora Lanzadera.',
+          did: [
+            'Backend, frontend y las integraciones con Microsoft 365, Google Workspace y las APIs de proveedores de IA',
+            'Onboarding reducido de más de siete minutos a tres pasos',
+            'Un informe en PDF que el cliente puede enviar a sus propios clientes',
+          ],
         },
         {
-          t: 'Funciones de IA',
-          tags: ['Integración de LLMs', 'Voz y agentes', 'Persona en el circuito'],
-          stat: 'Agentes que actúan dentro de tu producto, con una línea clara entre lo que hacen solos y lo que espera a una persona.',
+          id: 'casa' as const,
+          role: 'Backend e IA · equipo de tres',
+          when: 'Oct 2026',
+          kind: 'Agentes de IA · Open Agent Hackathon',
+          summary:
+            'Agentes que revisan un anuncio de alquiler en España antes de pagar: los metros contra el Catastro, el precio contra el índice oficial, los gastos contra la ley y señales de estafa. Hecho en seis días.',
+          did: [
+            'El backend, los datos y los agentes, en un equipo remoto de varios países',
+            'Un planificador, agentes especialistas y un crítico que descarta todo hallazgo sin fuente',
+            'Datos en vivo del Catastro y del índice oficial de alquiler SERPAVI',
+          ],
         },
       ],
     },
-    works: {
-      marquee: 'Trabajo',
-      rows: [
-        {
-          which: 'blockflow' as const,
-          index: '01',
-          caption: 'SaaS para administradores de fincas en Reino Unido. Un agente de voz IA atiende las llamadas fuera de horario, hace triaje y abre el ticket.',
-        },
-        {
-          which: 'kiblo' as const,
-          index: '02',
-          caption: 'App iOS para dueños de perros: escanea un pienso, obtén su nota y la ración diaria exacta. Publicada en la App Store.',
-        },
-        {
-          which: 'trace' as const,
-          index: '03',
-          caption: 'App de privacidad que encuentra dónde están expuestos tus datos y envía por ti las solicitudes de borrado GDPR/CCPA. Publicada en la App Store.',
-        },
-        {
-          which: 'dross' as const,
-          index: '04',
-          caption: 'App nativa de Mac y CLI que revisa un repo antes de desplegar y detecta desajustes entre frontend y backend.',
-        },
-      ],
-    },
-    values: {
-      title: 'Cómo trabajo',
-      body: 'Tres reglas para cada proyecto que acepto.',
+    other: {
+      label: 'Otros proyectos',
       items: [
-        { t: 'Producción, no demos', d: 'Si no funciona con usuarios reales, no está terminado. Lo lanzo, lo despliego y sigo ahí para arreglar lo que falle.' },
-        { t: 'Una persona, todo el stack', d: 'Diseño, frontend, backend y lanzamiento. Hablas con quien escribe el código, sin intermediarios.' },
-        { t: 'Es tuyo', d: 'Cesión completa del código y la propiedad intelectual al terminar. Un repo limpio, documentado y sin ataduras.' },
+        {
+          id: 'kiblo' as const,
+          kind: 'App iOS',
+          summary: 'Escanea el saco de pienso, calcula la ración por el peso del perro y vuelve a pedir antes de que se acabe. Publicada en la App Store de EE. UU. y Canadá.',
+        },
+        {
+          id: 'dross' as const,
+          kind: 'App Mac y CLI',
+          summary: 'Detecta cuándo un frontend y su backend dejan de entenderse, antes de desplegar. Notarizada y de código abierto.',
+        },
       ],
+    },
+    plans: {
+      label: 'Planes',
+      note: 'Precio cerrado tras una primera llamada',
+      intro: 'Tres formas de trabajar juntos, de la primera pantalla a un producto en producción con usuarios reales.',
+      includes: 'Incluye',
+      get: 'Te llevas',
+      items: [
+        {
+          t: 'Diseño',
+          for: 'Para cuando hay que definir el producto antes de escribir código.',
+          includes: ['Flujos de usuario y UX', 'Pantallas en Figma', 'Un prototipo navegable', 'Un pequeño sistema de diseño con componentes'],
+          get: 'Un archivo de Figma listo para que cualquier desarrollador lo construya',
+        },
+        {
+          t: 'Diseño + Desarrollo',
+          for: 'Product engineering: lo diseño y escribo el código.',
+          includes: ['Todo lo de Diseño', 'App web o app de iPhone en código', 'Backend, base de datos y login', 'Funciones de IA: voz, agentes, LLMs', 'Versiones semanales que puedes abrir y usar'],
+          get: 'Un producto que funciona y el repositorio completo',
+        },
+        {
+          t: 'Lanzamiento',
+          for: 'Diseñado, construido y en producción con usuarios reales.',
+          includes: [
+            'Todo lo de Diseño + Desarrollo',
+            'Publicación en la App Store con el Apple Developer Program',
+            'SaaS en tu propio dominio',
+            'Suscripciones y pagos',
+            'Hosting, monitorización y revisión de la tienda',
+          ],
+          get: 'Un producto en producción, con el código y la propiedad entregados',
+        },
+      ],
+      after: 'Después del lanzamiento: soporte y nuevas funciones con un retainer mensual.',
     },
     process: {
-      title: 'Cómo va un proyecto',
+      label: 'Cómo va un proyecto',
       steps: [
         { t: 'Llamada', d: 'Hablamos del problema, no de la lista de funciones.' },
-        { t: 'Alcance y precio', d: 'Un alcance corto por escrito y precio cerrado, o un retainer.' },
+        { t: 'Alcance y precio', d: 'Un alcance corto por escrito y precio cerrado, o un retainer mensual.' },
         { t: 'Construcción', d: 'Versiones semanales que puedes abrir y usar, no informes de estado.' },
         { t: 'Lanzamiento', d: 'Desplegado, revisión de la tienda hecha, código y propiedad entregados.' },
       ],
     },
-    techStack: { eyebrow: 'Con qué construyo' },
     faq: {
-      eyebrow: 'FAQ',
-      title: 'Preguntas frecuentes de clientes',
+      label: 'Preguntas',
       items: [
-        {
-          q: '¿Con qué rapidez puedes empezar?',
-          a: 'Normalmente en una semana desde la primera llamada. Llevo pocos proyectos a la vez para que cada uno tenga toda mi atención.',
-        },
-        {
-          q: '¿De quién es el código?',
-          a: 'Tuyo. Cesión completa de la propiedad intelectual al terminar, sin excepciones.',
-        },
-        {
-          q: '¿Cómo cobras?',
-          a: 'Precio cerrado para un alcance definido, o un retainer mensual para trabajo continuo. Te recomiendo uno después de hablar.',
-        },
-        {
-          q: '¿Firmas NDA?',
-          a: 'Sí. Firmo el tuyo antes de que compartas nada sensible.',
-        },
-        {
-          q: '¿Eres solo tú?',
-          a: 'Sí. StackD es mi práctica freelance, así que trabajas directamente conmigo desde la primera llamada hasta el lanzamiento.',
-        },
+        { q: '¿Eres solo tú?', a: 'Sí. StackD es mi estudio, así que trabajas directamente con quien escribe el código, desde la primera llamada hasta el lanzamiento.' },
+        { q: '¿Cuándo puedes empezar?', a: 'Normalmente en una semana desde la primera llamada. Llevo pocos proyectos a la vez.' },
+        { q: '¿Cómo cobras?', a: 'Precio cerrado para un alcance definido, o un retainer mensual para trabajo continuo. Te recomiendo uno después de hablar.' },
+        { q: '¿De quién es el código?', a: 'Tuyo. Cesión completa del código y la propiedad intelectual al terminar.' },
+        { q: '¿Dónde estás?', a: 'En Ámsterdam. Trabajo en remoto con empresas de toda la UE, en inglés o en español.' },
       ],
     },
     contact: {
-      eyebrow: '¿Tienes un proyecto?',
-      title: '¡Hablemos!',
+      title: '¿Tienes un proyecto?',
+      body: 'Cuéntame qué necesitas construir y quedamos para una primera llamada.',
       name: 'Nombre',
       email: 'Email',
-      message: 'Mensaje',
+      message: '¿Qué necesitas?',
       send: 'Enviar',
+      sent: (email: string) => `Se habrá abierto tu correo. Si no, escríbeme a ${email}.`,
     },
   },
-} as const
+}
+
+export type Copy = (typeof COPY)['en']

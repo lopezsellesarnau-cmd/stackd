@@ -1,19 +1,19 @@
 import type { Config } from 'tailwindcss'
 
 /**
- * Lenguaje "minimal espacio abierto" (5 oct 2026), el mismo de arnau-lopez.com
- * (vault: Diseño/10-minimal-espacio-abierto). Diferencia deliberada con el
- * portfolio: el acento de StackD es su terracota #C1663D, no el rust #B0413D.
+ * Minimal editorial (10 nov 2026): el estilo personal de Arnau (el de arnau-lopez.com) sobre
+ * blanco puro, con otra composición. Acento: el terracota de StackD.
  */
 const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        paper: '#FCFCFB',
-        card: '#EDEDEB',
+        paper: '#FFFFFF',
+        card: '#F2F2F0',
         ink: '#141310',
         accent: '#C1663D',
+        line: 'rgba(20,19,16,0.10)',
         fg: {
           muted: 'rgba(20,19,16,0.72)',
           dim: 'rgba(20,19,16,0.55)',

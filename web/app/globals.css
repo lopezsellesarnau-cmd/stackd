@@ -9,7 +9,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    background: #fcfcfb;
+    background: #ffffff;
     color: #141310;
     overflow-x: clip;
     font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, ui-sans-serif, system-ui, sans-serif;
@@ -28,7 +28,7 @@
 }
 
 @layer components {
-  /* Un solo marco de 6 columnas para todas las secciones. */
+  /* Un solo marco para todas las secciones. */
   .frame {
     @apply mx-auto w-full max-w-[75rem] px-4 md:px-8;
   }

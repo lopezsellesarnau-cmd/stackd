@@ -3,8 +3,8 @@ import { IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/components/language-context'
 
-// Sans = Helvetica (globals.css); IBM Plex Mono solo para números, índices y
-// stacks. Mismo lenguaje que arnau-lopez.com (vault Diseño/10-minimal-espacio-abierto).
+// Sans = Helvetica (globals.css); IBM Plex Mono para índices, etiquetas y stacks.
+// Mismo estilo personal que arnau-lopez.com (vault Diseño/10-minimal-espacio-abierto), otra composición.
 const mono = IBM_Plex_Mono({
   subsets: ['latin'],
   weight: ['400'],
@@ -14,9 +14,9 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.stackd.codes'),
-  title: 'StackD | Arnau López, freelance software developer',
+  title: 'StackD | Software and AI studio by Arnau López',
   description:
-    'Freelance full-stack development by Arnau López. Web apps, mobile apps and AI features, built and shipped to production.',
+    'StackD is the studio of Arnau López in Amsterdam. Web apps, mobile apps and AI features, designed, built and taken to production.',
   // Indexable desde el 24 jul 2026: el `noindex` era un resto de cuando la web
   // estaba en desarrollo y dejaba la agencia invisible en buscadores.
   robots: { index: true, follow: true },
@@ -25,19 +25,19 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://www.stackd.codes',
     siteName: 'StackD',
-    title: 'StackD | Arnau López, freelance software developer',
+    title: 'StackD | Software and AI studio by Arnau López',
     description:
-      'Freelance full-stack development by Arnau López. Web apps, mobile apps and AI features, built and shipped to production.',
+      'StackD is the studio of Arnau López in Amsterdam. Web apps, mobile apps and AI features, designed, built and taken to production.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StackD | Arnau López, freelance software developer',
+    title: 'StackD | Software and AI studio by Arnau López',
     description:
-      'Freelance full-stack development by Arnau López. Web apps, mobile apps and AI features, built and shipped to production.',
+      'StackD is the studio of Arnau López in Amsterdam. Web apps, mobile apps and AI features, designed, built and taken to production.',
   },
 }
 
-export const viewport: Viewport = { themeColor: '#FCFCFB', colorScheme: 'light' }
+export const viewport: Viewport = { themeColor: '#FFFFFF', colorScheme: 'light' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,4 +1,4 @@
-import { Nav, Hero, Services, WorksGrid, Process, Faq, Contact } from '@/components/sections'
+import { Nav, Hero, Plans, Work, Quote, Process, Faq, Other, Contact } from '@/components/sections'
 
 export default function Page() {
   return (
@@ -6,10 +6,12 @@ export default function Page() {
       <Nav />
       <main id="contenido">
         <Hero />
-        <WorksGrid />
-        <Services />
+        <Plans />
+        <Work />
+        <Quote />
         <Process />
         <Faq />
+        <Other />
         <Contact />
       </main>
     </>

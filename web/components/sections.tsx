@@ -1,28 +1,26 @@
 'use client'
 
 /**
- * StackD landing — lenguaje "minimal espacio abierto" (5 oct 2026), el mismo
- * que arnau-lopez.com (vault: Diseño/10-minimal-espacio-abierto): papel casi
- * blanco, Helvetica pequeña, mono para números, rejilla invisible de 6
- * columnas, una pantalla por sección con etiquetas en las esquinas.
- *
- * Coherente con el portfolio pero no un espejo:
- *   - acento terracota de StackD (#C1663D) y el punto del logotipo
- *   - Services en tres columnas, Process como fila de pasos (no hitos)
- *   - contacto con formulario dentro del bloque gris, y selector EN/ES
- * El contenido (bilingüe EN/ES) sale de components/copy.ts.
+ * StackD landing, minimal editorial (10 nov 2026). El estilo personal de Arnau (el de
+ * arnau-lopez.com: blanco, Helvetica pequeña en mayúsculas, mono para índices, etiquetas en las
+ * esquinas, retrato en escala de grises en el centro) con otra composición:
+ *   - hero = retrato en el centro con el texto del estudio en las esquinas
+ *   - trabajo como fichas: nombre | imagen | ficha etiqueta → valor (rol, año, qué hice, stack)
+ *   - otros proyectos en dos columnas, servicios en tres, proceso en fila, FAQ en dos columnas
+ * Enfoque de estudio, en primera persona. El contenido (EN/ES) sale de components/copy.ts.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import { useState } from 'react'
 import { useLanguage } from './language-context'
-import { COPY } from './copy'
+import { COPY, PROJECTS, QUOTE } from './copy'
 
 const EMAIL = 'lopezsellesarnau@gmail.com'
 const PORTFOLIO = 'https://arnau-lopez.com'
 const LINKEDIN = 'https://www.linkedin.com/in/arnau-lopez-selles/'
 
-const ext = (href: string) =>
-  href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {}
+const ext = { target: '_blank', rel: 'noopener noreferrer' } as const
+const n2 = (i: number) => String(i + 1).padStart(2, '0')
 
 /** Logotipo: el punto terracota es la marca de StackD. */
 function Wordmark() {
@@ -33,70 +31,61 @@ function Wordmark() {
   )
 }
 
-/** Fila etiqueta/valor del bloque gris (popup y contacto). */
+/** Fila etiqueta → valor, como una ficha */
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
+    <div className="grid grid-cols-[6.5rem_1fr] gap-x-4 py-[3px]">
       <span className="text-right text-fg-faint">{label}</span>
       <div className="text-ink">{children}</div>
     </div>
   )
 }
 
-// ── Menu ─────────────────────────────────────────────────────────────────
+/** Cabecera de sección: [ 0n ] a la izquierda, nota a la derecha */
+function SectionHead({ n, label, note }: { n: string; label: string; note?: string }) {
+  return (
+    <div className="frame flex justify-between text-[12px] uppercase">
+      <span className="pl-2 text-ink">
+        <span className="mono text-accent">[ {n} ]</span> {label}
+      </span>
+      {note ? <span className="pr-2 text-fg-dim">{note}</span> : null}
+    </div>
+  )
+}
 
-const LINKS = ['work', 'services', 'process', 'contact'] as const
+// ── Menu ─────────────────────────────────────────────────────────────────
 
 export function Nav() {
   const { lang, setLang } = useLanguage()
   const t = COPY[lang].nav
   const en = lang === 'en'
-  const labels: Record<(typeof LINKS)[number], string> = {
-    work: t.work,
-    services: t.services,
-    process: en ? 'Process' : 'Proceso',
-    contact: t.contact,
-  }
-  const [active, setActive] = useState('')
-
-  useEffect(() => {
-    const els = LINKS.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[]
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
-      { rootMargin: '-45% 0px -50% 0px' },
-    )
-    els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
-  }, [])
+  const links = [
+    ['plans', t.plans],
+    ['work', t.work],
+    ['process', t.process],
+    ['contact', t.contact],
+  ] as const
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 bg-paper/85 backdrop-blur-[2px]">
-      <div className="frame grid grid-cols-3 py-5 text-[12px] leading-[1.45] md:grid-cols-6">
-        <a href="#top" className="pl-2 text-ink">
+    <header className="fixed inset-x-0 top-0 z-40 bg-paper/90 backdrop-blur-[2px]">
+      <div className="frame grid grid-cols-3 py-5 text-[12px] uppercase leading-[1.45] md:grid-cols-6">
+        <a href="#top" className="pl-2 normal-case text-ink">
           <Wordmark />
         </a>
-        <p className="hidden pl-2 text-fg-faint md:block">
-          {en ? 'Freelance software' : 'Software freelance'}
-          <br />
-          {en ? 'by Arnau López' : 'por Arnau López'}
-        </p>
-        <nav className="col-span-2 flex items-start justify-end gap-5 pr-2 md:col-span-4" aria-label="Primary">
-          {LINKS.map((id) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              className={`hidden transition-colors hover:text-accent sm:inline ${active === id ? 'text-ink underline decoration-1 underline-offset-[6px]' : 'text-fg-muted'}`}
-            >
-              {labels[id]}
+        <p className="hidden pl-2 text-fg-faint md:block">{en ? 'Studio of Arnau López' : 'Estudio de Arnau López'}</p>
+        <nav className="col-span-2 flex justify-end gap-5 pr-2 md:col-span-4" aria-label="Primary">
+          {links.map(([id, label]) => (
+            <a key={id} href={`#${id}`} className="hidden text-fg-muted transition-colors hover:text-accent sm:inline">
+              {label}
             </a>
           ))}
-          <span className="flex gap-2 uppercase">
+          <span className="flex gap-2">
             {(['en', 'es'] as const).map((l) => (
               <button
                 key={l}
                 onClick={() => setLang(l)}
                 aria-pressed={lang === l}
-                className={`transition-colors hover:text-accent ${lang === l ? 'text-ink' : 'text-fg-ghost'}`}
+                className={`uppercase transition-colors hover:text-accent ${lang === l ? 'text-ink' : 'text-fg-ghost'}`}
               >
                 {l}
               </button>
@@ -108,90 +97,38 @@ export function Nav() {
   )
 }
 
-// ── Hero ─────────────────────────────────────────────────────────────────
+// ── Hero: the portrait in the middle, the studio in the corners ──────────
 
 export function Hero() {
   const { lang } = useLanguage()
   const t = COPY[lang].hero
-  const en = lang === 'en'
-  const notes: { n: string; lines: string[]; pos: string }[] = [
-    { n: '1', lines: ['BlockFlow', en ? 'SaaS · in production' : 'SaaS · en producción'], pos: 'md:col-start-1 md:row-start-1' },
-    { n: '2', lines: ['Kiblo · TRACE', en ? 'iOS · live on the App Store' : 'iOS · en la App Store'], pos: 'md:col-start-2 md:row-start-2' },
-    { n: '3', lines: ['Dross', en ? 'Mac app · notarized' : 'App Mac · notarizada'], pos: 'md:col-start-1 md:row-start-3' },
-    { n: '4', lines: [en ? 'Status' : 'Estado', en ? 'Taking work' : 'Con hueco'], pos: 'md:col-start-2 md:row-start-4' },
-  ]
 
   return (
-    <section id="top" className="relative flex min-h-[100svh] flex-col pt-28">
-      <div className="frame text-center">
-        <h1 className="text-[clamp(1.25rem,2.6vw,1.75rem)] font-normal uppercase leading-[1.15] tracking-[-0.01em] text-ink">
-          <Wordmark />
-          <br />
-          {en ? 'Freelance software development' : 'Desarrollo de software freelance'}
-        </h1>
-        <p className="mt-3 text-[12px] uppercase tracking-[0.04em] text-fg-dim">
-          {en ? 'Web · Mobile · AI · ' : 'Web · Móvil · IA · '}
-          {t.location.replace(/[[\]]/g, '').trim()}
-        </p>
+    <section id="top" className="frame grid min-h-[100svh] grid-rows-[1fr_auto_1fr] pb-10 pt-24 text-[12px] uppercase">
+      <div className="flex items-start justify-between gap-8 px-2">
+        <h1 className="max-w-[26ch] font-normal leading-[1.35] text-ink">{t.title}</h1>
+        <ul className="hidden text-right text-fg-dim md:block">
+          {t.meta.map((m) => (
+            <li key={m}>{m}</li>
+          ))}
+        </ul>
       </div>
 
-      <div className="frame mt-16 grid grid-cols-2 content-start gap-y-10 pb-16 md:mt-20 md:grid-cols-6 md:gap-y-12">
-        {notes.map((h) => (
-          <p key={h.n} className={`mono pl-2 text-[11px] uppercase leading-[1.55] text-fg-muted ${h.pos}`}>
-            <span className="mr-3 text-accent">{h.n}</span>
-            {h.lines.map((l, i) => (
-              <span key={i} className="block">
-                {l}
-              </span>
-            ))}
-          </p>
-        ))}
-        <div className="col-span-2 max-w-[36ch] pl-2 md:col-span-2 md:col-start-5 md:row-start-3">
-          <p className="text-[12px] leading-[1.6] text-fg-muted">{t.body}</p>
-          <p className="mt-4 flex gap-5 text-[12px] uppercase">
-            <a href="#work" className="text-ink underline decoration-fg-ghost underline-offset-4 hover:text-accent">
-              {en ? 'See work' : 'Ver trabajo'}
-            </a>
-            <a href="#contact" className="text-ink underline decoration-fg-ghost underline-offset-4 hover:text-accent">
-              {en ? "Let's talk" : 'Hablemos'}
-            </a>
-          </p>
+      <figure className="flex flex-col items-center gap-3 py-10">
+        <Image src="/arnau.jpg" alt="Arnau López" width={180} height={240} priority className="h-auto w-[130px] grayscale md:w-[170px]" />
+        <figcaption className="mono text-[11px] text-fg-dim">Arnau López · StackD.</figcaption>
+      </figure>
+
+      <div className="flex items-end justify-between gap-8 px-2">
+        <p className="max-w-[40ch] normal-case leading-[1.5] text-fg-muted">{t.body}</p>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <a href="#plans" className="text-ink transition-colors hover:text-accent">
+            {t.plans} ↓
+          </a>
+          <a href="#contact" className="text-fg-dim transition-colors hover:text-accent">
+            {t.cta} →
+          </a>
         </div>
-      </div>
-    </section>
-  )
-}
-
-// ── Services ─────────────────────────────────────────────────────────────
-
-export function Services() {
-  const { lang } = useLanguage()
-  const t = COPY[lang].services
-  const s = COPY[lang].stats
-  return (
-    <section id="services" className="relative flex min-h-[100svh] flex-col justify-between py-24">
-      <p className="frame text-[12px] uppercase text-ink">
-        <span className="pl-2">{t.eyebrow}</span>
-      </p>
-
-      <div className="frame my-16 grid gap-y-12 md:grid-cols-6">
-        {t.items.map((it, i) => (
-          <div key={it.t} className="pl-2 pr-6 md:col-span-2">
-            <p className="mono text-[10px] text-fg-faint">{String(i + 1).padStart(2, '0')}</p>
-            <h2 className="mt-2 text-[13px] font-normal uppercase text-ink">{it.t}</h2>
-            <p className="mono mt-3 text-[10px] uppercase leading-[1.6] text-fg-dim">{it.tags.join(' · ')}</p>
-            <p className="mt-3 max-w-[34ch] text-[11px] leading-[1.55] text-fg-muted">{it.stat}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="frame grid gap-y-4 text-[12px] uppercase md:grid-cols-6">
-        {s.items.map((x) => (
-          <p key={x.l} className="pl-2 pr-6 text-fg-dim md:col-span-2">
-            <span className="mr-2 text-ink">{x.v}</span>
-            {x.l}
-          </p>
-        ))}
       </div>
     </section>
   )
@@ -199,202 +136,228 @@ export function Services() {
 
 // ── Work ─────────────────────────────────────────────────────────────────
 
-const WORK_META: Record<string, { name: string; kind: string; stack: string[]; year: string; link?: string; linkLabel?: string }> = {
-  blockflow: { name: 'BlockFlow', kind: 'SaaS · AI voice agent', stack: ['Next.js', 'Supabase', 'LLM', 'Voice AI'], year: '2026' },
-  kiblo: {
-    name: 'Kiblo',
-    kind: 'iOS app',
-    stack: ['React Native', 'Expo', 'TypeScript', 'Firebase'],
-    year: '2026',
-    link: 'https://apps.apple.com/app/id6802237827',
-    linkLabel: 'App Store',
-  },
-  trace: {
-    name: 'TRACE',
-    kind: 'iOS app · privacy',
-    stack: ['React Native', 'TypeScript', 'Firebase'],
-    year: '2026',
-    link: 'https://github.com/lopezsellesarnau-cmd/trace-app',
-    linkLabel: 'Repository',
-  },
-  dross: {
-    name: 'Dross',
-    kind: 'Mac app · dev tool',
-    stack: ['SwiftUI', 'macOS', 'TypeScript'],
-    year: '2026',
-    link: 'https://github.com/lopezsellesarnau-cmd/dross',
-    linkLabel: 'Repository',
-  },
-}
-
-type Caso = { which: string; index: string; caption: string }
-
-function ProjectCard({ caso, en, onClose }: { caso: Caso; en: boolean; onClose: () => void }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const m = WORK_META[caso.which]
-
-  useEffect(() => {
-    ref.current?.focus()
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-paper/70 px-4" onClick={onClose}>
-      <div
-        ref={ref}
-        role="dialog"
-        aria-modal="true"
-        aria-label={m.name}
-        tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
-        className="relative max-h-[78vh] w-[min(470px,100%)] overflow-y-auto bg-card px-5 py-5 text-[11px] uppercase leading-[1.45] tracking-[0.01em] outline-none"
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-3 top-3 uppercase text-fg-faint transition-colors hover:text-ink"
-        >
-          {en ? 'Close' : 'Cerrar'}
-        </button>
-        <Row label={caso.index}>
-          {m.name}
-          <span className="block text-fg-dim">{m.kind}</span>
-        </Row>
-        <Row label={en ? 'Status' : 'Estado'}>{en ? 'In production' : 'En producción'}</Row>
-        <div className="h-3" />
-        <Row label={en ? 'What' : 'Qué'}>
-          <span className="normal-case">{caso.caption}</span>
-        </Row>
-        <div className="h-3" />
-        <Row label="Stack">{m.stack.join(', ')}</Row>
-        <Row label={en ? 'Year' : 'Año'}>{m.year}</Row>
-        {m.link && (
-          <Row label="Link">
-            <a href={m.link} {...ext(m.link)} className="underline decoration-fg-ghost underline-offset-2 hover:text-accent">
-              {m.linkLabel} ↗
-            </a>
-          </Row>
-        )}
-      </div>
-    </div>
-  )
-}
-
-export function WorksGrid() {
+export function Work() {
   const { lang } = useLanguage()
-  const t = COPY[lang].works
+  const t = COPY[lang].work
   const en = lang === 'en'
-  const [openKey, setOpenKey] = useState<string | null>(null)
-  const close = useCallback(() => setOpenKey(null), [])
-  const open = t.rows.find((r) => r.which === openKey) ?? null
 
   return (
-    <section id="work" className="relative flex min-h-[100svh] flex-col justify-between py-24">
-      <p className="frame text-[12px] uppercase text-ink">
-        <span className="pl-2">{en ? 'Selected work' : 'Trabajo seleccionado'}</span>
-      </p>
+    <section id="work" className="scroll-mt-16 py-24">
+      <SectionHead n="02" label={t.label} note={`${t.items.length} ${en ? 'cases' : 'casos'}`} />
 
-      <ul className="mx-auto my-16 flex flex-col items-center gap-[6px] text-center text-[12px] font-medium uppercase leading-[1.3] tracking-[0.01em]">
-        {t.rows.map((r) => (
-          <li key={r.which}>
-            <button
-              type="button"
-              onClick={() => setOpenKey(r.which)}
-              className={`relative inline-block font-medium uppercase transition-colors hover:text-accent ${openKey && openKey !== r.which ? 'text-fg-ghost' : 'text-ink'}`}
-            >
-              <span className="mono absolute right-full top-[1px] mr-3 text-[10px] font-normal text-fg-faint">{r.index}</span>
-              {WORK_META[r.which].name}
-              <span className="ml-3 font-normal text-fg-faint">{WORK_META[r.which].kind}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="frame mt-14 space-y-20">
+        {t.items.map((item, i) => {
+          const p = PROJECTS[item.id]
+          return (
+            <article key={item.id} className="grid gap-6 border-t border-line pt-5 text-[12px] md:grid-cols-12">
+              <h3 className="pl-2 uppercase text-ink md:col-span-2">
+                <span className="mono text-fg-faint">{n2(i)}</span>
+                <br />
+                {p.name}
+              </h3>
 
-      <div className="frame flex justify-between text-[12px] uppercase">
-        <span className="pl-2 text-ink">
-          {String(t.rows.length).padStart(2, '0')} {en ? 'projects' : 'proyectos'}
-          <span className="ml-4 text-fg-dim">2024–2026</span>
-        </span>
-        <span className="pr-2 text-fg-dim">{en ? 'Press a project' : 'Pulsa un proyecto'}</span>
+              <a href={p.link} {...ext} className="group block overflow-hidden bg-card md:col-span-6" aria-label={`${t.open} ${p.name}`}>
+                <Image
+                  src={p.image}
+                  alt={`${p.name}, ${item.kind}`}
+                  width={p.w}
+                  height={p.h}
+                  sizes="(min-width: 768px) 600px, 100vw"
+                  className="h-auto w-full transition-opacity duration-300 group-hover:opacity-90"
+                />
+              </a>
+
+              <div className="space-y-4 md:col-span-4">
+                <div className="uppercase">
+                  <Row label={en ? 'Role' : 'Rol'}>{item.role}</Row>
+                  <Row label={en ? 'When' : 'Cuándo'}>{item.when}</Row>
+                  <Row label={en ? 'What' : 'Qué'}>{item.kind}</Row>
+                </div>
+                <p className="leading-[1.55] text-fg-muted">{item.summary}</p>
+                <div>
+                  <p className="uppercase text-fg-faint">{t.did}</p>
+                  <ul className="mt-1 space-y-1 text-ink">
+                    {item.did.map((d) => (
+                      <li key={d} className="flex gap-2">
+                        <span className="text-accent" aria-hidden>
+                          )
+                        </span>
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="mono text-[11px] uppercase text-fg-dim">{p.stack.join(' · ')}</p>
+                <a
+                  href={p.link}
+                  {...ext}
+                  className="inline-block uppercase text-ink underline decoration-1 underline-offset-4 hover:text-accent"
+                >
+                  {t.open} {p.name} ↗
+                </a>
+                {p.certificate ? (
+                  <a
+                    href={p.certificate}
+                    {...ext}
+                    className="ml-5 inline-block uppercase text-fg-dim underline decoration-1 underline-offset-4 hover:text-accent"
+                  >
+                    {t.certificate} ↗
+                  </a>
+                ) : null}
+              </div>
+            </article>
+          )
+        })}
       </div>
-
-      {open && <ProjectCard caso={open} en={en} onClose={close} />}
     </section>
   )
 }
 
-// ── Process + valores ────────────────────────────────────────────────────
+// ── Plans ────────────────────────────────────────────────────────────────
+
+export function Plans() {
+  const { lang } = useLanguage()
+  const t = COPY[lang].plans
+
+  return (
+    <section id="plans" className="scroll-mt-16 py-24">
+      <SectionHead n="01" label={t.label} note={t.note} />
+      <p className="frame mt-10 text-[12px] uppercase text-ink">
+        <span className="block max-w-[44ch] pl-2">{t.intro}</span>
+      </p>
+      <div className="frame mt-10">
+        <div className="grid gap-px border border-line bg-line text-[12px] md:grid-cols-3">
+          {t.items.map((plan, i) => (
+            <div key={plan.t} className={`flex flex-col gap-5 px-5 py-6 ${i === 2 ? 'bg-ink text-paper' : 'bg-paper'}`}>
+              <div>
+                <p className={`mono text-[11px] ${i === 2 ? 'text-accent' : 'text-fg-faint'}`}>{`[ ${n2(i)} ]`}</p>
+                <h3 className="mt-2 text-[15px] uppercase">{plan.t}</h3>
+                <p className={`mt-2 leading-[1.55] ${i === 2 ? 'text-paper/70' : 'text-fg-muted'}`}>{plan.for}</p>
+              </div>
+              <div>
+                <p className={`uppercase ${i === 2 ? 'text-paper/50' : 'text-fg-faint'}`}>{t.includes}</p>
+                <ul className="mt-2 space-y-1">
+                  {plan.includes.map((x) => (
+                    <li key={x} className="flex gap-2">
+                      <span className="text-accent" aria-hidden>
+                        )
+                      </span>
+                      {x}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-auto">
+                <p className={`uppercase ${i === 2 ? 'text-paper/50' : 'text-fg-faint'}`}>{t.get}</p>
+                <p className="mt-1">{plan.get}</p>
+                <a
+                  href="#contact"
+                  className={`mt-5 inline-block uppercase underline decoration-1 underline-offset-4 transition-colors hover:text-accent`}
+                >
+                  {COPY[lang].hero.cta} →
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="frame mt-4 text-[12px] text-fg-dim">
+        <span className="pl-2">{t.after}</span>
+      </p>
+    </section>
+  )
+}
+
+// ── Quote ────────────────────────────────────────────────────────────────
+
+export function Quote() {
+  return (
+    <section aria-label="Quote" className="frame flex min-h-[50svh] flex-col items-center justify-center py-24 text-center">
+      <blockquote className="max-w-[34ch] text-[15px] uppercase leading-[1.4] text-ink">“{QUOTE.text}”</blockquote>
+      <p className="mono mt-5 text-[11px] uppercase text-fg-dim">
+        {QUOTE.who} · {QUOTE.where}
+      </p>
+    </section>
+  )
+}
+
+// ── Process ──────────────────────────────────────────────────────────────
 
 export function Process() {
   const { lang } = useLanguage()
-  const p = COPY[lang].process
-  const v = COPY[lang].values
-  return (
-    <section id="process" className="relative flex min-h-[100svh] flex-col justify-between py-24">
-      <p className="frame text-[12px] uppercase text-ink">
-        <span className="pl-2">{p.title}</span>
-      </p>
+  const t = COPY[lang].process
 
-      <ol className="frame my-16 grid gap-y-8 md:grid-cols-4">
-        {p.steps.map((s, i) => (
-          <li key={s.t} className="pl-2 pr-6">
-            <p className="text-[13px] text-ink">
-              <span className="mono mr-2 text-[11px] text-accent">{String(i + 1).padStart(2, '0')}</span>
-              {s.t} <span className="ml-1 text-fg-faint">)</span>
+  return (
+    <section id="process" className="scroll-mt-16 py-24">
+      <SectionHead n="03" label={t.label} />
+      <ol className="frame mt-10 grid gap-8 text-[12px] md:grid-cols-4">
+        {t.steps.map((s, i) => (
+          <li key={s.t} className="px-2">
+            <p className="uppercase text-ink">
+              <span className="text-fg-ghost">{i + 1})</span> {s.t}
             </p>
-            <p className="mt-2 max-w-[26ch] text-[11px] leading-[1.45] text-fg-dim">{s.d}</p>
+            <p className="mt-2 max-w-[30ch] leading-[1.55] text-fg-muted">{s.d}</p>
           </li>
         ))}
       </ol>
-
-      <div className="frame grid gap-y-8 md:grid-cols-6">
-        {v.items.map((it) => (
-          <div key={it.t} className="pl-2 pr-6 md:col-span-2">
-            <p className="text-[12px] uppercase text-ink">{it.t}</p>
-            <p className="mt-2 max-w-[34ch] text-[11px] leading-[1.5] text-fg-muted">{it.d}</p>
-          </div>
-        ))}
-      </div>
     </section>
   )
 }
 
-// ── Stack + FAQ ──────────────────────────────────────────────────────────
-
-const STACK = [
-  'TypeScript', 'Next.js', 'React', 'React Native', 'Expo', 'Python', 'FastAPI',
-  'Node.js', 'Postgres', 'Supabase', 'Firebase', 'SwiftUI', 'OpenAI', 'Anthropic', 'Vercel',
-]
+// ── FAQ ──────────────────────────────────────────────────────────────────
 
 export function Faq() {
   const { lang } = useLanguage()
   const t = COPY[lang].faq
-  const s = COPY[lang].techStack
-  return (
-    <section id="faq" className="relative py-32">
-      <div className="frame grid gap-y-16 md:grid-cols-6">
-        <h2 className="pl-2 text-[clamp(1.1rem,2vw,1.4rem)] font-normal uppercase text-ink md:col-span-2">Stack</h2>
-        <div className="pl-2 pr-6 md:col-span-4">
-          <p className="mono text-[10px] uppercase text-fg-faint">{s.eyebrow}</p>
-          <p className="mono mt-2 max-w-[60ch] text-[11px] uppercase leading-[1.6] text-ink">{STACK.join(', ')}</p>
-        </div>
 
-        <h2 className="pl-2 text-[clamp(1.1rem,2vw,1.4rem)] font-normal uppercase text-ink md:col-span-2">{t.eyebrow}</h2>
-        <div className="md:col-span-4">
-          {t.items.map((it, i) => (
-            <details key={it.q} className="group pl-2 pr-6 [&:not(:first-child)]:mt-3">
-              <summary className="flex cursor-pointer list-none items-baseline gap-3 text-[12px] uppercase text-ink transition-colors hover:text-accent">
-                <span className="mono text-[10px] text-fg-faint">{String(i + 1).padStart(2, '0')}</span>
-                {it.q}
-                <span aria-hidden className="text-fg-faint transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-2 max-w-[52ch] pl-[26px] text-[11px] leading-[1.55] text-fg-muted">{it.a}</p>
-            </details>
-          ))}
+  return (
+    <section id="faq" className="py-24">
+      <SectionHead n="04" label={t.label} />
+      <dl className="frame mt-10 text-[12px]">
+        {t.items.map((f) => (
+          <div key={f.q} className="grid gap-2 border-t border-line px-2 py-4 md:grid-cols-[1fr_2fr]">
+            <dt className="uppercase text-ink">{f.q}</dt>
+            <dd className="max-w-[60ch] leading-[1.55] text-fg-muted">{f.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+// ── Other projects ───────────────────────────────────────────────────────
+
+export function Other() {
+  const { lang } = useLanguage()
+  const o = COPY[lang].other
+
+  return (
+    <section id="other" className="py-24">
+      <div>
+        <SectionHead n="05" label={o.label} />
+        <div className="frame mt-10 grid gap-10 text-[12px] md:grid-cols-2">
+          {o.items.map((item) => {
+            const p = PROJECTS[item.id]
+            return (
+              <a key={item.id} href={p.link} {...ext} className="group block border-t border-line pt-5">
+                <div className="aspect-[16/10] overflow-hidden bg-card">
+                  <Image
+                    src={p.image}
+                    alt={`${p.name}, ${item.kind}`}
+                    width={p.w}
+                    height={p.h}
+                    sizes="(min-width: 768px) 560px, 100vw"
+                    className="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
+                  />
+                </div>
+                <div className="mt-4 flex justify-between px-2 uppercase">
+                  <span className="text-ink group-hover:text-accent">{p.name} ↗</span>
+                  <span className="text-fg-dim">{item.kind}</span>
+                </div>
+                <p className="mt-2 max-w-[52ch] px-2 leading-[1.55] text-fg-muted">{item.summary}</p>
+              </a>
+            )
+          })}
         </div>
       </div>
     </section>
@@ -406,76 +369,72 @@ export function Faq() {
 export function Contact() {
   const { lang } = useLanguage()
   const t = COPY[lang].contact
-  const en = lang === 'en'
   const [sent, setSent] = useState(false)
   const field = 'w-full bg-transparent text-ink outline-none placeholder:text-fg-ghost'
 
   return (
-    <section id="contact" className="relative flex min-h-[90svh] flex-col justify-between py-24">
-      <p className="frame text-[12px] uppercase text-ink">
-        <span className="pl-2">
-          {t.eyebrow} {t.title}
-        </span>
-      </p>
+    <section id="contact" className="flex min-h-[90svh] scroll-mt-16 flex-col justify-between py-24">
+      <SectionHead n="06" label={t.title} />
 
-      <div className="mx-auto my-16 w-[min(380px,calc(100%-2rem))] bg-card px-3 py-3 text-[11px] uppercase leading-[1.45]">
-        {sent ? (
-          <p className="px-2 py-1 normal-case text-fg-muted">
-            {en ? `Your mail client should have opened. If not, write me at ${EMAIL}.` : `Se habrá abierto tu correo. Si no, escríbeme a ${EMAIL}.`}
-          </p>
-        ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              const data = new FormData(e.currentTarget)
-              const subject = encodeURIComponent(`StackD | ${data.get('name') || ''}`)
-              const body = encodeURIComponent(`${data.get('message') || ''}\n\n${data.get('email') || ''}`)
-              window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`
-              setSent(true)
-            }}
-          >
-            <label className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
-              <span className="text-right text-fg-faint">{t.name}</span>
-              <input name="name" required className={field} />
-            </label>
-            <label className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
-              <span className="text-right text-fg-faint">{t.email}</span>
-              <input name="email" type="email" required className={`${field} normal-case`} />
-            </label>
-            <label className="grid grid-cols-[5.5rem_1fr] gap-x-4 py-[3px]">
-              <span className="text-right text-fg-faint">{t.message}</span>
-              <textarea name="message" rows={3} required className={`${field} resize-none normal-case`} />
-            </label>
-            <div className="grid grid-cols-[5.5rem_1fr] gap-x-4 pt-2">
-              <span />
-              <button type="submit" className="text-left uppercase text-ink transition-colors hover:text-accent">
-                {t.send} →
-              </button>
-            </div>
-          </form>
-        )}
-        <div className="mt-3 border-t border-paper pt-3">
-          <Row label="Email">
-            <a href={`mailto:${EMAIL}`} className="hover:text-accent">
-              {EMAIL}
-            </a>
-          </Row>
-          <Row label="LinkedIn">
-            <a href={LINKEDIN} {...ext(LINKEDIN)} className="hover:text-accent">
-              arnau-lopez-selles
-            </a>
-          </Row>
-          <Row label="Portfolio">
-            <a href={PORTFOLIO} {...ext(PORTFOLIO)} className="hover:text-accent">
-              arnau-lopez.com
-            </a>
-          </Row>
+      <div className="mx-auto my-16 w-[min(400px,calc(100%-2rem))] text-[11px] uppercase leading-[1.45]">
+        <p className="mb-4 text-center text-[12px] normal-case text-fg-muted">{t.body}</p>
+        <div className="bg-card px-3 py-3">
+          {sent ? (
+            <p className="px-2 py-1 normal-case text-fg-muted">{t.sent(EMAIL)}</p>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                const data = new FormData(e.currentTarget)
+                const subject = encodeURIComponent(`StackD | ${data.get('name') || ''}`)
+                const body = encodeURIComponent(`${data.get('message') || ''}\n\n${data.get('email') || ''}`)
+                window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`
+                setSent(true)
+              }}
+            >
+              <label className="grid grid-cols-[6.5rem_1fr] gap-x-4 py-[3px]">
+                <span className="text-right text-fg-faint">{t.name}</span>
+                <input name="name" required className={field} />
+              </label>
+              <label className="grid grid-cols-[6.5rem_1fr] gap-x-4 py-[3px]">
+                <span className="text-right text-fg-faint">{t.email}</span>
+                <input name="email" type="email" required className={`${field} normal-case`} />
+              </label>
+              <label className="grid grid-cols-[6.5rem_1fr] gap-x-4 py-[3px]">
+                <span className="text-right text-fg-faint">{t.message}</span>
+                <textarea name="message" rows={3} required className={`${field} resize-none normal-case`} />
+              </label>
+              <div className="grid grid-cols-[6.5rem_1fr] gap-x-4 pt-2">
+                <span />
+                <button type="submit" className="text-left uppercase text-ink transition-colors hover:text-accent">
+                  {t.send} →
+                </button>
+              </div>
+            </form>
+          )}
+          <div className="mt-3 border-t border-paper pt-3">
+            <Row label="Email">
+              <a href={`mailto:${EMAIL}`} className="normal-case hover:text-accent">
+                {EMAIL}
+              </a>
+            </Row>
+            <Row label="LinkedIn">
+              <a href={LINKEDIN} {...ext} className="hover:text-accent">
+                arnau-lopez-selles
+              </a>
+            </Row>
+            <Row label="Portfolio">
+              <a href={PORTFOLIO} {...ext} className="hover:text-accent">
+                arnau-lopez.com
+              </a>
+            </Row>
+          </div>
         </div>
       </div>
 
       <div className="frame flex justify-between text-[11px] uppercase text-fg-dim">
         <span className="pl-2">
-          <Wordmark /> · Arnau López
+          <Wordmark /> · Arnau López · Amsterdam
         </span>
         <span className="pr-2">© 2026</span>
       </div>
