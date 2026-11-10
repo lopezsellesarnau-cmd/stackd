@@ -265,131 +265,133 @@ export function PromptBar({
           <label htmlFor="prompt-input" className="sr-only">
             Message
           </label>
-          <textarea
-            id="prompt-input"
-            ref={input}
-            rows={1}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={onKey}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            placeholder={drag ? "Drop files to attach" : placeholder}
-            className={`block w-full resize-none bg-transparent py-2 pl-3 outline-none placeholder:text-ink/40 ${compact ? "pr-11" : "pr-3"}`}
-          />
+          {/* In the compact bar, the text and Send share one row */}
+          <div className={compact ? "flex items-end gap-1" : ""}>
+            <textarea
+              id="prompt-input"
+              ref={input}
+              rows={1}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={onKey}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder={drag ? "Drop files to attach" : placeholder}
+              className="block w-full min-w-0 resize-none bg-transparent px-3 py-2 outline-none placeholder:text-ink/40 [@media(pointer:coarse)]:text-[16px]"
+            />
 
-          {/* In the compact bar, Send sits on the same line as the text */}
-          <div
-            className={`flex items-center justify-between gap-2 ${compact ? "pointer-events-none -mt-10 [&_button]:pointer-events-auto" : "pt-1"}`}
-          >
-            <div className="flex items-center gap-1">
-              <input
-                ref={picker}
-                type="file"
-                multiple
-                className="hidden"
-                onChange={(e) => (
-                  addFiles(e.target.files),
-                  (e.target.value = "")
-                )}
-              />
-              <button
-                type="button"
-                onClick={() => picker.current?.click()}
-                aria-label="Attach files"
-                className={`${compact ? "hidden" : "flex"} h-8 w-8 items-center justify-center rounded-full text-ink/60 transition-colors hover:bg-ink/[0.06] hover:text-ink`}
-              >
-                <svg
-                  viewBox="0 0 20 20"
-                  className="h-[18px] w-[18px]"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                >
-                  <path d="M10 4v12M4 10h12" />
-                </svg>
-              </button>
-
-              <div ref={menuRef} className={compact ? "hidden" : "relative"}>
+            <div
+              className={`flex items-center justify-between gap-2 ${compact ? "shrink-0" : "pt-1"}`}
+            >
+              <div className="flex items-center gap-1">
+                <input
+                  ref={picker}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => (
+                    addFiles(e.target.files),
+                    (e.target.value = "")
+                  )}
+                />
                 <button
                   type="button"
-                  onClick={() => setMenu((m) => !m)}
-                  aria-haspopup="listbox"
-                  aria-expanded={menu}
-                  className="flex h-8 items-center gap-1 rounded-full px-3 text-[13px] text-ink/70 transition-colors hover:bg-ink/[0.06] hover:text-ink"
+                  onClick={() => picker.current?.click()}
+                  aria-label="Attach files"
+                  className={`${compact ? "hidden" : "flex"} h-8 w-8 items-center justify-center rounded-full text-ink/60 transition-colors hover:bg-ink/[0.06] hover:text-ink`}
                 >
-                  {model}
                   <svg
-                    viewBox="0 0 12 12"
-                    className={`h-3 w-3 transition-transform ${menu ? "rotate-180" : ""}`}
+                    viewBox="0 0 20 20"
+                    className="h-[18px] w-[18px]"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="1.5"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
                   >
-                    <path d="M3 4.5 6 7.5 9 4.5" />
+                    <path d="M10 4v12M4 10h12" />
                   </svg>
                 </button>
-                {menu ? (
-                  <ul
-                    role="listbox"
-                    aria-label="Model"
-                    className="absolute bottom-full left-0 mb-2 min-w-[140px] rounded-[14px] bg-paper p-1 shadow-[0_0_0_1px_rgba(17,17,17,0.08),0_12px_32px_-12px_rgba(17,17,17,0.25)]"
-                  >
-                    {models.map((m) => (
-                      <li key={m}>
-                        <button
-                          type="button"
-                          role="option"
-                          aria-selected={m === model}
-                          onClick={() => {
-                            setModel(m);
-                            setMenu(false);
-                          }}
-                          className="flex w-full items-center justify-between rounded-[10px] px-3 py-1.5 text-left text-[13px] hover:bg-ink/[0.05]"
-                        >
-                          {m}
-                          {m === model ? (
-                            <span className="text-ink/50">✓</span>
-                          ) : null}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
-            </div>
 
-            {busy ? (
-              <button
-                type="button"
-                onClick={() => stop.current?.abort()}
-                aria-label="Stop"
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-paper transition-opacity hover:opacity-85"
-              >
-                <span className="h-2.5 w-2.5 rounded-[2px] bg-paper" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={send}
-                disabled={!text.trim()}
-                aria-label="Send"
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-paper transition-opacity hover:opacity-85 disabled:opacity-20"
-              >
-                <svg
-                  viewBox="0 0 20 20"
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <div ref={menuRef} className={compact ? "hidden" : "relative"}>
+                  <button
+                    type="button"
+                    onClick={() => setMenu((m) => !m)}
+                    aria-haspopup="listbox"
+                    aria-expanded={menu}
+                    className="flex h-8 items-center gap-1 rounded-full px-3 text-[13px] text-ink/70 transition-colors hover:bg-ink/[0.06] hover:text-ink"
+                  >
+                    {model}
+                    <svg
+                      viewBox="0 0 12 12"
+                      className={`h-3 w-3 transition-transform ${menu ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="M3 4.5 6 7.5 9 4.5" />
+                    </svg>
+                  </button>
+                  {menu ? (
+                    <ul
+                      role="listbox"
+                      aria-label="Model"
+                      className="absolute bottom-full left-0 mb-2 min-w-[140px] rounded-[14px] bg-paper p-1 shadow-[0_0_0_1px_rgba(17,17,17,0.08),0_12px_32px_-12px_rgba(17,17,17,0.25)]"
+                    >
+                      {models.map((m) => (
+                        <li key={m}>
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={m === model}
+                            onClick={() => {
+                              setModel(m);
+                              setMenu(false);
+                            }}
+                            className="flex w-full items-center justify-between rounded-[10px] px-3 py-1.5 text-left text-[13px] hover:bg-ink/[0.05]"
+                          >
+                            {m}
+                            {m === model ? (
+                              <span className="text-ink/50">✓</span>
+                            ) : null}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              </div>
+
+              {busy ? (
+                <button
+                  type="button"
+                  onClick={() => stop.current?.abort()}
+                  aria-label="Stop"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-paper transition-opacity hover:opacity-85"
                 >
-                  <path d="M10 16V4M5 9l5-5 5 5" />
-                </svg>
-              </button>
-            )}
+                  <span className="h-2.5 w-2.5 rounded-[2px] bg-paper" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={send}
+                  disabled={!text.trim()}
+                  aria-label="Send"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-paper transition-opacity hover:opacity-85 disabled:opacity-20"
+                >
+                  <svg
+                    viewBox="0 0 20 20"
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M10 16V4M5 9l5-5 5 5" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

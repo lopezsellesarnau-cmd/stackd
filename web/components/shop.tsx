@@ -424,14 +424,26 @@ function PromptTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [withBot, setWithBot] = useState(true)
   const [cfg, setCfg] = useState<Config>({ shape: 'pill', eyes: 'tall', color: COLORS[1] })
+  // The bar rests in the middle of the tile and slides down once you start using it
+  const [focused, setFocused] = useState(false)
+  const [used, setUsed] = useState(false)
+  const down = focused || used
   const botProps = { shape: cfg.shape, eyes: cfg.eyes, color: cfg.color.body, eyeColor: cfg.color.eyes }
 
   return (
     <>
-      <article className={`group ${tile} bg-paper`}>
+      <article className={`group ${tile} bg-paper [container-type:size]`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} AI prompt bar`} className="absolute inset-0 cursor-pointer" />
         <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-card px-2 py-0.5 text-[11px] text-fg-dim">{t.free}</span>
-        <div className="pointer-events-none absolute inset-x-3 bottom-3 [&_*]:pointer-events-auto">
+        <div
+          onFocusCapture={() => setFocused(true)}
+          onBlurCapture={() => setFocused(false)}
+          onKeyDownCapture={(e) => e.key === 'Enter' && !e.shiftKey && setUsed(true)}
+          onClickCapture={(e) => (e.target as HTMLElement).closest('button[aria-label="Send"]') && setUsed(true)}
+          // From the bottom of the tile up to its middle: half the tile, minus the 12px gap, plus half the bar
+          style={{ transform: down ? 'translateY(0)' : 'translateY(calc(-50cqh + 12px + 50%))' }}
+          className="absolute inset-x-3 bottom-3 transition-transform duration-500 ease-[cubic-bezier(.2,.8,.2,1)] motion-reduce:transition-none"
+        >
           <PromptBar compact bot={withBot ? botProps : false} placeholder="Ask anything" />
         </div>
       </article>
