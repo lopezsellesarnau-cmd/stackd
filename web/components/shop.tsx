@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Bot, EYES, SHAPES, type BotEyes, type BotShape } from './kit/bot'
 import { PromptBar } from './kit/prompt-bar'
+import { SlideToPay } from './kit/slide-to-pay'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -37,6 +38,8 @@ const COPY = {
     includes: ['Figma file with every pose', 'React + Tailwind code, no other libraries', 'Respects reduced motion'],
     promptAbout: 'A chat input for AI products. It grows as you write, takes files, lets you pick a model, shows a thinking shimmer and streams the answer. The Bot can sit beside it as the assistant\'s face. Try it here.',
     promptIncludes: ['Figma file, desktop and mobile', 'React + Tailwind code, with the Bot', 'Works with any AI: Claude, GPT, your own', 'A ready /api/chat route for Next.js'],
+    payAbout: 'A slide-to-confirm button for checkouts. Drag the handle to the end: it locks, shows a spinner while your payment runs, then fills and ticks. Let go early and it springs back. If the payment fails it shakes and resets.',
+    payIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Works with mouse, touch and keyboard', 'Plug in any payment with one promise'],
     bot: 'Bot',
     on: 'On',
     off: 'Off',
@@ -62,6 +65,8 @@ const COPY = {
     includes: ['Archivo de Figma con todas las poses', 'Código en React + Tailwind, sin otras librerías', 'Respeta el movimiento reducido'],
     promptAbout: 'Un campo de chat para productos con IA. Crece al escribir, acepta archivos, deja elegir el modelo, muestra un brillo mientras piensa y escribe la respuesta palabra a palabra. El Bot puede ir al lado como la cara del asistente. Pruébalo aquí.',
     promptIncludes: ['Archivo de Figma, escritorio y móvil', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier IA: Claude, GPT o la tuya', 'Una ruta /api/chat lista para Next.js'],
+    payAbout: 'Un botón de deslizar para confirmar el pago. Arrastra el asa hasta el final: se bloquea, muestra un spinner mientras se procesa el pago y luego se llena con un check. Si lo sueltas antes, vuelve atrás. Si el pago falla, tiembla y se reinicia.',
+    payIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Funciona con ratón, táctil y teclado', 'Conecta cualquier pago con una promesa'],
     bot: 'Bot',
     on: 'Sí',
     off: 'No',
@@ -76,9 +81,11 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-const ITEMS: { id: 'bot' | 'prompt'; cat: Cat }[] = [
+type Id = 'bot' | 'prompt' | 'pay'
+const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
+  { id: 'pay', cat: 'buttons' },
 ]
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
@@ -95,9 +102,10 @@ const COLORS = [
 ]
 
 // Where each component is delivered
-const GUMROAD: Record<'bot' | 'prompt', string> = {
+const GUMROAD: Record<Id, string> = {
   bot: 'https://arnolop.gumroad.com/l/stackd?wanted=true',
   prompt: 'https://arnolop.gumroad.com/l/prompt_bar?wanted=true',
+  pay: 'https://arnolop.gumroad.com/l/slide_to_pay?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -184,7 +192,9 @@ export function Shop() {
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {cells.map((c) =>
               c.kind === 'item' ? (
-                <li key={c.key}>{c.item.id === 'bot' ? <BotTile t={t} /> : <PromptTile t={t} />}</li>
+                <li key={c.key}>
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : <PayTile t={t} />}
+                </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
                   <span className="absolute bottom-4 left-4 text-paper/35">{t.soon}</span>
@@ -475,6 +485,60 @@ function PromptTile({ t }: { t: T }) {
               </Choice>
               {withBot ? <BotOptions t={t} cfg={cfg} setCfg={setCfg} eyesToo={false} /> : null}
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 03 · Slide to pay, live in the tile. It resets a moment after paying so it can be tried again. */
+function PayTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [color, setColor] = useState(COLORS[1])
+  const [round, setRound] = useState(0)
+  const pay = () =>
+    new Promise<void>((ok) => setTimeout(ok, 1600)).then(() => {
+      setTimeout(() => setRound((n) => n + 1), 2200)
+    })
+  const dark = color.name === 'White'
+  const slider = <SlideToPay key={`${round}-${color.name}`} color={color.body} fg={color.eyes} onConfirm={pay} />
+
+  return (
+    <>
+      <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Slide to pay`} className="absolute inset-0 cursor-pointer" />
+        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-card px-2 py-0.5 text-[11px] text-fg-dim">{t.free}</span>
+        <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-center">{slider}</div>
+        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(COLORS, color))}>
+              <Swatch color={color.body} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.buttons}
+          name="Slide to pay"
+          about={t.payAbout}
+          includes={t.payIncludes}
+          usage={`<SlideToPay amount="€24.00" color="${color.body}" fg="${color.eyes}" onConfirm={yourPayment} />`}
+          href={GUMROAD.pay}
+          dark={dark}
+          onClose={() => setOpen(false)}
+          stage={<div className="flex w-full justify-center">{slider}</div>}
+          options={
+            <Choice label={t.color}>
+              {COLORS.map((c) => (
+                <Pick key={c.name} on={color.name === c.name} label={c.name} onClick={() => setColor(c)}>
+                  <Swatch color={c.body} />
+                </Pick>
+              ))}
+            </Choice>
           }
         />
       ) : null}
