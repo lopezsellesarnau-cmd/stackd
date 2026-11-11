@@ -120,7 +120,7 @@ const GUMROAD: Record<Id, string> = {
   bot: 'https://arnolop.gumroad.com/l/stackd?wanted=true',
   prompt: 'https://arnolop.gumroad.com/l/prompt_bar?wanted=true',
   pay: 'https://arnolop.gumroad.com/l/slide_to_pay?wanted=true',
-  stat: '', // TODO: Gumroad link once the product is up
+  stat: 'https://arnolop.gumroad.com/l/stat_card?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
