@@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Bot, EYES, SHAPES, type BotEyes, type BotShape } from './kit/bot'
 import { PromptBar } from './kit/prompt-bar'
 import { SlideToPay } from './kit/slide-to-pay'
+import { StatCard } from './kit/stat-card'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -40,6 +41,9 @@ const COPY = {
     promptIncludes: ['Figma file, desktop and mobile', 'React + Tailwind code, with the Bot', 'Works with any AI: Claude, GPT, your own', 'A ready /api/chat route for Next.js'],
     payAbout: 'A slide-to-confirm button for checkouts. Drag the handle to the end: it locks, shows a spinner while your payment runs, then fills and ticks. Let go early and it springs back. If the payment fails it shakes and resets.',
     payIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Works with mouse, touch and keyboard', 'Plug in any payment with one promise'],
+    statAbout: 'A stat card for dashboards. The number counts up and the line draws itself in. Run along the line and the number follows you. In live mode a new point arrives and the old line flows into the new one.',
+    statIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Works with mouse, touch and keyboard', 'Plug in your own data, or a live feed'],
+    live: 'Live',
     bot: 'Bot',
     on: 'On',
     off: 'Off',
@@ -67,6 +71,9 @@ const COPY = {
     promptIncludes: ['Archivo de Figma, escritorio y móvil', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier IA: Claude, GPT o la tuya', 'Una ruta /api/chat lista para Next.js'],
     payAbout: 'Un botón de deslizar para confirmar el pago. Arrastra el asa hasta el final: se bloquea, muestra un spinner mientras se procesa el pago y luego se llena con un check. Si lo sueltas antes, vuelve atrás. Si el pago falla, tiembla y se reinicia.',
     payIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Funciona con ratón, táctil y teclado', 'Conecta cualquier pago con una promesa'],
+    statAbout: 'Una tarjeta de estadística para dashboards. El número sube y la línea se dibuja sola. Recorre la línea y el número te sigue. En modo en directo llega un punto nuevo y la línea vieja se transforma en la nueva.',
+    statIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Funciona con ratón, táctil y teclado', 'Conecta tus datos o un feed en directo'],
+    live: 'En directo',
     bot: 'Bot',
     on: 'Sí',
     off: 'No',
@@ -81,11 +88,12 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
   { id: 'pay', cat: 'buttons' },
+  { id: 'stat', cat: 'cards' },
 ]
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
@@ -106,6 +114,7 @@ const GUMROAD: Record<Id, string> = {
   bot: 'https://arnolop.gumroad.com/l/stackd?wanted=true',
   prompt: 'https://arnolop.gumroad.com/l/prompt_bar?wanted=true',
   pay: 'https://arnolop.gumroad.com/l/slide_to_pay?wanted=true',
+  stat: '', // TODO: Gumroad link once the product is up
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -193,7 +202,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : <PayTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : <StatTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -539,6 +548,69 @@ function PayTile({ t }: { t: T }) {
                 </Pick>
               ))}
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// A white line would vanish on the white card
+const LINE_COLORS = COLORS.filter((c) => c.name !== 'White')
+
+/** 04 · Live stat card, on a dark tile so the white card stands out */
+function StatTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [color, setColor] = useState(LINE_COLORS[0])
+  const [live, setLive] = useState(true)
+
+  return (
+    <>
+      <article className={`group ${tile} bg-ink`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Live stat card`} className="absolute inset-0 cursor-pointer" />
+        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-paper/10 px-2 py-0.5 text-[11px] text-paper/70">{t.free}</span>
+        <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-center">
+          <StatCard live color={color.body} />
+        </div>
+        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(LINE_COLORS, color))}>
+              <Swatch color={color.body} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.cards}
+          name="Live stat card"
+          about={t.statAbout}
+          includes={t.statIncludes}
+          usage={`<StatCard label="Revenue" data={points} color="${color.body}"${live ? ' live' : ''} />`}
+          href={GUMROAD.stat}
+          dark
+          onClose={() => setOpen(false)}
+          stage={<StatCard key={String(live)} live={live} color={color.body} />}
+          options={
+            <>
+              <Choice label={t.live}>
+                <Pick on={live} label={t.on} onClick={() => setLive(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+                <Pick on={!live} label={t.off} onClick={() => setLive(false)}>
+                  <span className="px-1">{t.off}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.color}>
+                {LINE_COLORS.map((c) => (
+                  <Pick key={c.name} on={color.name === c.name} label={c.name} onClick={() => setColor(c)}>
+                    <Swatch color={c.body} />
+                  </Pick>
+                ))}
+              </Choice>
+            </>
           }
         />
       ) : null}
