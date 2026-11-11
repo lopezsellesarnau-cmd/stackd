@@ -44,6 +44,9 @@ const COPY = {
     statAbout: 'A stat card for dashboards. The number counts up and the line draws itself in. Run along the line and the number follows you. In live mode a new point arrives and the old line flows into the new one.',
     statIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Works with mouse, touch and keyboard', 'Plug in your own data, or a live feed'],
     live: 'Live',
+    theme: 'Card',
+    light: 'White',
+    darkT: 'Black',
     bot: 'Bot',
     on: 'On',
     off: 'Off',
@@ -74,6 +77,9 @@ const COPY = {
     statAbout: 'Una tarjeta de estadística para dashboards. El número sube y la línea se dibuja sola. Recorre la línea y el número te sigue. En modo en directo llega un punto nuevo y la línea vieja se transforma en la nueva.',
     statIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Funciona con ratón, táctil y teclado', 'Conecta tus datos o un feed en directo'],
     live: 'En directo',
+    theme: 'Tarjeta',
+    light: 'Blanca',
+    darkT: 'Negra',
     bot: 'Bot',
     on: 'Sí',
     off: 'No',
@@ -555,26 +561,37 @@ function PayTile({ t }: { t: T }) {
   )
 }
 
-// A white line would vanish on the white card
-const LINE_COLORS = COLORS.filter((c) => c.name !== 'White')
+// The line can't be the card's own colour: no white line on the white card, no ink on the black one
+const lineColors = (dark: boolean) => COLORS.filter((c) => c.name !== (dark ? 'Ink' : 'White'))
 
 /** 04 · Live stat card, on a dark tile so the white card stands out */
 function StatTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
-  const [color, setColor] = useState(LINE_COLORS[0])
+  const [dark, setDark] = useState(false)
+  const [color, setColor] = useState(COLORS[1])
   const [live, setLive] = useState(true)
+  const colors = lineColors(dark)
+  // Switching the card keeps the colour if it still reads, otherwise the card's default (ink or white)
+  const setTheme = (d: boolean) => {
+    setDark(d)
+    if (!lineColors(d).includes(color)) setColor(d ? COLORS[0] : COLORS[1])
+  }
+  const theme = dark ? 'dark' : 'light'
 
   return (
     <>
-      <article className={`group ${tile} bg-ink`}>
+      <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Live stat card`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-paper/10 px-2 py-0.5 text-[11px] text-paper/70">{t.free}</span>
+        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-fg-dim' : 'bg-paper/10 text-paper/70'}`}>{t.free}</span>
         <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-center">
-          <StatCard live color={color.body} />
+          <StatCard live theme={theme} color={color.body} />
         </div>
         <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
           <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(LINE_COLORS, color))}>
+            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setTheme(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(colors, color))}>
               <Swatch color={color.body} />
             </Step>
           </div>
@@ -588,11 +605,11 @@ function StatTile({ t }: { t: T }) {
           name="Live stat card"
           about={t.statAbout}
           includes={t.statIncludes}
-          usage={`<StatCard label="Revenue" data={points} color="${color.body}"${live ? ' live' : ''} />`}
+          usage={`<StatCard label="Revenue" data={points}${dark ? ' theme="dark"' : ''} color="${color.body}"${live ? ' live' : ''} />`}
           href={GUMROAD.stat}
-          dark
+          dark={!dark}
           onClose={() => setOpen(false)}
-          stage={<StatCard key={String(live)} live={live} color={color.body} />}
+          stage={<StatCard key={String(live)} live={live} theme={theme} color={color.body} />}
           options={
             <>
               <Choice label={t.live}>
@@ -603,8 +620,16 @@ function StatTile({ t }: { t: T }) {
                   <span className="px-1">{t.off}</span>
                 </Pick>
               </Choice>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setTheme(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setTheme(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
               <Choice label={t.color}>
-                {LINE_COLORS.map((c) => (
+                {colors.map((c) => (
                   <Pick key={c.name} on={color.name === c.name} label={c.name} onClick={() => setColor(c)}>
                     <Swatch color={c.body} />
                   </Pick>

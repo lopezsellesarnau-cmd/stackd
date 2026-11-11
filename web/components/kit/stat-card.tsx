@@ -18,7 +18,9 @@ type Props = {
   data?: Point[];
   /** How the number is written. Defaults to euros with no decimals. */
   format?: (n: number) => string;
-  /** Line colour. */
+  /** White card or black card. */
+  theme?: "light" | "dark";
+  /** Line colour. Defaults to ink on the light card and white on the dark one. */
   color?: string;
   /** Add a point every few seconds. `true` makes up demo points; a function gives your own. */
   live?: boolean | (() => Point | Promise<Point>);
@@ -43,10 +45,17 @@ export function StatCard({
   label = "Revenue",
   data = DEMO,
   format = (n) => euro.format(n),
-  color = "#141310",
+  theme = "light",
+  color,
   live = false,
   every = 3,
 }: Props) {
+  const dark = theme === "dark";
+  const ink = dark ? "#FFFFFF" : "#141310";
+  const line0 = color ?? ink;
+  // Up in Olive, down in Wine, a touch lighter on black so they still read
+  const good = dark ? "#9DB872" : "#6C8544";
+  const bad = dark ? "#E0726F" : "#901919";
   const [points, setPoints] = useState(data);
   // Where the pointer is along the line, as a fractional index; null = the latest point
   const [scrub, setScrub] = useState<number | null>(null);
@@ -150,15 +159,16 @@ export function StatCard({
       onKeyDown={keys}
       onBlur={() => setScrub(null)}
       aria-label={`${label}: ${format(values[last])}, ${goal.pct >= 0 ? "up" : "down"} ${Math.abs(goal.pct).toFixed(1)}%`}
-      className="w-full max-w-[320px] rounded-[22px] bg-white p-5 text-[#141310] outline-none focus-visible:ring-2 focus-visible:ring-[#141310]/20"
+      className="w-full max-w-[320px] rounded-[22px] p-5 outline-none focus-visible:ring-2 focus-visible:ring-[#888]/30"
+      style={{ background: dark ? "#141310" : "#FFFFFF", color: ink }}
     >
       <style>{`@keyframes sc-draw{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}`}</style>
 
       <div className="flex items-center justify-between">
-        <p className="text-[13px] text-[#141310]/55">{label}</p>
+        <p className="text-[13px] opacity-55">{label}</p>
         {live ? (
-          <span className="flex items-center gap-1.5 text-[11px] text-[#141310]/45">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full motion-reduce:animate-none" style={{ background: color }} />
+          <span className="flex items-center gap-1.5 text-[11px] opacity-45">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full motion-reduce:animate-none" style={{ background: line0 }} />
             Live
           </span>
         ) : null}
@@ -168,14 +178,14 @@ export function StatCard({
         <p className="text-[32px] font-semibold tabular-nums tracking-[-0.03em]">{format(Math.round(value))}</p>
         <span
           className="rounded-full px-1.5 py-0.5 text-[11px] font-medium tabular-nums transition-colors duration-300"
-          style={{ background: up ? "#6C854418" : "#90191918", color: up ? "#6C8544" : "#901919" }}
+          style={{ background: `${up ? good : bad}${dark ? "26" : "18"}`, color: up ? good : bad }}
         >
           {up ? "↑" : "↓"} {Math.abs(pct).toFixed(1)}%
         </span>
       </div>
 
       {/* The date you're reading, or the range. Same row either way, so nothing jumps. */}
-      <p className="mt-0.5 h-4 text-[11px] text-[#141310]/40 tabular-nums">
+      <p className="mt-0.5 h-4 text-[11px] opacity-40 tabular-nums">
         {reading ? points[Math.round(scrub)].label : `${points[0].label} – ${points[last].label}`}
       </p>
 
@@ -189,15 +199,15 @@ export function StatCard({
         <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="block h-full w-full overflow-visible motion-reduce:[animation:none]" style={{ animation: "sc-draw 1.1s cubic-bezier(.2,.8,.2,1)" }} aria-hidden>
           <defs>
             <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stopColor={color} stopOpacity="0.12" />
-              <stop offset="1" stopColor={color} stopOpacity="0" />
+              <stop offset="0" stopColor={line0} stopOpacity="0.12" />
+              <stop offset="1" stopColor={line0} stopOpacity="0" />
             </linearGradient>
           </defs>
           <path d={`${d} L${W} ${H} L0 ${H} Z`} fill={`url(#${id})`} />
           <path
             d={d}
             fill="none"
-            stroke={color}
+            stroke={line0}
             strokeWidth="1.75"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
@@ -207,14 +217,15 @@ export function StatCard({
         {/* Guide, dot and tooltip live in HTML so the stretched svg can't squash them into ellipses */}
         <i
           className="pointer-events-none absolute inset-y-0 w-px"
-          style={{ left: `${dot.x}%`, background: `${color}26`, opacity: reading ? 1 : 0, transition: fade }}
+          style={{ left: `${dot.x}%`, background: `${line0}26`, opacity: reading ? 1 : 0, transition: fade }}
         />
         <span
-          className="pointer-events-none absolute h-2.5 w-2.5 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(20,19,16,0.08)]"
+          className="pointer-events-none absolute h-2.5 w-2.5 rounded-full border-2 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]"
           style={{
             left: `${dot.x}%`,
             top: `${(dot.y / H) * 100}%`,
-            background: color,
+            background: line0,
+            borderColor: dark ? "#141310" : "#FFFFFF",
             opacity: reading ? 1 : 0,
             transform: `translate(-50%,-50%) scale(${reading ? 1 : 0.4})`,
             transition: fade,
