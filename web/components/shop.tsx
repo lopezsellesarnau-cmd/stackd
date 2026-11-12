@@ -18,6 +18,7 @@ import { PromptBar } from './kit/prompt-bar'
 import { SlideToPay } from './kit/slide-to-pay'
 import { StatCard } from './kit/stat-card'
 import { NotificationStack, type Note } from './kit/notification-stack'
+import { SplitFlap } from './kit/split-flap'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -48,6 +49,10 @@ const COPY = {
     notifyAbout: 'A stack of notifications. The newest sits in front and the older ones peek out behind. Hover and the pile opens into a list. Swipe one sideways to dismiss it, or let it close by itself.',
     notifyIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Swipe, tap, mouse and keyboard', 'White and black versions'],
     notify: 'Notify',
+    flapAbout: 'Text on little tiles that flip like an old departure board. Each tile runs through the letters on its way to the new one, and the change rolls across the board. For prices, counters, launch dates and headlines. Type to try it.',
+    flapIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Letters, numbers, €, $, £ and punctuation', 'White and black versions'],
+    typeHere: 'Type something',
+    buy: 'Buy',
     autoClose: 'Auto-close',
     theme: 'Card',
     light: 'White',
@@ -58,7 +63,7 @@ const COPY = {
     soonGet: 'Coming soon',
     get: 'Get it free',
     emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
-    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications' },
+    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text' },
   },
   es: {
     title: 'Componentes',
@@ -85,6 +90,10 @@ const COPY = {
     notifyAbout: 'Una pila de notificaciones. La más nueva va delante y las anteriores asoman detrás. Pasa el ratón y la pila se abre en una lista. Desliza una hacia un lado para descartarla, o deja que se cierre sola.',
     notifyIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Deslizar, tocar, ratón y teclado', 'Versión blanca y negra'],
     notify: 'Notificar',
+    flapAbout: 'Texto en pequeñas fichas que giran como un panel de salidas antiguo. Cada ficha pasa por las letras hasta llegar a la nueva, y el cambio recorre el panel. Para precios, contadores, fechas de lanzamiento y titulares. Escribe para probarlo.',
+    flapIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Letras, números, €, $, £ y puntuación', 'Versión blanca y negra'],
+    typeHere: 'Escribe algo',
+    buy: 'Comprar',
     autoClose: 'Cierre automático',
     theme: 'Tarjeta',
     light: 'Blanca',
@@ -95,7 +104,7 @@ const COPY = {
     soonGet: 'Próximamente',
     get: 'Consíguelo gratis',
     emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
-    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones' },
+    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto' },
   },
 }
 
@@ -103,14 +112,18 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
   { id: 'pay', cat: 'buttons' },
   { id: 'stat', cat: 'cards' },
   { id: 'notify', cat: 'notifications' },
+  { id: 'flap', cat: 'text' },
 ]
+
+// The paid ones; everything else is free
+const PRICE: Partial<Record<Id, string>> = { flap: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
@@ -132,6 +145,7 @@ const GUMROAD: Record<Id, string> = {
   pay: 'https://arnolop.gumroad.com/l/slide_to_pay?wanted=true',
   stat: 'https://arnolop.gumroad.com/l/stat_card?wanted=true',
   notify: 'https://arnolop.gumroad.com/l/notification_stack?wanted=true',
+  flap: '', // TODO: Gumroad link once the product is up
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -219,7 +233,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : <NotifyTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : <FlapTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -296,6 +310,7 @@ function Detail({
   includes,
   usage,
   href,
+  price,
   stage,
   dark,
   options,
@@ -308,6 +323,7 @@ function Detail({
   includes: string[]
   usage: string
   href: string
+  price?: string
   stage: React.ReactNode
   dark?: boolean
   options: React.ReactNode
@@ -391,7 +407,7 @@ function Detail({
                 rel="noopener noreferrer"
                 className="flex h-10 w-full items-center justify-center rounded-full bg-ink px-4 font-medium text-paper transition-opacity hover:opacity-85"
               >
-                {t.get}
+                {price ? `${t.buy} · ${price}` : t.get}
               </a>
             ) : (
               <span className="flex h-10 w-full items-center justify-center rounded-full bg-card px-4 text-fg-dim">{t.soonGet}</span>
@@ -752,6 +768,83 @@ function NotifyTile({ t }: { t: T }) {
                 </Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+const FLAP_WORDS = ['STACKD', 'HELLO', '€24.00', 'GATE B', 'ON TIME']
+
+/** The board with its words cycling, until someone types their own */
+function FlapPlay({ t, dark, size, length, input }: { t: T; dark: boolean; size: number; length: number; input?: boolean }) {
+  const [i, setI] = useState(0)
+  const [typed, setTyped] = useState('')
+  useEffect(() => {
+    if (typed) return
+    const id = setInterval(() => setI((n) => n + 1), 3500)
+    return () => clearInterval(id)
+  }, [typed])
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <SplitFlap value={typed || FLAP_WORDS[i % FLAP_WORDS.length]} length={length} align="center" theme={dark ? 'dark' : 'light'} size={size} />
+      {input ? (
+        <input
+          value={typed}
+          onChange={(e) => setTyped(e.target.value.slice(0, length))}
+          placeholder={t.typeHere}
+          className="w-56 rounded-full bg-card px-4 py-2 text-center text-[16px] uppercase text-ink outline-none placeholder:normal-case placeholder:text-fg-faint sm:text-[14px]"
+        />
+      ) : null}
+    </div>
+  )
+}
+
+/** 06 · Split-flap display, the first paid one. Black tiles on white; white tiles on black. */
+function FlapTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(true)
+
+  return (
+    <>
+      <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Split-flap display`} className="absolute inset-0 cursor-pointer" />
+        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-ink' : 'bg-paper/10 text-paper'}`}>{PRICE.flap}</span>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <FlapPlay t={t} dark={dark} size={48} length={6} />
+        </div>
+        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Tiles: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.text}
+          name="Split-flap display"
+          about={t.flapAbout}
+          includes={t.flapIncludes}
+          usage={`<SplitFlap value="€24.00" length={8}${dark ? '' : ' theme="light"'} />`}
+          href={GUMROAD.flap}
+          price={PRICE.flap}
+          dark={!dark}
+          onClose={() => setOpen(false)}
+          stage={<FlapPlay t={t} dark={dark} size={52} length={8} input />}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+            </Choice>
           }
         />
       ) : null}
