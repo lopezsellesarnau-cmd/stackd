@@ -17,6 +17,7 @@ import { Bot, EYES, SHAPES, type BotEyes, type BotShape } from './kit/bot'
 import { PromptBar } from './kit/prompt-bar'
 import { SlideToPay } from './kit/slide-to-pay'
 import { StatCard } from './kit/stat-card'
+import { NotificationStack, type Note } from './kit/notification-stack'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -44,6 +45,10 @@ const COPY = {
     statAbout: 'A stat card for dashboards. The number counts up and the line draws itself in. Run along the line and the number follows you. In live mode a new point arrives and the old line flows into the new one.',
     statIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Works with mouse, touch and keyboard', 'Plug in your own data, or a live feed'],
     live: 'Live',
+    notifyAbout: 'A stack of notifications. The newest sits in front and the older ones peek out behind. Hover and the pile opens into a list. Swipe one sideways to dismiss it, or let it close by itself.',
+    notifyIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Swipe, tap, mouse and keyboard', 'White and black versions'],
+    notify: 'Notify',
+    autoClose: 'Auto-close',
     theme: 'Card',
     light: 'White',
     darkT: 'Black',
@@ -53,7 +58,7 @@ const COPY = {
     soonGet: 'Coming soon',
     get: 'Get it free',
     emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
-    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards' },
+    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications' },
   },
   es: {
     title: 'Componentes',
@@ -77,6 +82,10 @@ const COPY = {
     statAbout: 'Una tarjeta de estadística para dashboards. El número sube y la línea se dibuja sola. Recorre la línea y el número te sigue. En modo en directo llega un punto nuevo y la línea vieja se transforma en la nueva.',
     statIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Funciona con ratón, táctil y teclado', 'Conecta tus datos o un feed en directo'],
     live: 'En directo',
+    notifyAbout: 'Una pila de notificaciones. La más nueva va delante y las anteriores asoman detrás. Pasa el ratón y la pila se abre en una lista. Desliza una hacia un lado para descartarla, o deja que se cierre sola.',
+    notifyIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Deslizar, tocar, ratón y teclado', 'Versión blanca y negra'],
+    notify: 'Notificar',
+    autoClose: 'Cierre automático',
     theme: 'Tarjeta',
     light: 'Blanca',
     darkT: 'Negra',
@@ -86,7 +95,7 @@ const COPY = {
     soonGet: 'Próximamente',
     get: 'Consíguelo gratis',
     emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
-    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas' },
+    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones' },
   },
 }
 
@@ -94,12 +103,13 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
   { id: 'pay', cat: 'buttons' },
   { id: 'stat', cat: 'cards' },
+  { id: 'notify', cat: 'notifications' },
 ]
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
@@ -121,6 +131,7 @@ const GUMROAD: Record<Id, string> = {
   prompt: 'https://arnolop.gumroad.com/l/prompt_bar?wanted=true',
   pay: 'https://arnolop.gumroad.com/l/slide_to_pay?wanted=true',
   stat: 'https://arnolop.gumroad.com/l/stat_card?wanted=true',
+  notify: '', // TODO: Gumroad link once the product is up
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -208,7 +219,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : <StatTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : <NotifyTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -634,6 +645,111 @@ function StatTile({ t }: { t: T }) {
                     <Swatch color={c.body} />
                   </Pick>
                 ))}
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 05 · Notification stack: sample notes, cycled by the Notify button */
+const NOTES: Omit<Note, 'id'>[] = [
+  { title: 'Payment received', body: 'Lena paid €240.00 for order #1042.', time: 'now', icon: <Dot c="#6C8544" /> },
+  { title: 'New comment', body: 'Marc: "Can we move the call to 4?"', time: 'now', icon: <Dot c="#C9B8FF" /> },
+  { title: 'Deploy finished', body: 'stackd.codes is live. Built in 42 s.', time: 'now', icon: <Dot c="currentColor" /> },
+  { title: 'Invoice overdue', body: 'Invoice #318 is 3 days late.', time: 'now', icon: <Dot c="#901919" />, action: { label: 'Send reminder', onClick: () => {} } },
+  { title: 'Low stock', body: 'Only 4 left of Oak desk, large.', time: 'now', icon: <Dot c="#BE9344" /> },
+]
+
+function Dot({ c }: { c: string }) {
+  return <span className="mt-1 block h-2.5 w-2.5 rounded-full" style={{ background: c }} />
+}
+
+/** The stack with its own list and a Notify button. `max` keeps the tile from overflowing. */
+function NotifyPlay({ t, dark, auto, max }: { t: T; dark: boolean; auto: boolean; max: number }) {
+  const [n, setN] = useState(3)
+  const [notes, setNotes] = useState<Note[]>(() => NOTES.slice(0, 3).map((x, i) => ({ ...x, id: i })))
+  const notify = () => {
+    setNotes((l) => [...l, { ...NOTES[n % NOTES.length], id: n }].slice(-max))
+    setN(n + 1)
+  }
+  return (
+    <div className="flex w-full flex-col items-center gap-3">
+      <NotificationStack
+        notes={notes}
+        onDismiss={(id) => setNotes((l) => l.filter((x) => x.id !== id))}
+        theme={dark ? 'dark' : 'light'}
+        duration={auto ? 5000 : 0}
+      />
+      <button
+        type="button"
+        onClick={notify}
+        className={`relative rounded-full px-3.5 py-1.5 text-[12px] font-medium transition-opacity hover:opacity-85 ${dark ? 'bg-ink text-paper' : 'bg-paper text-ink'}`}
+      >
+        {t.notify}
+      </button>
+    </div>
+  )
+}
+
+/** 05 · Notification stack. White notes on a dark tile; black notes on a white one. */
+function NotifyTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [auto, setAuto] = useState(false)
+
+  return (
+    <>
+      <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Notification stack`} className="absolute inset-0 cursor-pointer" />
+        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-fg-dim' : 'bg-paper/10 text-paper/70'}`}>{t.free}</span>
+        <div className="absolute inset-x-3 bottom-12">
+          <NotifyPlay t={t} dark={dark} auto={false} max={3} />
+        </div>
+        <div className="absolute left-3 top-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.notifications}
+          name="Notification stack"
+          about={t.notifyAbout}
+          includes={t.notifyIncludes}
+          usage={`<NotificationStack notes={notes} onDismiss={remove}${dark ? ' theme="dark"' : ''}${auto ? '' : ' duration={0}'} />`}
+          href={GUMROAD.notify}
+          dark={!dark}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="flex h-full w-full items-end justify-center pb-4">
+              <NotifyPlay key={String(auto)} t={t} dark={dark} auto={auto} max={6} />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.autoClose}>
+                <Pick on={auto} label={t.on} onClick={() => setAuto(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+                <Pick on={!auto} label={t.off} onClick={() => setAuto(false)}>
+                  <span className="px-1">{t.off}</span>
+                </Pick>
               </Choice>
             </>
           }
