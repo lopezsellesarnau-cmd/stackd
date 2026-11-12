@@ -145,7 +145,7 @@ const GUMROAD: Record<Id, string> = {
   pay: 'https://arnolop.gumroad.com/l/slide_to_pay?wanted=true',
   stat: 'https://arnolop.gumroad.com/l/stat_card?wanted=true',
   notify: 'https://arnolop.gumroad.com/l/notification_stack?wanted=true',
-  flap: '', // TODO: Gumroad link once the product is up
+  flap: 'https://arnolop.gumroad.com/l/split_flap?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
