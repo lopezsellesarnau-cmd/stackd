@@ -21,6 +21,7 @@ import { NotificationStack, type Note } from './kit/notification-stack'
 import { SplitFlap } from './kit/split-flap'
 import { RotaryDial } from './kit/rotary-dial'
 import { FocusTimer } from './kit/focus-timer'
+import { BotLogin } from './kit/bot-login'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -54,6 +55,8 @@ const COPY = {
     flapAbout: 'Text on little tiles that flip like an old departure board. Each tile runs through the letters on its way to the new one, and the change rolls across the board. For prices, counters, launch dates and headlines. Type to try it.',
     flapIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Letters, numbers, €, $, £ and punctuation', 'White and black versions'],
     typeHere: 'Type something',
+    loginAbout: 'A sign-in card with the Bot. It follows your cursor, reads along as you type your email, turns away while you type the password and peeks if you show it. It smiles when you are in and shakes its head when the password is wrong. Try it: the password is stackd.',
+    loginIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Works with any sign-in: return true or false', 'Keyboard, screen readers and password managers'],
     timerAbout: 'A focus timer with the Bot. A small pill that opens into a panel as one smooth object: the Bot grows into the corner, the time travels beside it and the ticks arrive last. The Bot watches the time, follows your cursor and smiles when you are done. Comes as a phone island and as a laptop notch that opens on hover.',
     timerIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Island and laptop notch versions', 'Mouse, touch and keyboard'],
     shapeLabel: 'Shape',
@@ -103,6 +106,8 @@ const COPY = {
     flapAbout: 'Texto en pequeñas fichas que giran como un panel de salidas antiguo. Cada ficha pasa por las letras hasta llegar a la nueva, y el cambio recorre el panel. Para precios, contadores, fechas de lanzamiento y titulares. Escribe para probarlo.',
     flapIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Letras, números, €, $, £ y puntuación', 'Versión blanca y negra'],
     typeHere: 'Escribe algo',
+    loginAbout: 'Una tarjeta de inicio de sesión con el Bot. Sigue tu cursor, lee mientras escribes el email, se gira mientras escribes la contraseña y mira si la muestras. Sonríe cuando entras y niega con la cabeza si la contraseña está mal. Pruébalo: la contraseña es stackd.',
+    loginIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier login: devuelve true o false', 'Teclado, lectores de pantalla y gestores de contraseñas'],
     timerAbout: 'Un temporizador de concentración con el Bot. Una pequeña píldora que se abre en un panel como un solo objeto: el Bot crece hasta la esquina, la hora viaja a su lado y las marcas llegan al final. El Bot mira la hora, sigue tu cursor y sonríe al terminar. Viene como isla para móvil y como notch de portátil que se abre al pasar el ratón.',
     timerIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Versión isla y notch de portátil', 'Ratón, táctil y teclado'],
     shapeLabel: 'Forma',
@@ -130,7 +135,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -140,10 +145,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'flap', cat: 'text' },
   { id: 'dial', cat: 'inputs' },
   { id: 'timer', cat: 'widgets' },
+  { id: 'login', cat: 'inputs' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
@@ -168,6 +174,7 @@ const GUMROAD: Record<Id, string> = {
   flap: 'https://arnolop.gumroad.com/l/split_flap?wanted=true',
   dial: 'https://arnolop.gumroad.com/l/rotary_dial?wanted=true',
   timer: 'https://arnolop.gumroad.com/l/focus_timer?wanted=true',
+  login: '', // TODO: Gumroad link once the product is up
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -255,7 +262,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : <TimerTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : <LoginTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1060,6 +1067,74 @@ function TimerTile({ t }: { t: T }) {
                 </Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 09 · Bot login. The compact card, scaled to the tile's real width. */
+function LoginTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // Fit the card's width and height, leaving room for the badge and the option button
+  const fit = Math.min(1, (w - 48) / 360, (w - 72) / 330)
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Bot login`} className="absolute inset-0 cursor-pointer" />
+        <span className={`pointer-events-none absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-ink' : 'bg-paper/10 text-paper'}`}>{PRICE.login}</span>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto w-[360px] shrink-0" style={{ transform: `scale(${fit})` }}>
+            <BotLogin compact theme={theme} />
+          </div>
+        </div>
+        <div className="absolute bottom-3 left-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.inputs}
+          name="Bot login"
+          about={t.loginAbout}
+          includes={t.loginIncludes}
+          usage={`<BotLogin${dark ? ' theme="dark"' : ''} onSubmit={(email, password) => signIn(email, password)} />`}
+          href={GUMROAD.login}
+          price={PRICE.login}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="w-full max-w-[360px]">
+              <BotLogin theme={theme} />
+            </div>
+          }
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+            </Choice>
           }
         />
       ) : null}
