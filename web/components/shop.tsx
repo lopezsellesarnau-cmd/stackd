@@ -251,7 +251,7 @@ export function Shop() {
         </aside>
 
         <main id="contenido">
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
@@ -631,7 +631,7 @@ function StatTile({ t }: { t: T }) {
     <>
       <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Live stat card`} className="absolute inset-0 cursor-pointer" />
-        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-fg-dim' : 'bg-paper/10 text-paper/70'}`}>{t.free}</span>
+        <span className={`pointer-events-none absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-fg-dim' : 'bg-paper/10 text-paper/70'}`}>{t.free}</span>
         <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-center">
           <StatCard live theme={theme} color={color.body} />
         </div>
