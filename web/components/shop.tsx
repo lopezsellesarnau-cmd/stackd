@@ -949,11 +949,11 @@ function DialTile({ t }: { t: T }) {
 /** A soft screen for the timer to sit on, like a laptop's display */
 const SCREEN = 'linear-gradient(180deg,#E9E7F5 0%,#F6F1E8 100%)'
 
-/** 08 · Focus timer. In the tile: the laptop notch, hanging from the top edge, opening on hover. */
+/** 08 · Focus timer. The island by default; the laptop notch (with its bezel) when picked. */
 function TimerTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(true)
-  const [notch, setNotch] = useState(true)
+  const [notch, setNotch] = useState(false)
   const theme = dark ? 'dark' : 'light'
 
   const stage = (scale: number) =>
@@ -966,24 +966,35 @@ function TimerTile({ t }: { t: T }) {
     ) : (
       <div className="absolute inset-0 flex items-center justify-center rounded-[18px]" style={{ background: SCREEN }}>
         <div style={{ transform: `scale(${scale})` }}>
-          <FocusTimer theme={theme} remaining={9 * 60 + 41} />
+          <FocusTimer theme={theme} remaining={9 * 60 + 41} defaultOpen />
         </div>
       </div>
     )
 
   return (
     <>
-      {/* A laptop screen: a black bezel, the notch part of it */}
-      <article className={`group ${tile} bg-ink`}>
-        <div className="absolute inset-[7px] overflow-hidden rounded-[12px]" style={{ background: SCREEN }} />
+      <article className={`group ${tile} ${notch ? 'bg-ink' : ''}`} style={notch ? undefined : { background: SCREEN }}>
+        {/* The notch sits in a laptop screen: a black bezel, the notch part of it */}
+        {notch ? <div className="absolute inset-[7px] overflow-hidden rounded-[12px]" style={{ background: SCREEN }} /> : null}
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Focus timer`} className="absolute inset-0 cursor-pointer" />
         <span className="pointer-events-none absolute bottom-4 right-4 z-10 rounded-full bg-paper px-2 py-0.5 text-[11px] text-ink">{PRICE.timer}</span>
-        <span className="pointer-events-none absolute bottom-[18px] left-1/2 -translate-x-1/2 text-[11px] text-ink/40 [@media(hover:none)]:hidden">{t.hoverNotch}</span>
-        <div className="pointer-events-none absolute inset-x-0 top-[7px] flex justify-center">
-          <div className="pointer-events-auto" style={{ transform: 'scale(.82)', transformOrigin: '50% 0' }}>
-            <FocusTimer variant="notch" theme={theme} remaining={18 * 60 + 5} label="Deep work" />
+        {notch ? (
+          <>
+            <span className="pointer-events-none absolute bottom-[18px] left-1/2 -translate-x-1/2 text-[11px] text-ink/40 [@media(hover:none)]:hidden">{t.hoverNotch}</span>
+            <div className="pointer-events-none absolute inset-x-0 top-[7px] flex justify-center">
+              <div className="pointer-events-auto" style={{ transform: 'scale(.82)', transformOrigin: '50% 0' }}>
+                <FocusTimer variant="notch" theme={theme} remaining={18 * 60 + 5} label="Deep work" />
+              </div>
+            </div>
+          </>
+        ) : (
+          // The island, as big as the tile allows once it's open
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="pointer-events-auto" style={{ transform: 'scale(.9)' }}>
+              <FocusTimer theme={theme} remaining={9 * 60 + 41} defaultOpen />
+            </div>
           </div>
-        </div>
+        )}
         <div className="absolute bottom-4 left-4 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
           <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
             <Step label={`Timer: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>

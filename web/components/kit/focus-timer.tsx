@@ -30,6 +30,8 @@ type Props = {
   /** The Bot's body and eyes (Kit 01). Its colours follow the theme. */
   bot?: Pick<ComponentProps<typeof Bot>, "shape" | "eyes">;
   open?: boolean;
+  /** Start open when not controlled. */
+  defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   onDone?: () => void;
   /** "island" floats; "notch" hangs from the top edge of its container, like a laptop's notch. */
@@ -102,6 +104,7 @@ export function FocusTimer({
   color,
   bot,
   open: controlled,
+  defaultOpen = false,
   onOpenChange,
   onDone,
   variant = "island",
@@ -114,7 +117,7 @@ export function FocusTimer({
   const [paused, setPaused] = useState(false);
   const done = left === 0;
 
-  const [own, setOwn] = useState(false);
+  const [own, setOwn] = useState(defaultOpen);
   const open = controlled ?? own;
   const setOpen = (v: boolean) => {
     if (controlled === undefined) setOwn(v);
@@ -260,7 +263,18 @@ export function FocusTimer({
   });
 
   return (
-    <div className="relative" style={{ width: W, height: H }} {...hover}>
+    <div
+      className="relative"
+      style={{
+        width: W,
+        height: H,
+        // The squeeze moves everything together, the notch's curves included.
+        // The notch only squeezes vertically, from the top, so it never comes away from the edge.
+        transform: notch ? `scaleY(${squeeze})` : `scale(${squeeze})`,
+        transformOrigin: notch ? "50% 0" : "50% 50%",
+      }}
+      {...hover}
+    >
       {notch ? (
         <>
           <span aria-hidden style={flareStyle("left")} />
@@ -274,8 +288,6 @@ export function FocusTimer({
         width: W,
         height: H,
         borderRadius: notch ? `0 0 ${R}px ${R}px` : R,
-        transform: `scale(${squeeze})`,
-        transformOrigin: notch ? "50% 0" : "50% 50%",
         background: bg,
         color: fg,
         boxShadow: notch
