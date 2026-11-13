@@ -954,6 +954,8 @@ function TimerTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(true)
   const [notch, setNotch] = useState(false)
+  // The island in the tile: big while it's a pill, scaled down as it opens so the panel still fits
+  const [islandOpen, setIslandOpen] = useState(false)
   const theme = dark ? 'dark' : 'light'
 
   const stage = (scale: number) =>
@@ -988,10 +990,13 @@ function TimerTile({ t }: { t: T }) {
             </div>
           </>
         ) : (
-          // The island, as big as the tile allows once it's open
+          // The island: big as a pill, eased down as it opens (same timing as the morph) so the panel fits
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="pointer-events-auto" style={{ transform: 'scale(.9)' }}>
-              <FocusTimer theme={theme} remaining={9 * 60 + 41} defaultOpen />
+            <div
+              className="pointer-events-auto motion-reduce:!transition-none"
+              style={{ transform: `scale(${islandOpen ? 0.9 : 1.35})`, transition: 'transform .46s cubic-bezier(.25,1,.5,1)' }}
+            >
+              <FocusTimer theme={theme} remaining={9 * 60 + 41} open={islandOpen} onOpenChange={setIslandOpen} />
             </div>
           </div>
         )}
