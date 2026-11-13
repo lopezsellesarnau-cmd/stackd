@@ -19,6 +19,7 @@ import { SlideToPay } from './kit/slide-to-pay'
 import { StatCard } from './kit/stat-card'
 import { NotificationStack, type Note } from './kit/notification-stack'
 import { SplitFlap } from './kit/split-flap'
+import { RotaryDial } from './kit/rotary-dial'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -52,6 +53,8 @@ const COPY = {
     flapAbout: 'Text on little tiles that flip like an old departure board. Each tile runs through the letters on its way to the new one, and the change rolls across the board. For prices, counters, launch dates and headlines. Type to try it.',
     flapIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Letters, numbers, €, $, £ and punctuation', 'White and black versions'],
     typeHere: 'Type something',
+    dialAbout: 'A knob you turn by dragging in a circle. It follows your finger smoothly while the value and the ring of ticks move in steps, then clicks into place with a small bounce. Past either end it gives a little, like rubber. Turn it.',
+    dialIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard, works with screen readers', 'Any range, step, label and colour'],
     buy: 'Buy',
     autoClose: 'Auto-close',
     theme: 'Card',
@@ -93,6 +96,8 @@ const COPY = {
     flapAbout: 'Texto en pequeñas fichas que giran como un panel de salidas antiguo. Cada ficha pasa por las letras hasta llegar a la nueva, y el cambio recorre el panel. Para precios, contadores, fechas de lanzamiento y titulares. Escribe para probarlo.',
     flapIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Letras, números, €, $, £ y puntuación', 'Versión blanca y negra'],
     typeHere: 'Escribe algo',
+    dialAbout: 'Un mando que se gira arrastrando en círculo. Sigue tu dedo con suavidad mientras el valor y el anillo de marcas avanzan a pasos, y al soltar encaja con un pequeño rebote. En los extremos cede un poco, como goma. Gíralo.',
+    dialIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado, compatible con lectores de pantalla', 'Cualquier rango, paso, etiqueta y color'],
     buy: 'Comprar',
     autoClose: 'Cierre automático',
     theme: 'Tarjeta',
@@ -112,7 +117,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -120,10 +125,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'stat', cat: 'cards' },
   { id: 'notify', cat: 'notifications' },
   { id: 'flap', cat: 'text' },
+  { id: 'dial', cat: 'inputs' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
@@ -146,6 +152,7 @@ const GUMROAD: Record<Id, string> = {
   stat: 'https://arnolop.gumroad.com/l/stat_card?wanted=true',
   notify: 'https://arnolop.gumroad.com/l/notification_stack?wanted=true',
   flap: 'https://arnolop.gumroad.com/l/split_flap?wanted=true',
+  dial: '', // TODO: Gumroad link once the product is up
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -233,7 +240,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : <FlapTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : <DialTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -845,6 +852,78 @@ function FlapTile({ t }: { t: T }) {
                 <span className="px-1">{t.light}</span>
               </Pick>
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 07 · Rotary dial. A white knob on a white tile; a black knob on a black one. */
+function DialTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [color, setColor] = useState(COLORS[1])
+  const colors = lineColors(dark)
+  const setTheme = (d: boolean) => {
+    setDark(d)
+    if (!lineColors(d).includes(color)) setColor(d ? COLORS[0] : COLORS[1])
+  }
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Rotary dial`} className="absolute inset-0 cursor-pointer" />
+        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-paper/10 text-paper' : 'bg-card text-ink'}`}>{PRICE.dial}</span>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto">
+            <RotaryDial theme={theme} color={color.body} size={170} />
+          </div>
+        </div>
+        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Knob: ${dark ? 'black' : 'white'}`} onClick={() => setTheme(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(colors, color))}>
+              <Swatch color={color.body} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.inputs}
+          name="Rotary dial"
+          about={t.dialAbout}
+          includes={t.dialIncludes}
+          usage={`<RotaryDial label="Volume"${dark ? ' theme="dark"' : ''} color="${color.body}" onChange={setVolume} />`}
+          href={GUMROAD.dial}
+          price={PRICE.dial}
+          dark={dark}
+          onClose={() => setOpen(false)}
+          stage={<RotaryDial theme={theme} color={color.body} size={260} />}
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setTheme(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setTheme(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.color}>
+                {colors.map((c) => (
+                  <Pick key={c.name} on={color.name === c.name} label={c.name} onClick={() => setColor(c)}>
+                    <Swatch color={c.body} />
+                  </Pick>
+                ))}
+              </Choice>
+            </>
           }
         />
       ) : null}
