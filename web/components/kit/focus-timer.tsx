@@ -283,7 +283,7 @@ export function FocusTimer({
       ) : null}
     <div
       ref={shell}
-      className="relative overflow-hidden"
+      className="relative overflow-hidden has-[button:focus-visible]:ring-2 has-[button:focus-visible]:ring-[#888]/50"
       style={{
         width: W,
         height: H,
@@ -305,7 +305,7 @@ export function FocusTimer({
         aria-expanded={open}
         aria-label={`${label}, ${time} left. ${open ? "Close" : "Open"}`}
         onClick={() => setOpen(!open)}
-        className="absolute inset-x-0 top-0 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#888]/40"
+        className="absolute inset-x-0 top-0 outline-none"
         style={{ height: mix(PILL, stripY, p) }}
       />
 

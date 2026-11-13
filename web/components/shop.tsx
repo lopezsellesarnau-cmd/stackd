@@ -969,12 +969,16 @@ function TimerTile({ t }: { t: T }) {
   const fit = live ? Math.min(1, room / 300) : Math.min(notch ? 1.2 : 1.35, room / 148)
   const grow = { transform: `scale(${fit})`, transition: 'transform .46s cubic-bezier(.25,1,.5,1)' }
   const theme = dark ? 'dark' : 'light'
+  const bezel = dark ? '#141310' : '#FFFFFF'
 
   const stage = (scale: number) =>
     notch ? (
-      <div className="absolute inset-0 flex justify-center overflow-hidden rounded-[18px]" style={{ background: SCREEN }}>
+      // A laptop screen whose bezel is the notch's own colour: a real notch is part of the bezel
+      <div className="absolute inset-0 rounded-[18px] p-[9px]" style={{ background: bezel, boxShadow: dark ? undefined : 'inset 0 0 0 1px rgba(20,19,16,0.08)' }}>
+        <div className="flex h-full justify-center overflow-hidden rounded-[11px]" style={{ background: SCREEN }}>
         <div style={{ transform: `scale(${scale})`, transformOrigin: '50% 0' }}>
           <FocusTimer variant="notch" theme={theme} remaining={18 * 60 + 5} label="Deep work" />
+        </div>
         </div>
       </div>
     ) : (
@@ -987,7 +991,11 @@ function TimerTile({ t }: { t: T }) {
 
   return (
     <>
-      <article ref={box} className={`group ${tile} ${notch ? 'bg-ink' : ''}`} style={notch ? undefined : { background: SCREEN }}>
+      <article
+        ref={box}
+        className={`group ${tile} transition-colors duration-300`}
+        style={notch ? { background: bezel, boxShadow: dark ? undefined : 'inset 0 0 0 1px rgba(20,19,16,0.08)' } : { background: SCREEN }}
+      >
         {/* The notch sits in a laptop screen: a black bezel, the notch part of it */}
         {notch ? <div className="absolute inset-[7px] overflow-hidden rounded-[12px]" style={{ background: SCREEN }} /> : null}
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Focus timer`} className="absolute inset-0 cursor-pointer" />
