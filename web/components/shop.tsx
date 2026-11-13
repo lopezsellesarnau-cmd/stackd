@@ -152,7 +152,7 @@ const GUMROAD: Record<Id, string> = {
   stat: 'https://arnolop.gumroad.com/l/stat_card?wanted=true',
   notify: 'https://arnolop.gumroad.com/l/notification_stack?wanted=true',
   flap: 'https://arnolop.gumroad.com/l/split_flap?wanted=true',
-  dial: '', // TODO: Gumroad link once the product is up
+  dial: 'https://arnolop.gumroad.com/l/rotary_dial?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
