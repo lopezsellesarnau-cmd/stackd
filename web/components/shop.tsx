@@ -20,6 +20,7 @@ import { StatCard } from './kit/stat-card'
 import { NotificationStack, type Note } from './kit/notification-stack'
 import { SplitFlap } from './kit/split-flap'
 import { RotaryDial } from './kit/rotary-dial'
+import { FocusTimer } from './kit/focus-timer'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -53,6 +54,12 @@ const COPY = {
     flapAbout: 'Text on little tiles that flip like an old departure board. Each tile runs through the letters on its way to the new one, and the change rolls across the board. For prices, counters, launch dates and headlines. Type to try it.',
     flapIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Letters, numbers, €, $, £ and punctuation', 'White and black versions'],
     typeHere: 'Type something',
+    timerAbout: 'A focus timer with the Bot. A small pill that opens into a panel as one smooth object: the Bot grows into the corner, the time travels beside it and the ticks arrive last. The Bot watches the time, follows your cursor and smiles when you are done. Comes as a phone island and as a laptop notch that opens on hover.',
+    timerIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Island and laptop notch versions', 'Mouse, touch and keyboard'],
+    shapeLabel: 'Shape',
+    hoverNotch: 'Hover the notch',
+    notch: 'Notch',
+    island: 'Island',
     dialAbout: 'A knob you turn by dragging in a circle. It follows your finger smoothly while the value and the ring of ticks move in steps, then clicks into place with a small bounce. Past either end it gives a little, like rubber. Turn it.',
     dialIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard, works with screen readers', 'Any range, step, label and colour'],
     buy: 'Buy',
@@ -66,7 +73,7 @@ const COPY = {
     soonGet: 'Coming soon',
     get: 'Get it free',
     emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
-    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text' },
+    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets' },
   },
   es: {
     title: 'Componentes',
@@ -96,6 +103,12 @@ const COPY = {
     flapAbout: 'Texto en pequeñas fichas que giran como un panel de salidas antiguo. Cada ficha pasa por las letras hasta llegar a la nueva, y el cambio recorre el panel. Para precios, contadores, fechas de lanzamiento y titulares. Escribe para probarlo.',
     flapIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Letras, números, €, $, £ y puntuación', 'Versión blanca y negra'],
     typeHere: 'Escribe algo',
+    timerAbout: 'Un temporizador de concentración con el Bot. Una pequeña píldora que se abre en un panel como un solo objeto: el Bot crece hasta la esquina, la hora viaja a su lado y las marcas llegan al final. El Bot mira la hora, sigue tu cursor y sonríe al terminar. Viene como isla para móvil y como notch de portátil que se abre al pasar el ratón.',
+    timerIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Versión isla y notch de portátil', 'Ratón, táctil y teclado'],
+    shapeLabel: 'Forma',
+    hoverNotch: 'Pasa el ratón por el notch',
+    notch: 'Notch',
+    island: 'Isla',
     dialAbout: 'Un mando que se gira arrastrando en círculo. Sigue tu dedo con suavidad mientras el valor y el anillo de marcas avanzan a pasos, y al soltar encaja con un pequeño rebote. En los extremos cede un poco, como goma. Gíralo.',
     dialIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado, compatible con lectores de pantalla', 'Cualquier rango, paso, etiqueta y color'],
     buy: 'Comprar',
@@ -109,7 +122,7 @@ const COPY = {
     soonGet: 'Próximamente',
     get: 'Consíguelo gratis',
     emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
-    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto' },
+    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets' },
   },
 }
 
@@ -117,7 +130,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -126,10 +139,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'notify', cat: 'notifications' },
   { id: 'flap', cat: 'text' },
   { id: 'dial', cat: 'inputs' },
+  { id: 'timer', cat: 'widgets' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
@@ -153,6 +167,7 @@ const GUMROAD: Record<Id, string> = {
   notify: 'https://arnolop.gumroad.com/l/notification_stack?wanted=true',
   flap: 'https://arnolop.gumroad.com/l/split_flap?wanted=true',
   dial: 'https://arnolop.gumroad.com/l/rotary_dial?wanted=true',
+  timer: '', // TODO: Gumroad link once the product is up
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -240,7 +255,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : <DialTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : <TimerTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -922,6 +937,91 @@ function DialTile({ t }: { t: T }) {
                     <Swatch color={c.body} />
                   </Pick>
                 ))}
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** A soft screen for the timer to sit on, like a laptop's display */
+const SCREEN = 'linear-gradient(180deg,#E9E7F5 0%,#F6F1E8 100%)'
+
+/** 08 · Focus timer. In the tile: the laptop notch, hanging from the top edge, opening on hover. */
+function TimerTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(true)
+  const [notch, setNotch] = useState(true)
+  const theme = dark ? 'dark' : 'light'
+
+  const stage = (scale: number) =>
+    notch ? (
+      <div className="absolute inset-0 flex justify-center overflow-hidden rounded-[18px]" style={{ background: SCREEN }}>
+        <div style={{ transform: `scale(${scale})`, transformOrigin: '50% 0' }}>
+          <FocusTimer variant="notch" theme={theme} remaining={18 * 60 + 5} label="Deep work" />
+        </div>
+      </div>
+    ) : (
+      <div className="absolute inset-0 flex items-center justify-center rounded-[18px]" style={{ background: SCREEN }}>
+        <div style={{ transform: `scale(${scale})` }}>
+          <FocusTimer theme={theme} remaining={9 * 60 + 41} />
+        </div>
+      </div>
+    )
+
+  return (
+    <>
+      {/* A laptop screen: a black bezel, the notch part of it */}
+      <article className={`group ${tile} bg-ink`}>
+        <div className="absolute inset-[7px] overflow-hidden rounded-[12px]" style={{ background: SCREEN }} />
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Focus timer`} className="absolute inset-0 cursor-pointer" />
+        <span className="pointer-events-none absolute bottom-4 right-4 z-10 rounded-full bg-paper px-2 py-0.5 text-[11px] text-ink">{PRICE.timer}</span>
+        <span className="pointer-events-none absolute bottom-[18px] left-1/2 -translate-x-1/2 text-[11px] text-ink/40 [@media(hover:none)]:hidden">{t.hoverNotch}</span>
+        <div className="pointer-events-none absolute inset-x-0 top-[7px] flex justify-center">
+          <div className="pointer-events-auto" style={{ transform: 'scale(.82)', transformOrigin: '50% 0' }}>
+            <FocusTimer variant="notch" theme={theme} remaining={18 * 60 + 5} label="Deep work" />
+          </div>
+        </div>
+        <div className="absolute bottom-4 left-4 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Timer: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.widgets}
+          name="Focus timer"
+          about={t.timerAbout}
+          includes={t.timerIncludes}
+          usage={`<FocusTimer minutes={25}${notch ? ' variant="notch"' : ''}${dark ? '' : ' theme="light"'} onDone={takeABreak} />`}
+          href={GUMROAD.timer}
+          price={PRICE.timer}
+          onClose={() => setOpen(false)}
+          stage={stage(1)}
+          options={
+            <>
+              <Choice label={t.shapeLabel}>
+                <Pick on={notch} label={t.notch} onClick={() => setNotch(true)}>
+                  <span className="px-1">{t.notch}</span>
+                </Pick>
+                <Pick on={!notch} label={t.island} onClick={() => setNotch(false)}>
+                  <span className="px-1">{t.island}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.theme}>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
               </Choice>
             </>
           }
