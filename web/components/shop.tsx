@@ -953,9 +953,21 @@ const SCREEN = 'linear-gradient(180deg,#E9E7F5 0%,#F6F1E8 100%)'
 function TimerTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(true)
-  const [notch, setNotch] = useState(false)
-  // The island in the tile: big while it's a pill, scaled down as it opens so the panel still fits
-  const [islandOpen, setIslandOpen] = useState(false)
+  const [notch, setNotch] = useState(true)
+  // Big while it's a pill, scaled down as it opens so the panel always fits the tile, at any width
+  const [live, setLive] = useState(false)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const room = w - 28 // a little margin on each side
+  const fit = live ? Math.min(1, room / 300) : Math.min(notch ? 1.2 : 1.35, room / 148)
+  const grow = { transform: `scale(${fit})`, transition: 'transform .46s cubic-bezier(.25,1,.5,1)' }
   const theme = dark ? 'dark' : 'light'
 
   const stage = (scale: number) =>
@@ -975,7 +987,7 @@ function TimerTile({ t }: { t: T }) {
 
   return (
     <>
-      <article className={`group ${tile} ${notch ? 'bg-ink' : ''}`} style={notch ? undefined : { background: SCREEN }}>
+      <article ref={box} className={`group ${tile} ${notch ? 'bg-ink' : ''}`} style={notch ? undefined : { background: SCREEN }}>
         {/* The notch sits in a laptop screen: a black bezel, the notch part of it */}
         {notch ? <div className="absolute inset-[7px] overflow-hidden rounded-[12px]" style={{ background: SCREEN }} /> : null}
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Focus timer`} className="absolute inset-0 cursor-pointer" />
@@ -984,8 +996,8 @@ function TimerTile({ t }: { t: T }) {
           <>
             <span className="pointer-events-none absolute bottom-[18px] left-1/2 -translate-x-1/2 text-[11px] text-ink/40 [@media(hover:none)]:hidden">{t.hoverNotch}</span>
             <div className="pointer-events-none absolute inset-x-0 top-[7px] flex justify-center">
-              <div className="pointer-events-auto" style={{ transform: 'scale(.82)', transformOrigin: '50% 0' }}>
-                <FocusTimer variant="notch" theme={theme} remaining={18 * 60 + 5} label="Deep work" />
+              <div className="pointer-events-auto motion-reduce:!transition-none" style={{ ...grow, transformOrigin: '50% 0' }}>
+                <FocusTimer variant="notch" theme={theme} remaining={18 * 60 + 5} label="Deep work" open={live} onOpenChange={setLive} />
               </div>
             </div>
           </>
@@ -994,9 +1006,9 @@ function TimerTile({ t }: { t: T }) {
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div
               className="pointer-events-auto motion-reduce:!transition-none"
-              style={{ transform: `scale(${islandOpen ? 0.9 : 1.35})`, transition: 'transform .46s cubic-bezier(.25,1,.5,1)' }}
+              style={grow}
             >
-              <FocusTimer theme={theme} remaining={9 * 60 + 41} open={islandOpen} onOpenChange={setIslandOpen} />
+              <FocusTimer theme={theme} remaining={9 * 60 + 41} open={live} onOpenChange={setLive} />
             </div>
           </div>
         )}
