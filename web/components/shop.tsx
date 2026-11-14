@@ -22,6 +22,7 @@ import { SplitFlap } from './kit/split-flap'
 import { RotaryDial } from './kit/rotary-dial'
 import { FocusTimer } from './kit/focus-timer'
 import { BotLogin } from './kit/bot-login'
+import { ElasticTabs } from './kit/elastic-tabs'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -59,6 +60,11 @@ const COPY = {
     loginIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Works with any sign-in: return true or false', 'Keyboard, screen readers and password managers'],
     timerAbout: 'A focus timer with the Bot. A small pill that opens into a panel as one smooth object: the Bot grows into the corner, the time travels beside it and the ticks arrive last. The Bot watches the time, follows your cursor and smiles when you are done. Comes as a phone island and as a laptop notch that opens on hover.',
     timerIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Island and laptop notch versions', 'Mouse, touch and keyboard'],
+    tabsAbout: 'Tabs with an indicator that moves like a drop. The front edge leaves first and the back one catches up, so it stretches on the way and lands with a small wobble. Grab it and drag: it follows your finger, gives like rubber at the ends and drops on the nearest tab. The text changes colour right at its edge.',
+    tabsIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard, works with screen readers', 'Labels, icons or both, any colour'],
+    show: 'Show',
+    labels: 'Labels',
+    icons: 'Icons',
     shapeLabel: 'Shape',
     hoverNotch: 'Hover the notch',
     notch: 'Notch',
@@ -76,7 +82,7 @@ const COPY = {
     soonGet: 'Coming soon',
     get: 'Get it free',
     emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
-    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets' },
+    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation' },
   },
   es: {
     title: 'Componentes',
@@ -110,6 +116,11 @@ const COPY = {
     loginIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier login: devuelve true o false', 'Teclado, lectores de pantalla y gestores de contraseñas'],
     timerAbout: 'Un temporizador de concentración con el Bot. Una pequeña píldora que se abre en un panel como un solo objeto: el Bot crece hasta la esquina, la hora viaja a su lado y las marcas llegan al final. El Bot mira la hora, sigue tu cursor y sonríe al terminar. Viene como isla para móvil y como notch de portátil que se abre al pasar el ratón.',
     timerIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Versión isla y notch de portátil', 'Ratón, táctil y teclado'],
+    tabsAbout: 'Pestañas con un indicador que se mueve como una gota. El borde de delante sale primero y el de detrás lo alcanza, así que se estira por el camino y llega con un pequeño rebote. Agárralo y arrastra: sigue tu dedo, cede como goma en los extremos y cae en la pestaña más cercana. El texto cambia de color justo en su borde.',
+    tabsIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado, compatible con lectores de pantalla', 'Texto, iconos o ambos, cualquier color'],
+    show: 'Mostrar',
+    labels: 'Texto',
+    icons: 'Iconos',
     shapeLabel: 'Forma',
     hoverNotch: 'Pasa el ratón por el notch',
     notch: 'Notch',
@@ -127,7 +138,7 @@ const COPY = {
     soonGet: 'Próximamente',
     get: 'Consíguelo gratis',
     emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
-    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets' },
+    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación' },
   },
 }
 
@@ -135,7 +146,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -146,10 +157,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'dial', cat: 'inputs' },
   { id: 'timer', cat: 'widgets' },
   { id: 'login', cat: 'inputs' },
+  { id: 'tabs', cat: 'navigation' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
@@ -175,6 +187,7 @@ const GUMROAD: Record<Id, string> = {
   dial: 'https://arnolop.gumroad.com/l/rotary_dial?wanted=true',
   timer: 'https://arnolop.gumroad.com/l/focus_timer?wanted=true',
   login: 'https://arnolop.gumroad.com/l/bot_login?wanted=true',
+  tabs: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -262,7 +275,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : <LoginTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : <TabsTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1182,6 +1195,121 @@ function EyesIcon({ eyes }: { eyes: BotEyes }) {
         <rect key={x} x={x - w / 2} y={15 - h / 2} width={w} height={h} rx={r} fill="currentColor" />
       ))}
     </svg>
+  )
+}
+
+// The tabs' colours: every Bot colour but white, which wouldn't show on the white bar
+const TAB_COLORS = COLORS.filter((c) => c.name !== 'White')
+
+const tabIcon = (d: string) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d={d} />
+  </svg>
+)
+const RANGE = [
+  { id: 'd', label: 'Day' },
+  { id: 'w', label: 'Week' },
+  { id: 'm', label: 'Month' },
+  { id: 'y', label: 'Year' },
+]
+const NAV = [
+  { id: 'home', label: 'Home', icon: tabIcon('M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z') },
+  { id: 'search', label: 'Search', icon: tabIcon('M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4') },
+  { id: 'inbox', label: 'Inbox', icon: tabIcon('M3 13l3-8h12l3 8v6H3zM3 13h5l1 3h6l1-3h5') },
+  { id: 'me', label: 'Profile', icon: tabIcon('M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0') },
+]
+
+/** 10 · Elastic tabs. Two bars on an ink tile, scaled to the tile's real width. */
+function TabsTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [color, setColor] = useState(TAB_COLORS[0])
+  const [dark, setDark] = useState(false)
+  const [icons, setIcons] = useState(true)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const fit = Math.min(1, (w - 40) / 270)
+  // On a black bar a black indicator wouldn't show, so it turns white
+  const ind = dark && color.name === 'Ink' ? '#FFFFFF' : color.body
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-ink`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Elastic tabs`} className="absolute inset-0 cursor-pointer" />
+        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-paper/10 px-2 py-0.5 text-[11px] text-paper">{PRICE.tabs}</span>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="flex shrink-0 flex-col items-center gap-4" style={{ transform: `scale(${fit})` }}>
+            <div className="pointer-events-auto">
+              <ElasticTabs tabs={RANGE} color={color.body} aria-label="Range" />
+            </div>
+            <div className="pointer-events-auto">
+              <ElasticTabs tabs={NAV} iconOnly color={color.body} aria-label="Navigation" />
+            </div>
+          </div>
+        </div>
+        <div className="absolute bottom-3 left-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(TAB_COLORS, color))}>
+              <Swatch color={color.body} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.navigation}
+          name="Elastic tabs"
+          about={t.tabsAbout}
+          includes={t.tabsIncludes}
+          usage={`<ElasticTabs tabs={tabs}${dark ? ' theme="dark"' : ''}${icons ? '' : ' iconOnly'} color="${ind}" onChange={setTab} />`}
+          href={GUMROAD.tabs}
+          price={PRICE.tabs}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="flex flex-col items-center gap-6">
+              <ElasticTabs tabs={RANGE} theme={theme} color={ind} aria-label="Range" />
+              <ElasticTabs tabs={NAV} theme={theme} iconOnly={!icons} color={ind} aria-label="Navigation" />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.color}>
+                {TAB_COLORS.map((c) => (
+                  <Pick key={c.name} on={color.name === c.name} label={c.name} onClick={() => setColor(c)}>
+                    <Swatch color={c.body} />
+                  </Pick>
+                ))}
+              </Choice>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.show}>
+                <Pick on={icons} label={t.labels} onClick={() => setIcons(true)}>
+                  <span className="px-1">{t.labels}</span>
+                </Pick>
+                <Pick on={!icons} label={t.icons} onClick={() => setIcons(false)}>
+                  <span className="px-1">{t.icons}</span>
+                </Pick>
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
   )
 }
 
