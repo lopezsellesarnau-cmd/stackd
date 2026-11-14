@@ -26,6 +26,7 @@ import { ElasticTabs } from './kit/elastic-tabs'
 import { BotFeedback } from './kit/bot-feedback'
 import { CommandPalette, type CommandItem } from './kit/command-palette'
 import { FileDrop, type SampleFile } from './kit/file-drop'
+import { BotLoader, type LoaderStep } from './kit/bot-loader'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -73,6 +74,11 @@ const COPY = {
     paletteIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Keyboard first, works with screen readers', 'As a pop-up on ⌘K or inline, any colour'],
     pressK: 'Open as a pop-up · ⌘K',
     dropAbout: 'A file dropzone with the Bot. Bring a file near and it opens its mouth; let go and the file is pulled in, the Bot chews, and the upload appears below with a rolling percentage. Images get a thumbnail. Too big? It shakes its head, and if you keep trying it starts answering back. Try the files on the tray.',
+    loaderAbout: 'A loader where the Bot does the work you are waiting for. Each step says what it is: the Bot reads (its eyes scan line by line), thinks (it looks up) or works (it looks down and chews). The step shimmers, a bar fills step by step and a list ticks them off. Done: a happy hop. Error: a frown and Retry. Also as a small inline pill.',
+    loaderIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Exact progress or a moving sheen', 'Card and inline pill, works with screen readers'],
+    progressLabel: 'Progress',
+    known: 'Known',
+    unknown: 'Unknown',
     dropIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Drop, click, paste, keyboard and screen readers', 'Plug in any upload: progress, cancel and retry'],
     icons: 'Icons',
     shapeLabel: 'Shape',
@@ -136,6 +142,11 @@ const COPY = {
     paletteIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Pensado para teclado, compatible con lectores de pantalla', 'Como pop-up con ⌘K o integrado, cualquier color'],
     pressK: 'Abrir como pop-up · ⌘K',
     dropAbout: 'Una zona para soltar archivos con el Bot. Acerca un archivo y abre la boca; suéltalo y se lo traga, mastica y la subida aparece debajo con un porcentaje que rueda. Las imágenes tienen miniatura. ¿Demasiado grande? Niega con la cabeza, y si insistes empieza a contestarte. Prueba con los archivos de la bandeja.',
+    loaderAbout: 'Un loader en el que el Bot hace el trabajo que estás esperando. Cada paso dice qué es: el Bot lee (sus ojos recorren las líneas), piensa (mira hacia arriba) o trabaja (mira abajo y mastica). El paso brilla, una barra se llena paso a paso y una lista los va marcando. Al terminar, salta de alegría. Si falla, frunce el ceño y aparece Reintentar. También como píldora pequeña.',
+    loaderIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Progreso exacto o un brillo en movimiento', 'Tarjeta y píldora, compatible con lectores de pantalla'],
+    progressLabel: 'Progreso',
+    known: 'Conocido',
+    unknown: 'Desconocido',
     dropIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Soltar, clic, pegar, teclado y lectores de pantalla', 'Conecta cualquier subida: progreso, cancelar y reintentar'],
     icons: 'Iconos',
     shapeLabel: 'Forma',
@@ -163,7 +174,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -178,13 +189,14 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'feedback', cat: 'inputs' },
   { id: 'palette', cat: 'navigation' },
   { id: 'drop', cat: 'inputs' },
+  { id: 'loader', cat: 'loaders' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
-const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1]
+const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1]
 
 // Body colour, and the eye colour that reads on it
 const COLORS = [
@@ -211,6 +223,7 @@ const GUMROAD: Record<Id, string> = {
   feedback: 'https://arnolop.gumroad.com/l/feedback?wanted=true',
   palette: 'https://arnolop.gumroad.com/l/command_palette?wanted=true',
   drop: 'https://arnolop.gumroad.com/l/file_drop?wanted=true',
+  loader: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -298,7 +311,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : <DropTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : <LoaderTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1493,6 +1506,145 @@ function DropTile({ t }: { t: T }) {
                 </Pick>
               </Choice>
               {/* The Bot's body and eyes, like in the Bot's own pop-up (its colour follows the card) */}
+              <Choice label={t.shape}>
+                {shapes.map((sh) => (
+                  <Pick key={sh} on={shape === sh} label={sh} onClick={() => setShape(sh)}>
+                    <ShapeIcon shape={sh} />
+                  </Pick>
+                ))}
+              </Choice>
+              <Choice label={t.eyes}>
+                {eyeKinds.map((e) => (
+                  <Pick key={e} on={eyes === e} label={e} onClick={() => setEyes(e)}>
+                    <EyesIcon eyes={e} />
+                  </Pick>
+                ))}
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// The loader's pretend task: four steps, each a different kind of work
+const LOADER_STEPS: LoaderStep[] = [
+  { label: 'Reading your file', activity: 'read' },
+  { label: 'Thinking it through', activity: 'think' },
+  { label: 'Writing the summary', activity: 'work' },
+  { label: 'Checking the answer', activity: 'read' },
+]
+
+/** Runs the pretend task on a loop. Every third run fails on step 3; Retry starts again, and so does waiting. */
+function useLoaderRun(exact: boolean) {
+  const [current, setCurrent] = useState(0)
+  const [status, setStatus] = useState<'loading' | 'done' | 'error'>('loading')
+  const [progress, setProgress] = useState(0)
+  const runs = useRef(0)
+  const timers = useRef<number[]>([])
+  const start = () => {
+    timers.current.forEach(clearTimeout)
+    timers.current = []
+    runs.current++
+    const fail = runs.current % 3 === 0
+    setStatus('loading')
+    setCurrent(0)
+    setProgress(0)
+    const at = (ms: number, fn: () => void) => timers.current.push(window.setTimeout(fn, ms))
+    let t = 0
+    for (let i = 0; i < LOADER_STEPS.length; i++) {
+      const len = 1800 + i * 300
+      at(t, () => {
+        setCurrent(i)
+        setProgress(0)
+      })
+      for (let k = 1; k <= 10; k++) at(t + (len * k) / 10, () => setProgress(k / 10))
+      if (fail && i === 2) {
+        at(t + len * 0.6, () => setStatus('error'))
+        at(t + len * 0.6 + 4500, start) // nobody pressed Retry: try again
+        return
+      }
+      t += len
+    }
+    at(t, () => setStatus('done'))
+    at(t + 2600, start)
+  }
+  useEffect(() => {
+    start()
+    return () => timers.current.forEach(clearTimeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  return { current, status, progress: exact ? progress : undefined, retry: start }
+}
+
+/** 14 · Bot loader. The card (without its list) running a pretend task on a white tile. */
+function LoaderTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [exact, setExact] = useState(false)
+  const [shape, setShape] = useState<BotShape>('pill')
+  const [eyes, setEyes] = useState<BotEyes>('tall')
+  const run = useLoaderRun(exact)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const fit = Math.min(1, (w - 40) / 300)
+  const theme = dark ? 'dark' : 'light'
+  const common = { steps: LOADER_STEPS, current: run.current, status: run.status, progress: run.progress, onRetry: run.retry, error: "Couldn't write the summary", theme, bot: { shape, eyes } } as const
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Bot loader`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto w-[300px] shrink-0" style={{ transform: `scale(${fit})` }}>
+            <BotLoader {...common} showSteps={false} />
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.loaders}
+          name="Bot loader"
+          about={t.loaderAbout}
+          includes={t.loaderIncludes}
+          usage={`<BotLoader steps={steps} current={step} status={status}${exact ? ' progress={p}' : ''}${dark ? ' theme="dark"' : ''}${shape !== 'pill' || eyes !== 'tall' ? ` bot={{ shape: '${shape}', eyes: '${eyes}' }}` : ''} onRetry={retry} />`}
+          href={GUMROAD.loader}
+          price={PRICE.loader}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="flex w-full max-w-[360px] flex-col items-center gap-5 self-start pt-4 sm:self-center sm:pt-0">
+              <BotLoader {...common} />
+              <BotLoader {...common} variant="inline" error="Couldn't write it" />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.progressLabel}>
+                <Pick on={!exact} label={t.unknown} onClick={() => setExact(false)}>
+                  <span className="px-1">{t.unknown}</span>
+                </Pick>
+                <Pick on={exact} label={t.known} onClick={() => setExact(true)}>
+                  <span className="px-1">{t.known}</span>
+                </Pick>
+              </Choice>
               <Choice label={t.shape}>
                 {shapes.map((sh) => (
                   <Pick key={sh} on={shape === sh} label={sh} onClick={() => setShape(sh)}>
