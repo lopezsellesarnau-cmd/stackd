@@ -321,9 +321,8 @@ type T = (typeof COPY)['en'] | (typeof COPY)['es']
 
 const shapes = Object.keys(SHAPES) as BotShape[]
 const eyeKinds = Object.keys(EYES) as BotEyes[]
-const step = <V,>(list: readonly V[], now: V) => list[(list.indexOf(now) + 1) % list.length]
 
-/** The Bot, live. Three small buttons step through its shape, eyes and colour; the tile opens the details. */
+/** The Bot, live. The tile opens the details, where its shape, eyes and colour can be changed. */
 function BotTile({ t }: { t: T }) {
   const [cfg, setCfg] = useState<Config>({ shape: 'pill', eyes: 'tall', color: COLORS[0] })
   const [open, setOpen] = useState(false)
@@ -334,31 +333,12 @@ function BotTile({ t }: { t: T }) {
   return (
     <>
       <article className={`kit-tile group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
-        {/* The whole tile opens the details; the small buttons sit above it */}
+        {/* The whole tile opens the details */}
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Bot`} className="absolute inset-0 cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <Bot size={112} shape={shape} eyes={eyes} color={color.body} eyeColor={color.eyes} within=".kit-tile" />
         </div>
-        <span
-          className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-paper/10 text-paper/70' : 'bg-card text-fg-dim'}`}
-        >
-          {t.free}
-        </span>
 
-        {/* Always there on a phone, on hover with a mouse */}
-        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Shape: ${shape}`} onClick={() => setCfg({ ...cfg, shape: step(shapes, shape) })}>
-              <ShapeIcon shape={shape} />
-            </Step>
-            <Step label={`Eyes: ${eyes}`} onClick={() => setCfg({ ...cfg, eyes: step(eyeKinds, eyes) })}>
-              <EyesIcon eyes={eyes} />
-            </Step>
-            <Step label={`Colour: ${color.name}`} onClick={() => setCfg({ ...cfg, color: step(COLORS, color) })}>
-              <Swatch color={color.body} />
-            </Step>
-          </div>
-        </div>
       </article>
 
       {open ? <BotDetail t={t} cfg={cfg} setCfg={setCfg} onClose={() => setOpen(false)} /> : null}
@@ -555,7 +535,6 @@ function PromptTile({ t }: { t: T }) {
     <>
       <article className={`group ${tile} bg-paper [container-type:size]`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} AI prompt bar`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-card px-2 py-0.5 text-[11px] text-fg-dim">{t.free}</span>
         <div
           onFocusCapture={() => setFocused(true)}
           onBlurCapture={() => setFocused(false)}
@@ -619,15 +598,7 @@ function PayTile({ t }: { t: T }) {
     <>
       <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Slide to pay`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-card px-2 py-0.5 text-[11px] text-fg-dim">{t.free}</span>
         <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-center">{slider}</div>
-        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(COLORS, color))}>
-              <Swatch color={color.body} />
-            </Step>
-          </div>
-        </div>
       </article>
 
       {open ? (
@@ -678,19 +649,8 @@ function StatTile({ t }: { t: T }) {
     <>
       <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Live stat card`} className="absolute inset-0 cursor-pointer" />
-        <span className={`pointer-events-none absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-fg-dim' : 'bg-paper/10 text-paper/70'}`}>{t.free}</span>
         <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-center">
           <StatCard live theme={theme} color={color.body} />
-        </div>
-        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setTheme(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
-            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(colors, color))}>
-              <Swatch color={color.body} />
-            </Step>
-          </div>
         </div>
       </article>
 
@@ -789,16 +749,8 @@ function NotifyTile({ t }: { t: T }) {
     <>
       <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Notification stack`} className="absolute inset-0 cursor-pointer" />
-        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-fg-dim' : 'bg-paper/10 text-paper/70'}`}>{t.free}</span>
         <div className="absolute inset-x-3 bottom-12">
           <NotifyPlay t={t} dark={dark} auto={false} max={3} />
-        </div>
-        <div className="absolute left-3 top-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
-          </div>
         </div>
       </article>
 
@@ -879,16 +831,8 @@ function FlapTile({ t }: { t: T }) {
     <>
       <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Split-flap display`} className="absolute inset-0 cursor-pointer" />
-        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-ink' : 'bg-paper/10 text-paper'}`}>{PRICE.flap}</span>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <FlapPlay t={t} dark={dark} size={48} length={6} />
-        </div>
-        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Tiles: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
-          </div>
         </div>
       </article>
 
@@ -937,20 +881,9 @@ function DialTile({ t }: { t: T }) {
     <>
       <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Rotary dial`} className="absolute inset-0 cursor-pointer" />
-        <span className={`pointer-events-none absolute right-3 top-3 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-paper/10 text-paper' : 'bg-card text-ink'}`}>{PRICE.dial}</span>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="pointer-events-auto">
             <RotaryDial theme={theme} color={color.body} size={170} />
-          </div>
-        </div>
-        <div className="absolute inset-x-0 bottom-3 flex justify-center transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Knob: ${dark ? 'black' : 'white'}`} onClick={() => setTheme(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
-            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(colors, color))}>
-              <Swatch color={color.body} />
-            </Step>
           </div>
         </div>
       </article>
@@ -1046,7 +979,6 @@ function TimerTile({ t }: { t: T }) {
         {/* The notch sits in a laptop screen: a black bezel, the notch part of it */}
         {notch ? <div className="absolute inset-[7px] overflow-hidden rounded-[12px]" style={{ background: SCREEN }} /> : null}
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Focus timer`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute bottom-4 right-4 z-10 rounded-full bg-paper px-2 py-0.5 text-[11px] text-ink">{PRICE.timer}</span>
         {notch ? (
           <>
             <span className="pointer-events-none absolute bottom-[18px] left-1/2 -translate-x-1/2 text-[11px] text-ink/40 [@media(hover:none)]:hidden">{t.hoverNotch}</span>
@@ -1067,13 +999,6 @@ function TimerTile({ t }: { t: T }) {
             </div>
           </div>
         )}
-        <div className="absolute bottom-4 left-4 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Timer: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
-          </div>
-        </div>
       </article>
 
       {open ? (
@@ -1135,17 +1060,9 @@ function LoginTile({ t }: { t: T }) {
     <>
       <article ref={box} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Bot login`} className="absolute inset-0 cursor-pointer" />
-        <span className={`pointer-events-none absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-ink' : 'bg-paper/10 text-paper'}`}>{PRICE.login}</span>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="pointer-events-auto w-[360px] shrink-0" style={{ transform: `scale(${fit})` }}>
             <BotLogin compact theme={theme} />
-          </div>
-        </div>
-        <div className="absolute bottom-3 left-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
           </div>
         </div>
       </article>
@@ -1270,7 +1187,6 @@ function TabsTile({ t }: { t: T }) {
     <>
       <article ref={box} className={`group ${tile} bg-ink`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Elastic tabs`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-paper/10 px-2 py-0.5 text-[11px] text-paper">{PRICE.tabs}</span>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="flex shrink-0 flex-col items-center gap-4" style={{ transform: `scale(${fit})` }}>
             <div className="pointer-events-auto">
@@ -1279,13 +1195,6 @@ function TabsTile({ t }: { t: T }) {
             <div className="pointer-events-auto">
               <ElasticTabs tabs={NAV} iconOnly color={color.body} aria-label="Navigation" />
             </div>
-          </div>
-        </div>
-        <div className="absolute bottom-3 left-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Colour: ${color.name}`} onClick={() => setColor(step(TAB_COLORS, color))}>
-              <Swatch color={color.body} />
-            </Step>
           </div>
         </div>
       </article>
@@ -1362,17 +1271,9 @@ function FeedbackTile({ t }: { t: T }) {
     <>
       <article ref={box} className={`group ${tile} bg-paper`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Bot feedback`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-card px-2 py-0.5 text-[11px] text-ink">{PRICE.feedback}</span>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="pointer-events-auto w-[300px] shrink-0" style={{ transform: `scale(${fit})` }}>
             <BotFeedback key={round} compact theme={theme} onSubmit={again} />
-          </div>
-        </div>
-        <div className="absolute bottom-3 left-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
           </div>
         </div>
       </article>
@@ -1461,20 +1362,10 @@ function PaletteTile({ t }: { t: T }) {
       {/* Always a white tile; the button switches the palette between white and black */}
       <article ref={box} className={`group ${tile} bg-paper`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Command palette`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-card px-2 py-0.5 text-[11px] text-ink">
-          {PRICE.palette}
-        </span>
         {/* Pinned to the top so it grows downwards as the results change, instead of jumping */}
         <div className="pointer-events-none absolute inset-x-0 top-14 flex justify-center">
           <div className="pointer-events-auto w-[380px] shrink-0 origin-top" style={{ transform: `scale(${fit})` }}>
             <CommandPalette modal={false} hotkey={false} recents={0} items={CMD_SHORT} theme={theme} placeholder="Type a command…" />
-          </div>
-        </div>
-        <div className="absolute left-3 top-2 z-10 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
           </div>
         </div>
       </article>
@@ -1532,6 +1423,8 @@ const DROP_MAX = 5 * 1024 * 1024
 function DropTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(false)
+  const [shape, setShape] = useState<BotShape>('pill')
+  const [eyes, setEyes] = useState<BotEyes>('tall')
   const [round, setRound] = useState(0) // a new key = a fresh, empty dropzone
   const box = useRef<HTMLElement>(null)
   const reset = useRef(0)
@@ -1558,18 +1451,10 @@ function DropTile({ t }: { t: T }) {
     <>
       <article ref={box} className={`group ${tile} bg-paper`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} File drop`} className="absolute inset-0 cursor-pointer" />
-        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-card px-2 py-0.5 text-[11px] text-ink">{PRICE.drop}</span>
         {/* Pinned to the top so new rows grow downwards */}
         <div className="pointer-events-none absolute inset-x-0 top-9 flex justify-center">
           <div className="pointer-events-auto w-[380px] shrink-0 origin-top" style={{ transform: `scale(${fit})` }}>
-            <FileDrop key={round} compact theme={theme} maxSize={DROP_MAX} samples={DROP_SAMPLES} onChange={settle} />
-          </div>
-        </div>
-        <div className="absolute left-3 top-2 z-10 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
-          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
-            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
-              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
-            </Step>
+            <FileDrop key={round} compact theme={theme} bot={{ shape, eyes }} maxSize={DROP_MAX} samples={DROP_SAMPLES} onChange={settle} />
           </div>
         </div>
       </article>
@@ -1581,24 +1466,41 @@ function DropTile({ t }: { t: T }) {
           name="File drop"
           about={t.dropAbout}
           includes={t.dropIncludes}
-          usage={`<FileDrop${dark ? ' theme="dark"' : ''} maxSize={5 * 1024 * 1024} upload={(file, { onProgress, signal }) => send(file, onProgress, signal)} />`}
+          usage={`<FileDrop${dark ? ' theme="dark"' : ''}${shape !== 'pill' || eyes !== 'tall' ? ` bot={{ shape: '${shape}', eyes: '${eyes}' }}` : ''} maxSize={5 * 1024 * 1024} upload={(file, { onProgress, signal }) => send(file, onProgress, signal)} />`}
           href={GUMROAD.drop}
           price={PRICE.drop}
           onClose={() => setOpen(false)}
           stage={
             <div className="w-full max-w-[420px] self-start pt-4 sm:self-center sm:pt-0">
-              <FileDrop theme={theme} maxSize={DROP_MAX} samples={DROP_SAMPLES} />
+              <FileDrop theme={theme} bot={{ shape, eyes }} maxSize={DROP_MAX} samples={DROP_SAMPLES} />
             </div>
           }
           options={
-            <Choice label={t.theme}>
-              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
-                <span className="px-1">{t.light}</span>
-              </Pick>
-              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
-                <span className="px-1">{t.darkT}</span>
-              </Pick>
-            </Choice>
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              {/* The Bot's body and eyes, like in the Bot's own pop-up (its colour follows the card) */}
+              <Choice label={t.shape}>
+                {shapes.map((sh) => (
+                  <Pick key={sh} on={shape === sh} label={sh} onClick={() => setShape(sh)}>
+                    <ShapeIcon shape={sh} />
+                  </Pick>
+                ))}
+              </Choice>
+              <Choice label={t.eyes}>
+                {eyeKinds.map((e) => (
+                  <Pick key={e} on={eyes === e} label={e} onClick={() => setEyes(e)}>
+                    <EyesIcon eyes={e} />
+                  </Pick>
+                ))}
+              </Choice>
+            </>
           }
         />
       ) : null}
@@ -1610,16 +1512,3 @@ function Swatch({ color }: { color: string }) {
   return <span className="block h-3.5 w-3.5 rounded-full shadow-[inset_0_0_0_1px_rgba(20,19,16,0.15)]" style={{ background: color }} />
 }
 
-function Step({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={label}
-      aria-label={label}
-      className="flex h-7 w-8 items-center justify-center rounded-full text-ink transition-colors hover:bg-card"
-    >
-      {children}
-    </button>
-  )
-}
