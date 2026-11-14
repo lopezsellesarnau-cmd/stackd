@@ -5,6 +5,7 @@ import { useEffect, useId, useRef } from 'react'
 /**
  * Bot · StackD Kit 01
  * A bot whose eyes follow the cursor around the page, and blink now and then.
+ * With `mood` its eyelids show how it feels: droopy when sad, smiling eyes when glad.
  * Four bodies, four kinds of eyes, any colour.
  *
  * The eyes are points on a sphere: when the bot turns, an eye heading for the
@@ -47,6 +48,8 @@ type Props = {
   look?: { x: number; y: number }
   /** Happy eyes. */
   happy?: boolean
+  /** How it feels, -1 (sad: the lids droop) to 1 (glad: the eyes smile). 0 = neutral. */
+  mood?: number
   /** Only watch the cursor inside the nearest ancestor matching this selector (a card, say). Unset: the whole page. */
   within?: string
   className?: string
@@ -64,27 +67,32 @@ export function Bot({
   follow = 0.8,
   look,
   happy = false,
+  mood = 0,
   within,
   className = '',
 }: Props) {
   const ball = useRef<SVGSVGElement>(null)
   const eyes = useRef<(SVGRectElement | null)[]>([])
+  const groups = useRef<(SVGGElement | null)[]>([])
+  const tops = useRef<(SVGRectElement | null)[]>([])
+  const bottoms = useRef<(SVGEllipseElement | null)[]>([])
   const clip = `bot-${useId().replace(/:/g, '')}`
   // Where the face should point; the loop springs towards it
-  const aim = useRef({ x: 0, y: 0 })
+  const aim = useRef({ x: 0, y: 0, m: 0 })
   const kick = useRef<() => void>(() => {})
-  const props = useRef({ follow, look, happy, shape, eyeStyle })
-  props.current = { follow, look, happy, shape, eyeStyle }
+  const props = useRef({ follow, look, happy, mood, shape, eyeStyle })
+  props.current = { follow, look, happy, mood, shape, eyeStyle }
 
   // A fixed look, a new shape or new eyes: redraw
   useEffect(() => {
-    if (look) aim.current = { x: look.x, y: look.y }
+    if (look) aim.current = { ...aim.current, x: look.x, y: look.y }
+    aim.current.m = clamp(mood, -1, 1)
     kick.current()
-  }, [look?.x, look?.y, happy, shape, eyeStyle])
+  }, [look?.x, look?.y, happy, mood, shape, eyeStyle])
 
   useEffect(() => {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const t = { x: 0, y: 0, vx: 0, vy: 0 }
+    const t = { x: 0, y: 0, vx: 0, vy: 0, m: 0, vm: 0 }
     let raf = 0
     let prev = 0
     let blinkAt = -1e9
@@ -101,7 +109,8 @@ export function Bot({
       const g = SPACING / body.rx
       ;[-g, g].forEach((x0, i) => {
         const el = eyes.current[i]
-        if (!el) return
+        const grp = groups.current[i]
+        if (!el || !grp) return
         // The eye as a point on the unit sphere, turned with the bot
         const z0 = Math.sqrt(1 - x0 * x0)
         const x1 = x0 * Math.cos(yaw) + z0 * Math.sin(yaw)
@@ -122,21 +131,46 @@ export function Bot({
         el.setAttribute('width', w.toFixed(2))
         el.setAttribute('height', h.toFixed(2))
         el.setAttribute('rx', Math.min(eye.r, w / 2, h / 2).toFixed(2))
-        el.setAttribute(
+        grp.setAttribute(
           'transform',
           `translate(${(body.cx + x1 * body.rx).toFixed(2)} ${(body.cy + y2 * body.ry).toFixed(2)}) rotate(${tilt.toFixed(2)})`,
         )
-        el.style.opacity = z2 < 0.05 ? '0' : '1'
+        grp.style.opacity = z2 < 0.05 ? '0' : '1'
+        // The lids, in the body's colour. Sad: a top lid that droops to the outside. Glad: a round
+        // lower lid that pushes up, so the eye smiles. Hidden at 0 and on happy eyes.
+        const top = tops.current[i]
+        const bottom = bottoms.current[i]
+        const m = props.current.happy ? 0 : t.m
+        const H = eye.h * k // the open height, so a blink doesn't move the lids
+        if (top) {
+          const cut = Math.max(0, -m) * 0.42 * H
+          const a = Math.max(0, -m) * 30 * (i === 0 ? -1 : 1)
+          top.setAttribute('x', (-w * 1.4).toFixed(2))
+          top.setAttribute('y', (-H / 2 - H * 1.5 + cut).toFixed(2))
+          top.setAttribute('width', (w * 2.8).toFixed(2))
+          top.setAttribute('height', (H * 1.5).toFixed(2))
+          top.setAttribute('transform', `rotate(${a.toFixed(2)} 0 ${(-H / 2 + cut).toFixed(2)})`)
+          top.style.display = cut > 0.05 ? '' : 'none'
+        }
+        if (bottom) {
+          const push = Math.max(0, m) * 0.62 * H
+          const ry = H * 0.5
+          bottom.setAttribute('rx', (w * 1.1).toFixed(2))
+          bottom.setAttribute('ry', ry.toFixed(2))
+          bottom.setAttribute('cy', (H / 2 + ry - push).toFixed(2))
+          bottom.style.display = push > 0.05 ? '' : 'none'
+        }
       })
     }
 
     const tick = (now: number) => {
       const dt = prev ? Math.min(2.5, (now - prev) / 16.67) : 1
       prev = now
-      const { x: tx, y: ty } = aim.current
+      const { x: tx, y: ty, m: tm } = aim.current
       if (still) {
         t.x = tx
         t.y = ty
+        t.m = tm
       } else {
         // One spring for both axes; the damping is raised to dt so a dropped frame behaves the same
         const damp = Math.pow(0.74, dt)
@@ -144,9 +178,12 @@ export function Bot({
         t.vy = (t.vy + (ty - t.y) * 0.07 * dt) * damp
         t.x += t.vx * dt
         t.y += t.vy * dt
+        t.vm = (t.vm + (tm - t.m) * 0.09 * dt) * Math.pow(0.7, dt)
+        t.m += t.vm * dt
       }
       draw(now)
-      const settled = Math.abs(tx - t.x) + Math.abs(ty - t.y) + Math.abs(t.vx) + Math.abs(t.vy) < 0.002
+      const settled =
+        Math.abs(tx - t.x) + Math.abs(ty - t.y) + Math.abs(t.vx) + Math.abs(t.vy) + Math.abs(tm - t.m) + Math.abs(t.vm) < 0.002
       if (settled && now - blinkAt > 160) {
         raf = 0
         prev = 0
@@ -187,12 +224,12 @@ export function Bot({
       const dy = e.clientY - (r.top + r.height / 2)
       const d = Math.hypot(dx, dy) || 1
       const far = Math.min(0.85, Math.tanh(d / reach) * clamp(props.current.follow, 0, 1))
-      aim.current = { x: (dx / d) * far, y: (dy / d) * far }
+      aim.current = { ...aim.current, x: (dx / d) * far, y: (dy / d) * far }
       kick.current()
     }
     const rest = () => {
       if (props.current.look) return
-      aim.current = { x: 0, y: 0 }
+      aim.current = { ...aim.current, x: 0, y: 0 }
       kick.current()
     }
     window.addEventListener('pointermove', move, { passive: true })
@@ -217,12 +254,33 @@ export function Bot({
       <path d={body.d} fill={color} />
       <g clipPath={`url(#${clip})`} fill={eyeColor}>
         {[0, 1].map((i) => (
-          <rect
+          <g
             key={i}
             ref={(el) => {
-              eyes.current[i] = el
+              groups.current[i] = el
             }}
-          />
+          >
+            <rect
+              ref={(el) => {
+                eyes.current[i] = el
+              }}
+            />
+            <rect
+              fill={color}
+              style={{ display: 'none' }}
+              ref={(el) => {
+                tops.current[i] = el
+              }}
+            />
+            <ellipse
+              cx={0}
+              fill={color}
+              style={{ display: 'none' }}
+              ref={(el) => {
+                bottoms.current[i] = el
+              }}
+            />
+          </g>
         ))}
       </g>
     </svg>

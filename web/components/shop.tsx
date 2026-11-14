@@ -23,6 +23,7 @@ import { RotaryDial } from './kit/rotary-dial'
 import { FocusTimer } from './kit/focus-timer'
 import { BotLogin } from './kit/bot-login'
 import { ElasticTabs } from './kit/elastic-tabs'
+import { BotFeedback } from './kit/bot-feedback'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -64,6 +65,8 @@ const COPY = {
     tabsIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard, works with screen readers', 'Labels, icons or both, any colour'],
     show: 'Show',
     labels: 'Labels',
+    feedbackAbout: 'A rating card with the Bot. Move along the 1 to 5 scale and its face changes with you: droopy eyes on a 1, smiling on a 4, a happy jump on a 5. Pick a number and a comment box opens with the right question. Send it and the Bot thanks you.',
+    feedbackIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Works with any backend: one onSubmit', 'Mouse, touch and keyboard, works with screen readers'],
     icons: 'Icons',
     shapeLabel: 'Shape',
     hoverNotch: 'Hover the notch',
@@ -120,6 +123,8 @@ const COPY = {
     tabsIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado, compatible con lectores de pantalla', 'Texto, iconos o ambos, cualquier color'],
     show: 'Mostrar',
     labels: 'Texto',
+    feedbackAbout: 'Una tarjeta de valoración con el Bot. Recorre la escala del 1 al 5 y su cara cambia contigo: ojos caídos en el 1, sonrientes en el 4 y un salto de alegría en el 5. Elige un número y se abre un comentario con la pregunta adecuada. Envíalo y el Bot te da las gracias.',
+    feedbackIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier backend: un solo onSubmit', 'Ratón, táctil y teclado, compatible con lectores de pantalla'],
     icons: 'Iconos',
     shapeLabel: 'Forma',
     hoverNotch: 'Pasa el ratón por el notch',
@@ -146,7 +151,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -158,10 +163,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'timer', cat: 'widgets' },
   { id: 'login', cat: 'inputs' },
   { id: 'tabs', cat: 'navigation' },
+  { id: 'feedback', cat: 'inputs' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
@@ -188,6 +194,7 @@ const GUMROAD: Record<Id, string> = {
   timer: 'https://arnolop.gumroad.com/l/focus_timer?wanted=true',
   login: 'https://arnolop.gumroad.com/l/bot_login?wanted=true',
   tabs: 'https://arnolop.gumroad.com/l/Elastictabs?wanted=true',
+  feedback: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -275,7 +282,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : <TabsTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : <FeedbackTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1306,6 +1313,75 @@ function TabsTile({ t }: { t: T }) {
                 </Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 11 · Bot feedback. The compact card on a white tile; after a rating it starts over. */
+function FeedbackTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [round, setRound] = useState(0) // a new key = a fresh card
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const fit = Math.min(1, (w - 36) / 300, (w - 64) / 290)
+  const theme = dark ? 'dark' : 'light'
+  const again = () => new Promise<void>((r) => setTimeout(r, 500)).then(() => void setTimeout(() => setRound((n) => n + 1), 2400))
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Bot feedback`} className="absolute inset-0 cursor-pointer" />
+        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-card px-2 py-0.5 text-[11px] text-ink">{PRICE.feedback}</span>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto w-[300px] shrink-0" style={{ transform: `scale(${fit})` }}>
+            <BotFeedback key={round} compact theme={theme} onSubmit={again} />
+          </div>
+        </div>
+        <div className="absolute bottom-3 left-3 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.inputs}
+          name="Bot feedback"
+          about={t.feedbackAbout}
+          includes={t.feedbackIncludes}
+          usage={`<BotFeedback${dark ? ' theme="dark"' : ''} onSubmit={(rating, comment) => save(rating, comment)} />`}
+          href={GUMROAD.feedback}
+          price={PRICE.feedback}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="w-full max-w-[360px]">
+              <BotFeedback key={round} theme={theme} onSubmit={again} />
+            </div>
+          }
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+            </Choice>
           }
         />
       ) : null}
