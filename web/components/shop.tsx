@@ -1805,7 +1805,7 @@ const GLASS_ALT = 'An impressionist street painting'
 const GLASS_START = [10, 11, 12, 17, 18, 19, 20, 21, 25, 26, 27, 28, 33, 34, 35, 36, 37, 42, 43]
 const GLASS_START_LARGE = [7, 8, 13, 14, 15, 20, 21]
 
-/** 16 · Glass tiles. Just the picture with its glass on a white tile, scaled to the tile's height. */
+/** 16 · Glass tiles. Just the picture with its glass, cropped square, on a white tile. The pop-up keeps the picture's own shape. */
 function GlassTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [thick, setThick] = useState(false)
@@ -1819,8 +1819,7 @@ function GlassTile({ t }: { t: T }) {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  // The picture is 970 × 1400: fit its height in the square tile with some air
-  const cardW = Math.round(((w - 48) * 970) / 1400)
+  const cardW = Math.round(w - 56)
   const columns = large ? 5 : 8
   const common = { src: GLASS_SRC, alt: GLASS_ALT, columns, strength: thick ? 1 : 0.6, toolbar: false } as const
 
@@ -1830,7 +1829,7 @@ function GlassTile({ t }: { t: T }) {
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Glass tiles`} className="absolute inset-0 cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="pointer-events-auto" style={{ width: cardW }}>
-            <GlassTiles key={columns} {...common} defaultValue={large ? GLASS_START_LARGE : GLASS_START} />
+            <GlassTiles key={columns} {...common} aspect={1} defaultValue={large ? GLASS_START_LARGE : GLASS_START} />
           </div>
         </div>
       </article>

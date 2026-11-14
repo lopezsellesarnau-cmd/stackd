@@ -19,7 +19,9 @@ type Lens = { zoom: number; dx: number; dy: number; blur: number; flip: boolean;
 type Props = {
   src: string;
   alt?: string;
-  /** Tiles across. The rows follow the picture's shape. Default 8. */
+  /** The frame's shape, width / height (1 = square). The picture fills it, cropped from the centre. Default: the picture's own shape. */
+  aspect?: number;
+  /** Tiles across. The rows follow the frame's shape. Default 8. */
   columns?: number;
   /** Covered tiles (row * columns + column), if you control them. */
   value?: number[];
@@ -68,6 +70,7 @@ function lensFor(i: number, seed: number): Lens {
 export function GlassTiles({
   src,
   alt = "",
+  aspect,
   columns = 8,
   value,
   defaultValue,
@@ -86,7 +89,7 @@ export function GlassTiles({
   const tiles = value ?? own;
   const on = useMemo(() => new Set(tiles), [tiles]);
   const [size, setSize] = useState({ w: 0, h: 0 }); // the frame, in px
-  const [ratio, setRatio] = useState(4 / 5); // the picture's width / height
+  const [nat, setNat] = useState({ w: 4, h: 5 }); // the picture's own size
   const [leaving, setLeaving] = useState<number[]>([]);
   const [peek, setPeek] = useState(false);
   const [cursor, setCursor] = useState(0);
@@ -100,7 +103,12 @@ export function GlassTiles({
   const live = useRef(tiles);
   live.current = tiles;
 
+  const ratio = aspect ?? nat.w / nat.h;
   const rows = Math.max(1, Math.round(columns / ratio));
+  // Where the picture sits in the frame (it covers it, centred, like object-fit: cover)
+  const fill = Math.max(size.w / nat.w, size.h / nat.h) || 1;
+  const dw = nat.w * fill, dh = nat.h * fill;
+  const ox = (size.w - dw) / 2, oy = (size.h - dh) / 2;
   const tw = size.w / columns;
   const th = size.h / rows;
   const lenses = useMemo(() => Array.from({ length: columns * rows }, (_, i) => lensFor(i, seed)), [columns, rows, seed]);
@@ -116,7 +124,7 @@ export function GlassTiles({
   // The image may already be loaded (cache) before React attaches onLoad
   useEffect(() => {
     const el = img.current;
-    if (el && el.complete && el.naturalWidth) setRatio(el.naturalWidth / el.naturalHeight);
+    if (el && el.complete && el.naturalWidth) setNat({ w: el.naturalWidth, h: el.naturalHeight });
   }, [src]);
 
   const commit = useCallback(
@@ -227,14 +235,16 @@ export function GlassTiles({
   const save = async () => {
     const el = img.current;
     if (!el || !download) return;
-    const W = el.naturalWidth, H = el.naturalHeight;
+    if (!size.w) return;
+    // Image pixels per frame pixel: the PNG keeps the picture's full detail, cropped like the frame
+    const k = nat.w / dw;
     const cv = document.createElement("canvas");
-    cv.width = W;
-    cv.height = H;
+    cv.width = Math.round(size.w * k);
+    cv.height = Math.round(size.h * k);
     const ctx = cv.getContext("2d");
     if (!ctx) return;
-    ctx.drawImage(el, 0, 0, W, H);
-    const sw = W / columns, sh = H / rows, unit = W / (size.w || W);
+    ctx.drawImage(el, ox * k, oy * k, nat.w, nat.h);
+    const sw = tw * k, sh = th * k, unit = k;
     for (const i of live.current) {
       const L = lenses[i];
       if (!L) continue;
@@ -245,10 +255,10 @@ export function GlassTiles({
       ctx.rect(x, y, sw, sh);
       ctx.clip();
       ctx.filter = `blur(${L.blur * strength * unit}px) saturate(1.15)`;
-      const px = x + sw / 2 + L.dx * sw, py = y + sh / 2 + L.dy * sh;
+      const px = ((c + 0.5 + L.dx) * tw - ox) * k, py = ((r + 0.5 + L.dy) * th - oy) * k;
       ctx.translate(x + sw / 2, y + sh / 2);
       ctx.scale(L.flip ? -L.zoom : L.zoom, L.zoom * L.stretch);
-      ctx.drawImage(el, -px, -py, W, H);
+      ctx.drawImage(el, -px, -py, nat.w, nat.h);
       ctx.restore();
       ctx.save();
       ctx.fillStyle = `rgba(255,255,255,${L.tint})`;
@@ -311,7 +321,7 @@ export function GlassTiles({
           alt={alt}
           crossOrigin={crossOrigin}
           draggable={false}
-          onLoad={(e) => setRatio(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)}
+          onLoad={(e) => setNat({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
           className="pointer-events-none absolute inset-0 h-full w-full object-cover"
         />
 
@@ -326,7 +336,7 @@ export function GlassTiles({
               const m = Math.ceil(L.blur * strength * 2) + 2; // room so the blur doesn't fade at the edges
               // The point of the picture this lens looks at, magnified around the tile's centre
               const px = (c + 0.5 + L.dx) * tw, py = (r + 0.5 + L.dy) * th;
-              const bw = size.w * L.zoom, bh = size.h * L.zoom * L.stretch;
+              const bw = dw * L.zoom, bh = dh * L.zoom * L.stretch;
               return (
                 <div
                   key={i}
@@ -349,7 +359,7 @@ export function GlassTiles({
                       height: th + 2 * m,
                       backgroundImage: `url("${src}")`,
                       backgroundSize: `${bw}px ${bh}px`,
-                      backgroundPosition: `${tw / 2 + m - px * L.zoom}px ${th / 2 + m - py * L.zoom * L.stretch}px`,
+                      backgroundPosition: `${tw / 2 + m - (px - ox) * L.zoom}px ${th / 2 + m - (py - oy) * L.zoom * L.stretch}px`,
                       filter: `blur(${(L.blur * strength).toFixed(2)}px) saturate(1.15)`,
                       transform: L.flip ? "scaleX(-1)" : undefined,
                     }}
