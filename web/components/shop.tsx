@@ -1447,10 +1447,10 @@ function PaletteTile({ t }: { t: T }) {
 
   return (
     <>
-      {/* A white palette on ink, a black one on white */}
-      <article ref={box} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
+      {/* Always a white tile; the button switches the palette between white and black */}
+      <article ref={box} className={`group ${tile} bg-paper`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Command palette`} className="absolute inset-0 cursor-pointer" />
-        <span className={`pointer-events-none absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-ink' : 'bg-paper/10 text-paper'}`}>
+        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-card px-2 py-0.5 text-[11px] text-ink">
           {PRICE.palette}
         </span>
         {/* Pinned to the top so it grows downwards as the results change, instead of jumping */}
