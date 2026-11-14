@@ -27,6 +27,7 @@ import { BotFeedback } from './kit/bot-feedback'
 import { CommandPalette, type CommandItem } from './kit/command-palette'
 import { FileDrop, type SampleFile } from './kit/file-drop'
 import { BotLoader, type LoaderStep } from './kit/bot-loader'
+import { OtpInput } from './kit/otp-input'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -78,6 +79,12 @@ const COPY = {
     loaderIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Exact progress or a moving sheen', 'Card and inline pill, works with screen readers'],
     progressLabel: 'Progress',
     known: 'Known',
+    otpAbout: 'A one-time code input with the Bot. Its eyes follow the box you are typing in, and a pasted code drops in digit by digit. When the last box is filled it checks by itself while the boxes ripple. Right: the boxes turn green and the Bot is happy. Wrong: the row shakes and the Bot looks a little sadder each time. Try 482913.',
+    otpIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Paste, phone autofill and screen readers', 'Any length, digits or letters, resend countdown'],
+    codeLabel: 'Code',
+    digits: 'Digits',
+    dots: 'Dots',
+    tryCode: 'Try 482913',
     unknown: 'Unknown',
     dropIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Drop, click, paste, keyboard and screen readers', 'Plug in any upload: progress, cancel and retry'],
     icons: 'Icons',
@@ -146,6 +153,12 @@ const COPY = {
     loaderIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Progreso exacto o un brillo en movimiento', 'Tarjeta y píldora, compatible con lectores de pantalla'],
     progressLabel: 'Progreso',
     known: 'Conocido',
+    otpAbout: 'Un campo de código de un solo uso con el Bot. Sus ojos siguen la casilla en la que escribes, y un código pegado entra dígito a dígito. Al llenar la última casilla comprueba solo mientras las casillas hacen una ola. Bien: las casillas se ponen verdes y el Bot se alegra. Mal: la fila tiembla y el Bot se pone un poco más triste cada vez. Prueba con 482913.',
+    otpIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Pegar, autocompletar del móvil y lectores de pantalla', 'Cualquier longitud, números o letras, cuenta atrás para reenviar'],
+    codeLabel: 'Código',
+    digits: 'Dígitos',
+    dots: 'Puntos',
+    tryCode: 'Prueba 482913',
     unknown: 'Desconocido',
     dropIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Soltar, clic, pegar, teclado y lectores de pantalla', 'Conecta cualquier subida: progreso, cancelar y reintentar'],
     icons: 'Iconos',
@@ -174,7 +187,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -190,10 +203,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'palette', cat: 'navigation' },
   { id: 'drop', cat: 'inputs' },
   { id: 'loader', cat: 'loaders' },
+  { id: 'otp', cat: 'inputs' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1]
@@ -224,6 +238,7 @@ const GUMROAD: Record<Id, string> = {
   palette: 'https://arnolop.gumroad.com/l/command_palette?wanted=true',
   drop: 'https://arnolop.gumroad.com/l/file_drop?wanted=true',
   loader: 'https://arnolop.gumroad.com/l/bot_loader?wanted=true',
+  otp: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -311,7 +326,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : <LoaderTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : <OtpTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1643,6 +1658,104 @@ function LoaderTile({ t }: { t: T }) {
                 </Pick>
                 <Pick on={exact} label={t.known} onClick={() => setExact(true)}>
                   <span className="px-1">{t.known}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.shape}>
+                {shapes.map((sh) => (
+                  <Pick key={sh} on={shape === sh} label={sh} onClick={() => setShape(sh)}>
+                    <ShapeIcon shape={sh} />
+                  </Pick>
+                ))}
+              </Choice>
+              <Choice label={t.eyes}>
+                {eyeKinds.map((e) => (
+                  <Pick key={e} on={eyes === e} label={e} onClick={() => setEyes(e)}>
+                    <EyesIcon eyes={e} />
+                  </Pick>
+                ))}
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 15 · OTP input. The compact card on a white tile, with the code to try under it. */
+function OtpTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [mask, setMask] = useState(false)
+  const [shape, setShape] = useState<BotShape>('pill')
+  const [eyes, setEyes] = useState<BotEyes>('tall')
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const fit = Math.min(1, (w - 40) / 360)
+  const theme = dark ? 'dark' : 'light'
+  // After the right code the tile starts over a little later, empty, so it can be tried again
+  const [round, setRound] = useState(0)
+  const reset = useRef(0)
+  useEffect(() => () => clearTimeout(reset.current), [])
+  const verify = async (code: string) => {
+    await new Promise((r) => setTimeout(r, 1100))
+    const ok = code === '482913'
+    if (ok) reset.current = window.setTimeout(() => setRound((n) => n + 1), 3200)
+    return ok
+  }
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} OTP input`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto w-[360px] shrink-0" style={{ transform: `scale(${fit})` }}>
+            <OtpInput key={round} compact theme={theme} mask={mask} bot={{ shape, eyes }} onComplete={verify} />
+          </div>
+        </div>
+        <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[12px] text-fg-faint">{t.tryCode}</p>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.inputs}
+          name="OTP input"
+          about={t.otpAbout}
+          includes={t.otpIncludes}
+          usage={`<OtpInput${dark ? ' theme="dark"' : ''}${mask ? ' mask' : ''}${shape !== 'pill' || eyes !== 'tall' ? ` bot={{ shape: '${shape}', eyes: '${eyes}' }}` : ''} sentTo={email} onComplete={(code) => verify(code)} onResend={sendAgain} />`}
+          href={GUMROAD.otp}
+          price={PRICE.otp}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="flex w-full max-w-[360px] flex-col items-center gap-4 self-start pt-4 sm:self-center sm:pt-0">
+              <OtpInput theme={theme} mask={mask} bot={{ shape, eyes }} sentTo="you@stackd.codes" />
+              <p className={dark ? 'text-fg-ghost' : 'text-fg-faint'}>{t.tryCode}</p>
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.codeLabel}>
+                <Pick on={!mask} label={t.digits} onClick={() => setMask(false)}>
+                  <span className="px-1">{t.digits}</span>
+                </Pick>
+                <Pick on={mask} label={t.dots} onClick={() => setMask(true)}>
+                  <span className="px-1">{t.dots}</span>
                 </Pick>
               </Choice>
               <Choice label={t.shape}>
