@@ -257,7 +257,8 @@ export function BotLoader({
       <div aria-hidden className="mt-5 text-center">
         {name("text-[17px] font-semibold tracking-[-0.01em]")}
         <p className="mt-1 text-[13px] tabular-nums opacity-50">
-          {done ? `${n} of ${n} · ${clock}` : failed ? `Stopped at step ${at + 1} of ${n}` : `Step ${at + 1} of ${n} · ${clock}`}
+          {/* The time only once there's some: "0s" says nothing */}
+          {done ? `${n} of ${n}${secs ? ` · ${clock}` : ""}` : failed ? `Stopped at step ${at + 1} of ${n}` : `Step ${at + 1} of ${n}${secs ? ` · ${clock}` : ""}`}
         </p>
       </div>
 
