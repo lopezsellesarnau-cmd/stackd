@@ -210,7 +210,7 @@ const GUMROAD: Record<Id, string> = {
   tabs: 'https://arnolop.gumroad.com/l/Elastictabs?wanted=true',
   feedback: 'https://arnolop.gumroad.com/l/feedback?wanted=true',
   palette: 'https://arnolop.gumroad.com/l/command_palette?wanted=true',
-  drop: '',
+  drop: 'https://arnolop.gumroad.com/l/file_drop?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
