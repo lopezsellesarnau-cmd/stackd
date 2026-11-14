@@ -26,6 +26,8 @@ type Props = {
   color?: string;
   /** A tighter card for small spaces: smaller Bot, no comment box. */
   compact?: boolean;
+  /** Start with a number already picked, 1 to 5. */
+  defaultRating?: number;
 };
 
 // How the Bot feels and where it looks, for 1 to 5
@@ -51,10 +53,11 @@ export function BotFeedback({
   labels = ["Bad", "Not great", "Okay", "Good", "Love it"],
   color,
   compact = false,
+  defaultRating = 0,
 }: Props) {
   const dark = theme === "dark";
   const [hover, setHover] = useState(0); // 0 = not over the scale
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(Math.min(5, Math.max(0, Math.round(defaultRating))));
   const [comment, setComment] = useState("");
   const [state, setState] = useState<"rating" | "sending" | "done">("rating");
   const [bounce, setBounce] = useState(0);
