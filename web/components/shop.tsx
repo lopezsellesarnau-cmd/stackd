@@ -268,7 +268,7 @@ const GUMROAD: Record<Id, string> = {
   loader: 'https://arnolop.gumroad.com/l/bot_loader?wanted=true',
   otp: 'https://arnolop.gumroad.com/l/otp_input?wanted=true',
   glass: 'https://arnolop.gumroad.com/l/glass_tiles?wanted=true',
-  swap: '',
+  swap: 'https://arnolop.gumroad.com/l/card_swap?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
