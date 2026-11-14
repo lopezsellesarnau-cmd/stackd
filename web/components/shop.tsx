@@ -24,6 +24,7 @@ import { FocusTimer } from './kit/focus-timer'
 import { BotLogin } from './kit/bot-login'
 import { ElasticTabs } from './kit/elastic-tabs'
 import { BotFeedback } from './kit/bot-feedback'
+import { CommandPalette, type CommandItem } from './kit/command-palette'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -67,6 +68,9 @@ const COPY = {
     labels: 'Labels',
     feedbackAbout: 'A rating card with the Bot. Move along the 1 to 5 scale and its face changes with you: droopy eyes on a 1, smiling on a 4, a happy jump on a 5. Pick a number and a comment box opens with the right question. Send it and the Bot thanks you.',
     feedbackIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Works with any backend: one onSubmit', 'Mouse, touch and keyboard, works with screen readers'],
+    paletteAbout: 'The ⌘K menu. Type a few letters and it finds the command, even out of order: "nwprj" gets you New project. Commands come in groups, with your recent ones on top, and some open a page of their own. The Bot is the search icon: it watches the row you are on, looks sad when nothing matches and smiles when a command runs. Try it, and press ⌘K.',
+    paletteIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Keyboard first, works with screen readers', 'As a pop-up on ⌘K or inline, any colour'],
+    pressK: 'Open as a pop-up · ⌘K',
     icons: 'Icons',
     shapeLabel: 'Shape',
     hoverNotch: 'Hover the notch',
@@ -125,6 +129,9 @@ const COPY = {
     labels: 'Texto',
     feedbackAbout: 'Una tarjeta de valoración con el Bot. Recorre la escala del 1 al 5 y su cara cambia contigo: ojos caídos en el 1, sonrientes en el 4 y un salto de alegría en el 5. Elige un número y se abre un comentario con la pregunta adecuada. Envíalo y el Bot te da las gracias.',
     feedbackIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier backend: un solo onSubmit', 'Ratón, táctil y teclado, compatible con lectores de pantalla'],
+    paletteAbout: 'El menú de ⌘K. Escribe unas letras y encuentra el comando, aunque no estén seguidas: con "nwprj" sale New project. Los comandos van en grupos, con los recientes arriba, y algunos abren su propia página. El Bot es el icono de búsqueda: mira la fila en la que estás, se pone triste si no hay resultados y sonríe cuando se ejecuta un comando. Pruébalo y pulsa ⌘K.',
+    paletteIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Pensado para teclado, compatible con lectores de pantalla', 'Como pop-up con ⌘K o integrado, cualquier color'],
+    pressK: 'Abrir como pop-up · ⌘K',
     icons: 'Iconos',
     shapeLabel: 'Forma',
     hoverNotch: 'Pasa el ratón por el notch',
@@ -151,7 +158,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -164,13 +171,14 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'login', cat: 'inputs' },
   { id: 'tabs', cat: 'navigation' },
   { id: 'feedback', cat: 'inputs' },
+  { id: 'palette', cat: 'navigation' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
-const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1]
+const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0]
 
 // Body colour, and the eye colour that reads on it
 const COLORS = [
@@ -195,6 +203,7 @@ const GUMROAD: Record<Id, string> = {
   login: 'https://arnolop.gumroad.com/l/bot_login?wanted=true',
   tabs: 'https://arnolop.gumroad.com/l/Elastictabs?wanted=true',
   feedback: 'https://arnolop.gumroad.com/l/feedback?wanted=true',
+  palette: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -282,7 +291,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : <FeedbackTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : <PaletteTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1371,6 +1380,117 @@ function FeedbackTile({ t }: { t: T }) {
           stage={
             <div className="w-full max-w-[360px]">
               <BotFeedback key={round} theme={theme} onSubmit={again} />
+            </div>
+          }
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+            </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// The palette's commands. The tile gets a short list; the pop-up gets them all
+const cmdIcon = (d: string) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d={d} />
+  </svg>
+)
+const CMD = {
+  project: { id: 'new-project', label: 'New project', group: 'Create', icon: cmdIcon('M12 5v14M5 12h14'), shortcut: ['⌘', 'N'] },
+  doc: { id: 'new-doc', label: 'New document', group: 'Create', icon: cmdIcon('M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5'), keywords: ['page', 'file'] },
+  invite: { id: 'invite', label: 'Invite teammates', group: 'Create', icon: cmdIcon('M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M19 8v6M16 11h6'), keywords: ['team', 'member'] },
+  dashboard: { id: 'dashboard', label: 'Go to dashboard', group: 'Navigate', icon: cmdIcon('M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z'), shortcut: ['G', 'D'] },
+  inbox: { id: 'inbox', label: 'Go to inbox', group: 'Navigate', icon: cmdIcon('M3 13l3-8h12l3 8v6H3zM3 13h5l1 3h6l1-3h5'), shortcut: ['G', 'I'], hint: '3 new' },
+  billing: { id: 'billing', label: 'Billing', group: 'Navigate', icon: cmdIcon('M3 6h18v12H3zM3 10h18M7 15h3'), keywords: ['invoice', 'plan'] },
+  theme: {
+    id: 'theme', label: 'Change theme', group: 'Settings', icon: cmdIcon('M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z'), keywords: ['dark', 'light', 'appearance'],
+    children: [
+      { id: 'theme-light', label: 'Light', icon: cmdIcon('M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4') },
+      { id: 'theme-dark', label: 'Dark', icon: cmdIcon('M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z') },
+      { id: 'theme-system', label: 'System', icon: cmdIcon('M3 5h18v11H3zM8 20h8M12 16v4') },
+    ],
+  },
+  language: {
+    id: 'language', label: 'Language', group: 'Settings', icon: cmdIcon('M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18'),
+    children: ['English', 'Español', 'Nederlands', 'Deutsch', 'Français'].map((l) => ({ id: `lang-${l}`, label: l })),
+  },
+  logout: { id: 'logout', label: 'Log out', group: 'Settings', icon: cmdIcon('M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 16l4-4-4-4M14 12H4') },
+} satisfies Record<string, CommandItem>
+const CMD_SHORT: CommandItem[] = [CMD.project, CMD.invite, CMD.theme]
+const CMD_ALL: CommandItem[] = [CMD.project, CMD.doc, CMD.invite, CMD.dashboard, CMD.inbox, CMD.billing, CMD.theme, CMD.language, CMD.logout]
+
+/** 12 · Command palette. An inline palette with a short list on the tile; ⌘K opens the real pop-up from the details. */
+function PaletteTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [modal, setModal] = useState(false)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const fit = Math.min(1, (w - 32) / 380)
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      {/* A white palette on ink, a black one on white */}
+      <article ref={box} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-paper' : 'bg-ink'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Command palette`} className="absolute inset-0 cursor-pointer" />
+        <span className={`pointer-events-none absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[11px] ${dark ? 'bg-card text-ink' : 'bg-paper/10 text-paper'}`}>
+          {PRICE.palette}
+        </span>
+        {/* Pinned to the top so it grows downwards as the results change, instead of jumping */}
+        <div className="pointer-events-none absolute inset-x-0 top-14 flex justify-center">
+          <div className="pointer-events-auto w-[380px] shrink-0 origin-top" style={{ transform: `scale(${fit})` }}>
+            <CommandPalette modal={false} hotkey={false} recents={0} items={CMD_SHORT} theme={theme} placeholder="Type a command…" />
+          </div>
+        </div>
+        <div className="absolute left-3 top-2 z-10 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.navigation}
+          name="Command palette"
+          about={t.paletteAbout}
+          includes={t.paletteIncludes}
+          usage={`<CommandPalette items={commands}${dark ? ' theme="dark"' : ''} onSelect={(item) => run(item)} />`}
+          href={GUMROAD.palette}
+          price={PRICE.palette}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="flex w-full max-w-[520px] flex-col items-center gap-4">
+              <CommandPalette modal={false} hotkey={false} items={CMD_ALL} theme={theme} />
+              <button
+                type="button"
+                onClick={() => setModal(true)}
+                className={`flex h-8 items-center gap-2 rounded-full px-3 text-[12px] transition-colors ${dark ? 'bg-paper/10 text-paper/70 hover:text-paper' : 'bg-card text-fg-dim hover:text-ink'}`}
+              >
+                {t.pressK}
+              </button>
+              {/* The pop-up version, on ⌘K while the details are open */}
+              <CommandPalette items={CMD_ALL} theme={theme} open={modal} onOpenChange={setModal} />
             </div>
           }
           options={
