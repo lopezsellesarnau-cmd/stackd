@@ -28,6 +28,7 @@ import { CommandPalette, type CommandItem } from './kit/command-palette'
 import { FileDrop, type SampleFile } from './kit/file-drop'
 import { BotLoader, type LoaderStep } from './kit/bot-loader'
 import { OtpInput } from './kit/otp-input'
+import { GlassTiles } from './kit/glass-tiles'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -85,6 +86,14 @@ const COPY = {
     digits: 'Digits',
     dots: 'Dots',
     tryCode: 'Try 482913',
+    glassAbout: 'Drag over a picture to cover parts of it with glass. Every tile is its own pane: frosted, a lens magnifying a nearby spot, a mirror or a smear, so it reads as glass and not as a grey box. Tiles pop in on a spring; start on glass and you clear it. Save the result as a PNG. Try it on the picture.',
+    glassIncludes: ['Figma file with the tiles and examples', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard', 'Peek, clear and save as PNG (optional toolbar with the Bot)'],
+    glassLabel: 'Glass',
+    tilesLabel: 'Tiles',
+    soft: 'Soft',
+    thick: 'Thick',
+    small: 'Small',
+    large: 'Large',
     unknown: 'Unknown',
     dropIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Drop, click, paste, keyboard and screen readers', 'Plug in any upload: progress, cancel and retry'],
     icons: 'Icons',
@@ -105,7 +114,7 @@ const COPY = {
     soonGet: 'Coming soon',
     get: 'Get it free',
     emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
-    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation' },
+    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation', media: 'Images' },
   },
   es: {
     title: 'Componentes',
@@ -159,6 +168,14 @@ const COPY = {
     digits: 'Dígitos',
     dots: 'Puntos',
     tryCode: 'Prueba 482913',
+    glassAbout: 'Arrastra sobre una imagen para cubrir partes con cristal. Cada baldosa es su propio cristal: esmerilado, una lupa que aumenta un punto cercano, un espejo o una mancha, así que se lee como cristal y no como una caja gris. Las baldosas entran con un rebote; si empiezas sobre cristal, lo borras. Guarda el resultado como PNG. Pruébalo en la imagen.',
+    glassIncludes: ['Archivo de Figma con las baldosas y ejemplos', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado', 'Ver debajo, borrar y guardar como PNG (barra opcional con el Bot)'],
+    glassLabel: 'Cristal',
+    tilesLabel: 'Baldosas',
+    soft: 'Suave',
+    thick: 'Grueso',
+    small: 'Pequeñas',
+    large: 'Grandes',
     unknown: 'Desconocido',
     dropIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Soltar, clic, pegar, teclado y lectores de pantalla', 'Conecta cualquier subida: progreso, cancelar y reintentar'],
     icons: 'Iconos',
@@ -179,7 +196,7 @@ const COPY = {
     soonGet: 'Próximamente',
     get: 'Consíguelo gratis',
     emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
-    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación' },
+    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación', media: 'Imágenes' },
   },
 }
 
@@ -187,7 +204,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -204,10 +221,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'drop', cat: 'inputs' },
   { id: 'loader', cat: 'loaders' },
   { id: 'otp', cat: 'inputs' },
+  { id: 'glass', cat: 'media' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1]
@@ -239,6 +257,7 @@ const GUMROAD: Record<Id, string> = {
   drop: 'https://arnolop.gumroad.com/l/file_drop?wanted=true',
   loader: 'https://arnolop.gumroad.com/l/bot_loader?wanted=true',
   otp: 'https://arnolop.gumroad.com/l/otp_input?wanted=true',
+  glass: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -326,7 +345,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : <OtpTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : <GlassTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1771,6 +1790,84 @@ function OtpTile({ t }: { t: T }) {
                     <EyesIcon eyes={e} />
                   </Pick>
                 ))}
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// The picture and a ragged block of glass to start with (8 columns)
+const GLASS_SRC = '/glass/street.jpg'
+const GLASS_ALT = 'An impressionist street painting'
+const GLASS_START = [10, 11, 12, 17, 18, 19, 20, 21, 25, 26, 27, 28, 33, 34, 35, 36, 37, 42, 43]
+const GLASS_START_LARGE = [7, 8, 13, 14, 15, 20, 21]
+
+/** 16 · Glass tiles. Just the picture with its glass on a white tile, scaled to the tile's height. */
+function GlassTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [thick, setThick] = useState(false)
+  const [large, setLarge] = useState(false)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // The picture is 970 × 1400: fit its height in the square tile with some air
+  const cardW = Math.round(((w - 48) * 970) / 1400)
+  const columns = large ? 5 : 8
+  const common = { src: GLASS_SRC, alt: GLASS_ALT, columns, strength: thick ? 1 : 0.6, toolbar: false } as const
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Glass tiles`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto" style={{ width: cardW }}>
+            <GlassTiles key={columns} {...common} defaultValue={large ? GLASS_START_LARGE : GLASS_START} />
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.media}
+          name="Glass tiles"
+          about={t.glassAbout}
+          includes={t.glassIncludes}
+          usage={`<GlassTiles src="/photo.jpg"${large ? ' columns={5}' : ''}${thick ? ' strength={1}' : ''} toolbar={false} onChange={setTiles} />`}
+          href={GUMROAD.glass}
+          price={PRICE.glass}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="w-full max-w-[320px] self-start pt-4 sm:self-center sm:pt-0">
+              <GlassTiles key={columns} {...common} defaultValue={large ? GLASS_START_LARGE : GLASS_START} />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.glassLabel}>
+                <Pick on={!thick} label={t.soft} onClick={() => setThick(false)}>
+                  <span className="px-1">{t.soft}</span>
+                </Pick>
+                <Pick on={thick} label={t.thick} onClick={() => setThick(true)}>
+                  <span className="px-1">{t.thick}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.tilesLabel}>
+                <Pick on={!large} label={t.small} onClick={() => setLarge(false)}>
+                  <span className="px-1">{t.small}</span>
+                </Pick>
+                <Pick on={large} label={t.large} onClick={() => setLarge(true)}>
+                  <span className="px-1">{t.large}</span>
+                </Pick>
               </Choice>
             </>
           }
