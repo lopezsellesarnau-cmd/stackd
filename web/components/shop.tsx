@@ -428,7 +428,7 @@ function Detail({
         </div>
 
         {/* The details */}
-        <div className="mt-3 flex flex-col rounded-[18px] bg-paper p-5 sm:mt-0 sm:overflow-y-auto">
+        <div className="mt-3 flex flex-col rounded-[18px] bg-paper p-5 sm:mt-0 sm:overflow-y-auto [&>*]:shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-fg-faint">{cat}</p>
@@ -1114,9 +1114,9 @@ function LoginTile({ t }: { t: T }) {
 
 function Choice({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="w-12 shrink-0 text-fg-faint">{label}</span>
-      <div className="flex flex-wrap gap-1">{children}</div>
+    <div className="flex items-start gap-3">
+      <span className="flex h-8 w-[72px] shrink-0 items-center text-fg-faint">{label}</span>
+      <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">{children}</div>
     </div>
   )
 }
@@ -1129,7 +1129,7 @@ function Pick({ on, label, onClick, children }: { on: boolean; label: string; on
       title={label}
       aria-label={label}
       aria-pressed={on}
-      className={`flex h-8 w-9 items-center justify-center rounded-[10px] transition-colors ${on ? 'bg-card text-ink' : 'text-fg-ghost hover:text-ink'}`}
+      className={`flex h-8 min-w-9 shrink-0 items-center justify-center whitespace-nowrap rounded-[10px] px-2.5 transition-colors ${on ? 'bg-card text-ink' : 'text-fg-ghost hover:text-ink'}`}
     >
       {children}
     </button>
