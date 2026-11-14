@@ -147,9 +147,21 @@ export function CardSwap({
   const slab = dark ? "#141310" : "#FFFFFF";
   const on = dark ? "#FFFFFF" : "#141310";
   const frontCard = cards.find((c) => c.id === order[0]);
-  // The box the stack needs: the front card plus every step behind it
-  const W = CW + (n - 1) * step.x + 8;
-  const H = CH + (n - 1) * step.y + CW * Math.tan((skew * Math.PI) / 180) + 8;
+  // The box the stack really fills: every card's corners, slanted, stepped back and seen through the
+  // perspective, so the component hugs what you see and centres properly wherever it's placed
+  const PERSP = 1000;
+  const ox = CW / 2 + ((n - 1) * step.x) / 2, oy = CH / 2 - ((n - 1) * step.y) / 2;
+  const tan = Math.tan((skew * Math.PI) / 180);
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (let k = 0; k < Math.max(1, n); k++) {
+    const f = PERSP / (PERSP + k * step.z);
+    for (const u of [-CW / 2, CW / 2]) for (const v of [-CH / 2, CH / 2]) {
+      const X = CW / 2 + u + k * step.x, Y = CH / 2 + v + u * tan - k * step.y;
+      const px = ox + (X - ox) * f, py = oy + (Y - oy) * f;
+      minX = Math.min(minX, px); maxX = Math.max(maxX, px); minY = Math.min(minY, py); maxY = Math.max(maxY, py);
+    }
+  }
+  const W = Math.ceil(maxX - minX), H = Math.ceil(maxY - minY);
 
   return (
     <div
@@ -178,12 +190,12 @@ export function CardSwap({
       <div
         className="absolute"
         style={{
-          left: 4,
-          bottom: 4,
+          left: -minX,
+          top: -minY,
           width: CW,
           height: CH,
-          perspective: 1000,
-          perspectiveOrigin: `${CW / 2 + ((n - 1) * step.x) / 2}px ${CH / 2 - ((n - 1) * step.y) / 2}px`,
+          perspective: PERSP,
+          perspectiveOrigin: `${ox}px ${oy}px`,
         }}
       >
         {cards.map((c) => {

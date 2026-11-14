@@ -1907,8 +1907,8 @@ function SwapTile({ t }: { t: T }) {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  // The stack's box is about 272 × 327
-  const fit = Math.min(1, (w - 40) / 272, (w - 40) / 327)
+  // The stack's box is exactly what the cards fill: 248 × 300 at the default size
+  const fit = Math.min(1, (w - 48) / 248, (w - 48) / 300)
   const theme = dark ? 'dark' : 'light'
 
   return (
