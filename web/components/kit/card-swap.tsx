@@ -65,13 +65,17 @@ export function CardSwap({
   const first = useRef(true);
 
   // New or removed cards: keep the order of the ones that stay, new ones go to the back
+  // (keyed on the ids, so a new array with the same cards on every render changes nothing)
+  const idKey = cards.map((c) => c.id).join("\u0000");
   useEffect(() => {
     setOrder((o) => {
       const ids = cards.map((c) => c.id);
       const kept = o.filter((id) => ids.includes(id));
-      return [...kept, ...ids.filter((id) => !kept.includes(id))];
+      const next = [...kept, ...ids.filter((id) => !kept.includes(id))];
+      return next.length === o.length && next.every((id, i) => id === o[i]) ? o : next;
     });
-  }, [cards]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idKey]);
 
   // Tell the page which card is in front (not on the first render)
   useEffect(() => {
