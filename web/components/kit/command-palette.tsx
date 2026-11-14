@@ -65,6 +65,8 @@ type Props = {
   placeholder?: string;
   /** How many recent commands to show on top. 0 = none. */
   recents?: number;
+  /** Start with this already typed in the search box. */
+  defaultQuery?: string;
   "aria-label"?: string;
 };
 
@@ -126,13 +128,14 @@ export function CommandPalette({
   bot,
   placeholder = "Search or jump to…",
   recents: maxRecents = 3,
+  defaultQuery = "",
   "aria-label": ariaLabel = "Command menu",
 }: Props) {
   const dark = theme === "dark";
   const [own, setOwn] = useState(defaultOpen);
   const isOpen = !modal || (open ?? own);
   const [mounted, setMounted] = useState(isOpen);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(defaultQuery);
   const [pages, setPages] = useState<CommandItem[]>([]);
   const [active, setActive] = useState(0);
   const [recent, setRecent] = useState<string[]>([]);
