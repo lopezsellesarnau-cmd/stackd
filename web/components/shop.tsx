@@ -203,7 +203,7 @@ const GUMROAD: Record<Id, string> = {
   login: 'https://arnolop.gumroad.com/l/bot_login?wanted=true',
   tabs: 'https://arnolop.gumroad.com/l/Elastictabs?wanted=true',
   feedback: 'https://arnolop.gumroad.com/l/feedback?wanted=true',
-  palette: '',
+  palette: 'https://arnolop.gumroad.com/l/command_palette?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
