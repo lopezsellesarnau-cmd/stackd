@@ -25,6 +25,7 @@ import { BotLogin } from './kit/bot-login'
 import { ElasticTabs } from './kit/elastic-tabs'
 import { BotFeedback } from './kit/bot-feedback'
 import { CommandPalette, type CommandItem } from './kit/command-palette'
+import { FileDrop, type SampleFile } from './kit/file-drop'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -71,6 +72,8 @@ const COPY = {
     paletteAbout: 'The ⌘K menu. Type a few letters and it finds the command, even out of order: "nwprj" gets you New project. Commands come in groups, with your recent ones on top, and some open a page of their own. The Bot is the search icon: it watches the row you are on, looks sad when nothing matches and smiles when a command runs. Try it, and press ⌘K.',
     paletteIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Keyboard first, works with screen readers', 'As a pop-up on ⌘K or inline, any colour'],
     pressK: 'Open as a pop-up · ⌘K',
+    dropAbout: 'A file dropzone with the Bot. Bring a file near and it opens its mouth; let go and the file is pulled in, the Bot chews, and the upload appears below with a rolling percentage. Images get a thumbnail. Too big? It shakes its head, and if you keep trying it starts answering back. Try the files on the tray.',
+    dropIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Drop, click, paste, keyboard and screen readers', 'Plug in any upload: progress, cancel and retry'],
     icons: 'Icons',
     shapeLabel: 'Shape',
     hoverNotch: 'Hover the notch',
@@ -132,6 +135,8 @@ const COPY = {
     paletteAbout: 'El menú de ⌘K. Escribe unas letras y encuentra el comando, aunque no estén seguidas: con "nwprj" sale New project. Los comandos van en grupos, con los recientes arriba, y algunos abren su propia página. El Bot es el icono de búsqueda: mira la fila en la que estás, se pone triste si no hay resultados y sonríe cuando se ejecuta un comando. Pruébalo y pulsa ⌘K.',
     paletteIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Pensado para teclado, compatible con lectores de pantalla', 'Como pop-up con ⌘K o integrado, cualquier color'],
     pressK: 'Abrir como pop-up · ⌘K',
+    dropAbout: 'Una zona para soltar archivos con el Bot. Acerca un archivo y abre la boca; suéltalo y se lo traga, mastica y la subida aparece debajo con un porcentaje que rueda. Las imágenes tienen miniatura. ¿Demasiado grande? Niega con la cabeza, y si insistes empieza a contestarte. Prueba con los archivos de la bandeja.',
+    dropIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Soltar, clic, pegar, teclado y lectores de pantalla', 'Conecta cualquier subida: progreso, cancelar y reintentar'],
     icons: 'Iconos',
     shapeLabel: 'Forma',
     hoverNotch: 'Pasa el ratón por el notch',
@@ -158,7 +163,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -172,13 +177,14 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'tabs', cat: 'navigation' },
   { id: 'feedback', cat: 'inputs' },
   { id: 'palette', cat: 'navigation' },
+  { id: 'drop', cat: 'inputs' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
-const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0]
+const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1]
 
 // Body colour, and the eye colour that reads on it
 const COLORS = [
@@ -204,6 +210,7 @@ const GUMROAD: Record<Id, string> = {
   tabs: 'https://arnolop.gumroad.com/l/Elastictabs?wanted=true',
   feedback: 'https://arnolop.gumroad.com/l/feedback?wanted=true',
   palette: 'https://arnolop.gumroad.com/l/command_palette?wanted=true',
+  drop: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -291,7 +298,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : <PaletteTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : <DropTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -392,6 +399,9 @@ function Detail({
   // A native dialog: it traps focus, closes on Escape, and the page behind stops scrolling
   useEffect(() => {
     ref.current?.showModal()
+    // showModal focuses the first focusable thing (a dropzone, an input), which then shows its focus ring.
+    // Focus the dialog itself instead; Tab still moves into it.
+    ref.current?.focus({ preventScroll: true })
     document.documentElement.style.overflow = 'hidden'
     return () => {
       document.documentElement.style.overflow = ''
@@ -401,9 +411,10 @@ function Detail({
   return (
     <dialog
       ref={ref}
+      tabIndex={-1}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && ref.current?.close()}
-      className="m-0 h-[100dvh] max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-card sm:m-auto sm:backdrop:bg-ink/40 sm:backdrop:backdrop-blur-[2px] sm:h-[min(640px,calc(100svh-48px))] sm:w-[min(1040px,calc(100vw-48px))]"
+      className="m-0 h-[100dvh] max-h-none w-full max-w-none bg-transparent p-0 outline-none backdrop:bg-card sm:m-auto sm:backdrop:bg-ink/40 sm:backdrop:backdrop-blur-[2px] sm:h-[min(640px,calc(100svh-48px))] sm:w-[min(1040px,calc(100vw-48px))]"
       style={{ fontFamily: SANS }}
     >
       <div className="grid h-full grid-cols-[minmax(0,1fr)] grid-rows-[max-content_1fr] overflow-y-auto bg-card p-3 text-[13px] leading-[1.45] text-ink sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:grid-rows-1 sm:gap-3 sm:overflow-hidden sm:rounded-[24px]">
@@ -1491,6 +1502,92 @@ function PaletteTile({ t }: { t: T }) {
               </button>
               {/* The pop-up version, on ⌘K while the details are open */}
               <CommandPalette items={CMD_ALL} theme={theme} open={modal} onOpenChange={setModal} />
+            </div>
+          }
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+            </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Pretend files for the dropzone; the video is over the 5 MB limit on purpose
+const DROP_SAMPLES: SampleFile[] = [
+  { name: 'moodboard.png', type: 'image/png', size: 2.4 * 1024 * 1024, color: '#C9B8FF' },
+  { name: 'brief.pdf', type: 'application/pdf', size: 860 * 1024 },
+  { name: 'launch-film.mp4', type: 'video/mp4', size: 12.6 * 1024 * 1024 },
+]
+const DROP_MAX = 5 * 1024 * 1024
+
+/** 13 · File drop. The compact dropzone with its sample tray on a white tile; it starts over after each round. */
+function DropTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [round, setRound] = useState(0) // a new key = a fresh, empty dropzone
+  const box = useRef<HTMLElement>(null)
+  const reset = useRef(0)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      clearTimeout(reset.current)
+    }
+  }, [])
+  const fit = Math.min(1, (w - 32) / 380, (w - 46) / 350)
+  const theme = dark ? 'dark' : 'light'
+  // Once nothing is uploading any more, clear the tile a little later so it can be tried again
+  const settle = (files: { status: string }[]) => {
+    clearTimeout(reset.current)
+    if (files.length && files.every((f) => f.status !== 'uploading')) reset.current = window.setTimeout(() => setRound((n) => n + 1), 3200)
+  }
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} File drop`} className="absolute inset-0 cursor-pointer" />
+        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-card px-2 py-0.5 text-[11px] text-ink">{PRICE.drop}</span>
+        {/* Pinned to the top so new rows grow downwards */}
+        <div className="pointer-events-none absolute inset-x-0 top-9 flex justify-center">
+          <div className="pointer-events-auto w-[380px] shrink-0 origin-top" style={{ transform: `scale(${fit})` }}>
+            <FileDrop key={round} compact theme={theme} maxSize={DROP_MAX} samples={DROP_SAMPLES} onChange={settle} />
+          </div>
+        </div>
+        <div className="absolute left-3 top-2 z-10 transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+          <div className="flex items-center gap-0.5 rounded-full bg-paper p-1 shadow-[0_0_0_1px_rgba(20,19,16,0.08)]">
+            <Step label={`Card: ${dark ? 'black' : 'white'}`} onClick={() => setDark(!dark)}>
+              <span className="block h-3.5 w-3.5 rounded-full border border-ink" style={{ background: 'linear-gradient(90deg,#141310 50%,#fff 50%)' }} />
+            </Step>
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.inputs}
+          name="File drop"
+          about={t.dropAbout}
+          includes={t.dropIncludes}
+          usage={`<FileDrop${dark ? ' theme="dark"' : ''} maxSize={5 * 1024 * 1024} upload={(file, { onProgress, signal }) => send(file, onProgress, signal)} />`}
+          href={GUMROAD.drop}
+          price={PRICE.drop}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="w-full max-w-[420px] self-start pt-4 sm:self-center sm:pt-0">
+              <FileDrop theme={theme} maxSize={DROP_MAX} samples={DROP_SAMPLES} />
             </div>
           }
           options={

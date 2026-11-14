@@ -6,6 +6,7 @@ import { useEffect, useId, useRef } from 'react'
  * Bot · StackD Kit 01
  * A bot whose eyes follow the cursor around the page, and blink now and then.
  * With `mood` its eyelids show how it feels: droopy when sad, smiling eyes when glad.
+ * With `mouth` it opens its mouth (0 closed, 1 wide open); it sits on the sphere like the eyes.
  * Four bodies, four kinds of eyes, any colour.
  *
  * The eyes are points on a sphere: when the bot turns, an eye heading for the
@@ -50,6 +51,8 @@ type Props = {
   happy?: boolean
   /** How it feels, -1 (sad: the lids droop) to 1 (glad: the eyes smile). 0 = neutral. */
   mood?: number
+  /** How open its mouth is, 0 (closed, hidden) to 1 (wide open). */
+  mouth?: number
   /** Only watch the cursor inside the nearest ancestor matching this selector (a card, say). Unset: the whole page. */
   within?: string
   className?: string
@@ -68,6 +71,7 @@ export function Bot({
   look,
   happy = false,
   mood = 0,
+  mouth = 0,
   within,
   className = '',
 }: Props) {
@@ -76,9 +80,10 @@ export function Bot({
   const groups = useRef<(SVGGElement | null)[]>([])
   const tops = useRef<(SVGRectElement | null)[]>([])
   const bottoms = useRef<(SVGEllipseElement | null)[]>([])
+  const mouthEl = useRef<SVGRectElement>(null)
   const clip = `bot-${useId().replace(/:/g, '')}`
   // Where the face should point; the loop springs towards it
-  const aim = useRef({ x: 0, y: 0, m: 0 })
+  const aim = useRef({ x: 0, y: 0, m: 0, o: 0 })
   const kick = useRef<() => void>(() => {})
   const props = useRef({ follow, look, happy, mood, shape, eyeStyle })
   props.current = { follow, look, happy, mood, shape, eyeStyle }
@@ -87,12 +92,13 @@ export function Bot({
   useEffect(() => {
     if (look) aim.current = { ...aim.current, x: look.x, y: look.y }
     aim.current.m = clamp(mood, -1, 1)
+    aim.current.o = clamp(mouth, 0, 1)
     kick.current()
-  }, [look?.x, look?.y, happy, mood, shape, eyeStyle])
+  }, [look?.x, look?.y, happy, mood, mouth, shape, eyeStyle])
 
   useEffect(() => {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const t = { x: 0, y: 0, vx: 0, vy: 0, m: 0, vm: 0 }
+    const t = { x: 0, y: 0, vx: 0, vy: 0, m: 0, vm: 0, o: 0, vo: 0 }
     let raf = 0
     let prev = 0
     let blinkAt = -1e9
@@ -161,16 +167,44 @@ export function Bot({
           bottom.style.display = push > 0.05 ? '' : 'none'
         }
       })
+
+      // The mouth: a point on the sphere below the eyes, turned with the head like they are
+      const mo = mouthEl.current
+      if (mo) {
+        const open = clamp(t.o, 0, 1)
+        if (open < 0.02) mo.style.display = 'none'
+        else {
+          const y0 = 0.56
+          const z0 = Math.sqrt(1 - y0 * y0)
+          const x1 = z0 * Math.sin(yaw)
+          const z1 = z0 * Math.cos(yaw)
+          const y2 = y0 * Math.cos(pitch) - z1 * Math.sin(pitch)
+          const z2 = y0 * Math.sin(pitch) + z1 * Math.cos(pitch)
+          const near = clamp(z2, 0, 1)
+          const k = 0.45 + 0.55 * near
+          const w = (12 + 8 * open) * k * (0.7 + 0.3 * near)
+          const h = (2.5 + 9 * open) * k
+          const cx = body.cx + x1 * body.rx
+          const cy = body.cy + y2 * body.ry
+          mo.setAttribute('x', (cx - w / 2).toFixed(2))
+          mo.setAttribute('y', (cy - h / 2).toFixed(2))
+          mo.setAttribute('width', w.toFixed(2))
+          mo.setAttribute('height', h.toFixed(2))
+          mo.setAttribute('rx', Math.min(w / 2, h / 2).toFixed(2))
+          mo.style.display = z2 < 0.05 ? 'none' : ''
+        }
+      }
     }
 
     const tick = (now: number) => {
       const dt = prev ? Math.min(2.5, (now - prev) / 16.67) : 1
       prev = now
-      const { x: tx, y: ty, m: tm } = aim.current
+      const { x: tx, y: ty, m: tm, o: to } = aim.current
       if (still) {
         t.x = tx
         t.y = ty
         t.m = tm
+        t.o = to
       } else {
         // One spring for both axes; the damping is raised to dt so a dropped frame behaves the same
         const damp = Math.pow(0.74, dt)
@@ -180,10 +214,13 @@ export function Bot({
         t.y += t.vy * dt
         t.vm = (t.vm + (tm - t.m) * 0.09 * dt) * Math.pow(0.7, dt)
         t.m += t.vm * dt
+        // The mouth is quicker, so a chew reads as a chew
+        t.vo = (t.vo + (to - t.o) * 0.2 * dt) * Math.pow(0.6, dt)
+        t.o += t.vo * dt
       }
       draw(now)
       const settled =
-        Math.abs(tx - t.x) + Math.abs(ty - t.y) + Math.abs(t.vx) + Math.abs(t.vy) + Math.abs(tm - t.m) + Math.abs(t.vm) < 0.002
+        Math.abs(tx - t.x) + Math.abs(ty - t.y) + Math.abs(t.vx) + Math.abs(t.vy) + Math.abs(tm - t.m) + Math.abs(t.vm) + Math.abs(to - t.o) + Math.abs(t.vo) < 0.002
       if (settled && now - blinkAt > 160) {
         raf = 0
         prev = 0
@@ -282,6 +319,7 @@ export function Bot({
             />
           </g>
         ))}
+        <rect ref={mouthEl} style={{ display: 'none' }} />
       </g>
     </svg>
   )
