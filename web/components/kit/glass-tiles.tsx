@@ -399,10 +399,10 @@ export function GlassTiles({
             {count ? (
               <>
                 <span className="font-medium tabular-nums">{count}</span>
-                <span className="opacity-55"> {count === 1 ? "tile" : "tiles"} of glass</span>
+                <span className="opacity-55"> {count === 1 ? "tile" : "tiles"}</span>
               </>
             ) : (
-              <span className="opacity-55">Drag over the picture</span>
+              <span className="opacity-55">Drag to cover</span>
             )}
           </p>
           <button
