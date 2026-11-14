@@ -29,6 +29,7 @@ import { FileDrop, type SampleFile } from './kit/file-drop'
 import { BotLoader, type LoaderStep } from './kit/bot-loader'
 import { OtpInput } from './kit/otp-input'
 import { GlassTiles } from './kit/glass-tiles'
+import { CardSwap, type SwapCard } from './kit/card-swap'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -89,6 +90,10 @@ const COPY = {
     glassAbout: 'Drag over a picture to cover parts of it with glass. Every tile is its own pane: frosted, a lens magnifying a nearby spot, a mirror or a smear, so it reads as glass and not as a grey box. Tiles pop in on a spring; start on glass and you clear it. Save the result as a PNG. Try it on the picture.',
     glassIncludes: ['Figma file with the tiles and examples', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard', 'Peek, clear and save as PNG (optional toolbar with the Bot)'],
     glassLabel: 'Glass',
+    swapAbout: 'A stack of pictures in depth, each card a step further back and slanted. Press the front card, or drag and fling it, and it goes to the back while the rest step forward; a short drag springs back. It can also swap by itself every few seconds, and stops while you are on it.',
+    swapIncludes: ['Figma file with the stack and the cards', 'React + Tailwind code, no other libraries', 'Press, drag and fling, keyboard and screen readers', 'Your own cards, size, step and slant, auto-swap'],
+    pillsLabel: 'Titles',
+    autoLabel: 'Auto',
     tilesLabel: 'Tiles',
     soft: 'Soft',
     thick: 'Thick',
@@ -171,6 +176,10 @@ const COPY = {
     glassAbout: 'Arrastra sobre una imagen para cubrir partes con cristal. Cada baldosa es su propio cristal: esmerilado, una lupa que aumenta un punto cercano, un espejo o una mancha, así que se lee como cristal y no como una caja gris. Las baldosas entran con un rebote; si empiezas sobre cristal, lo borras. Guarda el resultado como PNG. Pruébalo en la imagen.',
     glassIncludes: ['Archivo de Figma con las baldosas y ejemplos', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado', 'Ver debajo, borrar y guardar como PNG (barra opcional con el Bot)'],
     glassLabel: 'Cristal',
+    swapAbout: 'Una pila de imágenes en profundidad, cada carta un paso más atrás e inclinada. Pulsa la de delante, o arrástrala y lánzala, y se va al fondo mientras las demás avanzan; un arrastre corto vuelve a su sitio. También puede cambiar sola cada pocos segundos, y se para mientras estás encima.',
+    swapIncludes: ['Archivo de Figma con la pila y las cartas', 'Código en React + Tailwind, sin otras librerías', 'Pulsar, arrastrar y lanzar, teclado y lectores de pantalla', 'Tus propias cartas, tamaño, paso e inclinación, cambio automático'],
+    pillsLabel: 'Títulos',
+    autoLabel: 'Auto',
     tilesLabel: 'Baldosas',
     soft: 'Suave',
     thick: 'Grueso',
@@ -204,7 +213,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -222,13 +231,14 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'loader', cat: 'loaders' },
   { id: 'otp', cat: 'inputs' },
   { id: 'glass', cat: 'media' },
+  { id: 'swap', cat: 'media' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
-const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1]
+const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
 
 // Body colour, and the eye colour that reads on it
 const COLORS = [
@@ -258,6 +268,7 @@ const GUMROAD: Record<Id, string> = {
   loader: 'https://arnolop.gumroad.com/l/bot_loader?wanted=true',
   otp: 'https://arnolop.gumroad.com/l/otp_input?wanted=true',
   glass: 'https://arnolop.gumroad.com/l/glass_tiles?wanted=true',
+  swap: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -345,7 +356,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : <GlassTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : <SwapTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1866,6 +1877,83 @@ function GlassTile({ t }: { t: T }) {
                 </Pick>
                 <Pick on={large} label={t.large} onClick={() => setLarge(true)}>
                   <span className="px-1">{t.large}</span>
+                </Pick>
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+const SWAP_CARDS: SwapCard[] = [
+  { id: 'street', title: 'Street', src: '/glass/street.jpg', alt: 'An impressionist street painting' },
+  { id: 'autumn', title: 'Autumn', src: '/glass/autumn.jpg', alt: 'An abstract painting in orange and blue' },
+  { id: 'strokes', title: 'Strokes', src: '/glass/abstract.jpg', alt: 'An abstract painting with bold strokes' },
+]
+
+/** 17 · Card swap. The stack on a white tile, swapping by itself (it stops while the pointer is on it). */
+function SwapTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [auto, setAuto] = useState(true)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // The stack's box is about 272 × 327
+  const fit = Math.min(1, (w - 40) / 272, (w - 40) / 327)
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Card swap`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto shrink-0" style={{ transform: `scale(${fit})` }}>
+            <CardSwap cards={SWAP_CARDS} theme={theme} auto={auto} every={3.5} />
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.media}
+          name="Card swap"
+          about={t.swapAbout}
+          includes={t.swapIncludes}
+          usage={`<CardSwap cards={cards}${auto ? ' auto every={3.5}' : ''}${dark ? ' theme="dark"' : ''} onChange={(card) => setFront(card)} />`}
+          href={GUMROAD.swap}
+          price={PRICE.swap}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="flex w-full items-center justify-center self-start pt-6 sm:self-center sm:pt-0">
+              <CardSwap cards={SWAP_CARDS} theme={theme} auto={auto} every={3.5} />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.pillsLabel}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.autoLabel}>
+                <Pick on={auto} label={t.on} onClick={() => setAuto(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+                <Pick on={!auto} label={t.off} onClick={() => setAuto(false)}>
+                  <span className="px-1">{t.off}</span>
                 </Pick>
               </Choice>
             </>
