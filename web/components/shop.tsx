@@ -187,7 +187,7 @@ const GUMROAD: Record<Id, string> = {
   dial: 'https://arnolop.gumroad.com/l/rotary_dial?wanted=true',
   timer: 'https://arnolop.gumroad.com/l/focus_timer?wanted=true',
   login: 'https://arnolop.gumroad.com/l/bot_login?wanted=true',
-  tabs: '',
+  tabs: 'https://arnolop.gumroad.com/l/Elastictabs?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
