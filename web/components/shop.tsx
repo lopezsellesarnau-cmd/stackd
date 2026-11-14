@@ -238,7 +238,7 @@ const GUMROAD: Record<Id, string> = {
   palette: 'https://arnolop.gumroad.com/l/command_palette?wanted=true',
   drop: 'https://arnolop.gumroad.com/l/file_drop?wanted=true',
   loader: 'https://arnolop.gumroad.com/l/bot_loader?wanted=true',
-  otp: '',
+  otp: 'https://arnolop.gumroad.com/l/otp_input?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
