@@ -1347,6 +1347,12 @@ function PaletteTile({ t }: { t: T }) {
   const [modal, setModal] = useState(false)
   const box = useRef<HTMLElement>(null)
   const [w, setW] = useState(280)
+  // The palette's height at rest, measured once: it starts centred, then grows downwards from there
+  const inner = useRef<HTMLDivElement>(null)
+  const [restH, setRestH] = useState(0)
+  useEffect(() => {
+    if (inner.current) setRestH(inner.current.offsetHeight)
+  }, [])
   useEffect(() => {
     const el = box.current
     if (!el) return
@@ -1355,6 +1361,7 @@ function PaletteTile({ t }: { t: T }) {
     return () => ro.disconnect()
   }, [])
   const fit = Math.min(1, (w - 32) / 380)
+  const top = restH ? Math.max(12, (w - restH * fit) / 2) : 56
   const theme = dark ? 'dark' : 'light'
 
   return (
@@ -1363,8 +1370,8 @@ function PaletteTile({ t }: { t: T }) {
       <article ref={box} className={`group ${tile} bg-paper`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Command palette`} className="absolute inset-0 cursor-pointer" />
         {/* Pinned to the top so it grows downwards as the results change, instead of jumping */}
-        <div className="pointer-events-none absolute inset-x-0 top-14 flex justify-center">
-          <div className="pointer-events-auto w-[380px] shrink-0 origin-top" style={{ transform: `scale(${fit})` }}>
+        <div className="pointer-events-none absolute inset-x-0 flex justify-center" style={{ top }}>
+          <div ref={inner} className="pointer-events-auto w-[380px] shrink-0 origin-top" style={{ transform: `scale(${fit})` }}>
             <CommandPalette modal={false} hotkey={false} recents={0} items={CMD_SHORT} theme={theme} placeholder="Type a command…" />
           </div>
         </div>
