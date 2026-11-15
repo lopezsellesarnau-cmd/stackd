@@ -124,6 +124,12 @@ const COPY = {
     soonGet: 'Coming soon',
     get: 'Get it free',
     emailNote: 'Checkout on Gumroad. The Figma file and the code arrive in your inbox.',
+    install: 'Install with shadcn',
+    copy: 'Copy',
+    copied: 'Copied',
+    setup: 'Set up once after buying',
+    setupJson: 'Add the StackD registry to components.json:',
+    setupKey: 'Put the licence key from your Gumroad receipt in .env.local. Bought more than one? Separate the keys with commas.',
     cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation', media: 'Images' },
   },
   es: {
@@ -214,6 +220,12 @@ const COPY = {
     soonGet: 'Próximamente',
     get: 'Consíguelo gratis',
     emailNote: 'Se consigue a través de Gumroad. El archivo de Figma y el código llegan a tu correo.',
+    install: 'Instalar con shadcn',
+    copy: 'Copiar',
+    copied: 'Copiado',
+    setup: 'Configúralo una vez tras comprar',
+    setupJson: 'Añade el registro de StackD a components.json:',
+    setupKey: 'Pon la clave de licencia del recibo de Gumroad en .env.local. ¿Compraste más de uno? Separa las claves con comas.',
     cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación', media: 'Imágenes' },
   },
 }
@@ -284,6 +296,70 @@ const GUMROAD: Record<Id, string> = {
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
+
+// Each component's name in the shadcn registry (www.stackd.codes/r/{name}.json)
+const REGISTRY_NAME: Record<Id, string> = {
+  bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
+  flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
+  feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
+  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after',
+}
+const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
+  (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
+)
+const REGISTRY_SETUP = `"registries": {
+  "@stackd": {
+    "url": "https://www.stackd.codes/r/{name}.json",
+    "headers": { "X-License-Key": "\${STACKD_LICENSE_KEY}" }
+  }
+}`
+
+/** A command or snippet with a copy button */
+function Copyable({ t, text, small }: { t: T; text: string; small?: boolean }) {
+  const [done, setDone] = useState(false)
+  return (
+    <div className="relative">
+      <pre className={`overflow-x-auto rounded-[12px] bg-card py-2.5 pl-3 pr-16 leading-[1.6] text-fg-muted ${small ? 'text-[10.5px]' : 'text-[11px]'}`}>
+        <code>{text}</code>
+      </pre>
+      <button
+        type="button"
+        onClick={() => {
+          navigator.clipboard?.writeText(text).then(() => {
+            setDone(true)
+            window.setTimeout(() => setDone(false), 1400)
+          })
+        }}
+        className="absolute right-1.5 top-1.5 rounded-full bg-paper px-2.5 py-1 text-[11px] text-fg-dim transition-colors hover:text-ink"
+      >
+        {done ? t.copied : t.copy}
+      </button>
+    </div>
+  )
+}
+
+/** Install with shadcn: free ones by URL; paid ones through the @stackd registry with the licence key */
+function Install({ t, name, paid }: { t: T; name: string; paid: boolean }) {
+  return (
+    <div className="mt-5">
+      <p className="mb-1.5 text-fg-faint">{t.install}</p>
+      <Copyable t={t} text={paid ? `npx shadcn@latest add @stackd/${name}` : `npx shadcn@latest add https://www.stackd.codes/r/${name}.json`} />
+      {paid ? (
+        <details className="group mt-2">
+          <summary className="cursor-pointer list-none text-[12px] text-fg-dim transition-colors hover:text-ink [&::-webkit-details-marker]:hidden">
+            <span className="inline-block transition-transform group-open:rotate-90">›</span> {t.setup}
+          </summary>
+          <div className="mt-2 space-y-2 text-[12px] text-fg-muted">
+            <p>{t.setupJson}</p>
+            <Copyable t={t} text={REGISTRY_SETUP} small />
+            <p>{t.setupKey}</p>
+            <Copyable t={t} text="STACKD_LICENSE_KEY=your-key" small />
+          </div>
+        </details>
+      ) : null}
+    </div>
+  )
+}
 
 export function Shop() {
   const { lang, setLang } = useLanguage()
@@ -507,6 +583,8 @@ function Detail({
           <pre className="mt-5 overflow-x-auto rounded-[12px] bg-card px-3 py-2.5 text-[11px] leading-[1.6] text-fg-muted">
             <code>{usage}</code>
           </pre>
+
+          {REGISTRY_BY_HREF[href] ? <Install t={t} name={REGISTRY_BY_HREF[href]} paid={!!price} /> : null}
 
           <ul className="mt-5 space-y-1 text-fg-muted">
             {includes.map((i) => (
