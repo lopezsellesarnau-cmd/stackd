@@ -30,6 +30,7 @@ import { BotLoader, type LoaderStep } from './kit/bot-loader'
 import { OtpInput } from './kit/otp-input'
 import { GlassTiles } from './kit/glass-tiles'
 import { CardSwap, type SwapCard } from './kit/card-swap'
+import { BeforeAfter } from './kit/before-after'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -93,6 +94,10 @@ const COPY = {
     swapAbout: 'A stack of pictures in depth, each card a step further back and slanted. Press the front card, or drag and fling it, and it goes to the back while the rest step forward; a short drag springs back. It can also swap by itself every few seconds, and stops while you are on it.',
     swapIncludes: ['Figma file with the stack and the cards', 'React + Tailwind code, no other libraries', 'Press, drag and fling, keyboard and screen readers', 'Your own cards, size, step and slant, auto-swap'],
     pillsLabel: 'Titles',
+    compareAbout: 'Two pictures split by a line you drag. The line is jelly: the point you hold follows your hand and the ends trail behind, so a quick drag bends it and it wobbles a little as it settles. The edge of the picture bends with it. Press anywhere to jump there.',
+    compareIncludes: ['Figma file with the slider and its states', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard, works with screen readers', 'Your own pictures and labels, any size, how much it bends'],
+    lineLabel: 'Line',
+    jellyLabel: 'Jelly',
     autoLabel: 'Auto',
     tilesLabel: 'Tiles',
     soft: 'Soft',
@@ -179,6 +184,10 @@ const COPY = {
     swapAbout: 'Una pila de imágenes en profundidad, cada carta un paso más atrás e inclinada. Pulsa la de delante, o arrástrala y lánzala, y se va al fondo mientras las demás avanzan; un arrastre corto vuelve a su sitio. También puede cambiar sola cada pocos segundos, y se para mientras estás encima.',
     swapIncludes: ['Archivo de Figma con la pila y las cartas', 'Código en React + Tailwind, sin otras librerías', 'Pulsar, arrastrar y lanzar, teclado y lectores de pantalla', 'Tus propias cartas, tamaño, paso e inclinación, cambio automático'],
     pillsLabel: 'Títulos',
+    compareAbout: 'Dos imágenes separadas por una línea que arrastras. La línea es de gelatina: el punto que agarras sigue tu mano y los extremos van detrás, así que un arrastre rápido la curva y tiembla un poco al quedarse quieta. El borde de la imagen se curva con ella. Pulsa en cualquier sitio para saltar ahí.',
+    compareIncludes: ['Archivo de Figma con el slider y sus estados', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado, funciona con lectores de pantalla', 'Tus propias imágenes y etiquetas, cualquier tamaño, cuánto se curva'],
+    lineLabel: 'Línea',
+    jellyLabel: 'Gelatina',
     autoLabel: 'Auto',
     tilesLabel: 'Baldosas',
     soft: 'Suave',
@@ -213,7 +222,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare'
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
@@ -232,10 +241,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'otp', cat: 'inputs' },
   { id: 'glass', cat: 'media' },
   { id: 'swap', cat: 'media' },
+  { id: 'compare', cat: 'media' },
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -269,6 +279,7 @@ const GUMROAD: Record<Id, string> = {
   otp: 'https://arnolop.gumroad.com/l/otp_input?wanted=true',
   glass: 'https://arnolop.gumroad.com/l/glass_tiles?wanted=true',
   swap: 'https://arnolop.gumroad.com/l/card_swap?wanted=true',
+  compare: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -356,7 +367,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : <SwapTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -1953,6 +1964,71 @@ function SwapTile({ t }: { t: T }) {
                   <span className="px-1">{t.on}</span>
                 </Pick>
                 <Pick on={!auto} label={t.off} onClick={() => setAuto(false)}>
+                  <span className="px-1">{t.off}</span>
+                </Pick>
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+const COMPARE = {
+  before: { src: '/glass/street-raw.jpg', alt: 'The street painting, flat and washed out', label: 'Before' },
+  after: { src: '/glass/street.jpg', alt: 'The street painting, in full colour', label: 'After' },
+}
+
+/** 18 · Before / after. The slider fills a white tile; drag the jelly line. */
+function CompareTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [jelly, setJelly] = useState(true)
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Before / after`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-6">
+          <div className="pointer-events-auto h-full w-full">
+            <BeforeAfter {...COMPARE} theme={theme} jelly={jelly ? 1 : 0} width="100%" height="100%" />
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.media}
+          name="Before / after"
+          about={t.compareAbout}
+          includes={t.compareIncludes}
+          usage={`<BeforeAfter before={{ src: '/before.jpg' }} after={{ src: '/after.jpg' }}${dark ? ' theme="dark"' : ''}${jelly ? '' : ' jelly={0}'} onChange={setValue} />`}
+          href={GUMROAD.compare}
+          price={PRICE.compare}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="aspect-[7/5] w-full max-w-[420px] self-start pt-4 sm:self-center sm:pt-0">
+              <BeforeAfter {...COMPARE} theme={theme} jelly={jelly ? 1 : 0} width="100%" height="100%" />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.lineLabel}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.jellyLabel}>
+                <Pick on={jelly} label={t.on} onClick={() => setJelly(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+                <Pick on={!jelly} label={t.off} onClick={() => setJelly(false)}>
                   <span className="px-1">{t.off}</span>
                 </Pick>
               </Choice>
