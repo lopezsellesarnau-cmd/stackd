@@ -74,6 +74,7 @@ async function getText(name: string, keys: string[]) {
     `Write these ${fs.length} file(s) at these paths (relative to the project root; keep them in the same folder, they import each other with "./").`,
     deps.length ? `Then install: npm install ${deps.join(' ')}` : 'No npm dependencies beyond React. Needs Tailwind CSS.',
     `Same thing with the shadcn CLI: npx shadcn@latest add ${entry.free ? `https://www.stackd.codes/r/${entry.name}.json` : `@stackd/${entry.name}`}`,
+    `How to use it (the README; follow its props, e.g. width="100%" to fill a parent):\n\n${entry.readme}`,
     ...fs.map((f) => `File: ${f.target}\n\`\`\`${lang(f.target)}\n${f.content}\n\`\`\``),
   ].join('\n\n'))
 }
