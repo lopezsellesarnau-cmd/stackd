@@ -223,25 +223,26 @@ const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
 type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare'
+// Shop order (not the kit numbers): the liveliest first, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
+  { id: 'swap', cat: 'media' },
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
-  { id: 'pay', cat: 'buttons' },
-  { id: 'stat', cat: 'cards' },
-  { id: 'notify', cat: 'notifications' },
-  { id: 'flap', cat: 'text' },
-  { id: 'dial', cat: 'inputs' },
-  { id: 'timer', cat: 'widgets' },
-  { id: 'login', cat: 'inputs' },
-  { id: 'tabs', cat: 'navigation' },
-  { id: 'feedback', cat: 'inputs' },
   { id: 'palette', cat: 'navigation' },
   { id: 'drop', cat: 'inputs' },
+  { id: 'flap', cat: 'text' },
+  { id: 'compare', cat: 'media' },
+  { id: 'dial', cat: 'inputs' },
+  { id: 'pay', cat: 'buttons' },
+  { id: 'tabs', cat: 'navigation' },
+  { id: 'glass', cat: 'media' },
+  { id: 'login', cat: 'inputs' },
+  { id: 'notify', cat: 'notifications' },
+  { id: 'stat', cat: 'cards' },
+  { id: 'timer', cat: 'widgets' },
   { id: 'loader', cat: 'loaders' },
   { id: 'otp', cat: 'inputs' },
-  { id: 'glass', cat: 'media' },
-  { id: 'swap', cat: 'media' },
-  { id: 'compare', cat: 'media' },
+  { id: 'feedback', cat: 'inputs' },
 ]
 
 // The paid ones; everything else is free
