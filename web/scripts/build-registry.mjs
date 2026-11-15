@@ -7,7 +7,7 @@ import { join } from 'node:path'
 
 const KIT = join(homedir(), 'StackD/kit')
 const OUT = new URL('../registry/', import.meta.url).pathname
-const SITE = process.env.REGISTRY_SITE || 'https://stackd.codes'
+const SITE = process.env.REGISTRY_SITE || 'https://www.stackd.codes'
 const BOT = `${SITE}/r/bot.json`
 
 // Gumroad product IDs (the License key block in each product's Content tab shows it). Gumroad

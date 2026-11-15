@@ -9,7 +9,7 @@
     "@anthropic-ai/sdk"
   ],
   "registryDependencies": [
-    "https://stackd.codes/r/bot.json"
+    "https://www.stackd.codes/r/bot.json"
   ],
   "files": [
     {

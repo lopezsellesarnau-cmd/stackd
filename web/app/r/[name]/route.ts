@@ -1,7 +1,7 @@
 // The shadcn registry: /r/{name}.json. Free components are open; paid ones need the buyer's Gumroad
 // licence key in the X-License-Key header (several keys can be sent, comma-separated, one per
 // purchase). /r/registry.json lists everything.
-//   components.json → "registries": { "@stackd": { "url": "https://stackd.codes/r/{name}.json",
+//   components.json → "registries": { "@stackd": { "url": "https://www.stackd.codes/r/{name}.json",
 //                      "headers": { "X-License-Key": "${STACKD_LICENSE_KEY}" } } }
 import { REGISTRY } from '@/registry'
 
@@ -48,7 +48,7 @@ export async function GET(req: Request, { params }: { params: { name: string } }
   }
 
   const entry = REGISTRY[name]
-  if (!entry) return json({ error: 'Not found', message: `No component called "${name}". See https://stackd.codes/r/registry.json` }, 404)
+  if (!entry) return json({ error: 'Not found', message: `No component called "${name}". See https://www.stackd.codes/r/registry.json` }, 404)
   if (entry.free) return json(entry.item)
 
   const buy = `https://arnolop.gumroad.com/l/${entry.permalink}`
