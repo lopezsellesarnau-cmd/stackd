@@ -31,6 +31,7 @@ const PRODUCT_IDS = {
   'glass-tiles': 'tkjRb3NZZJLtFmBbYwjYxg==',
   'card-swap': 't_IVviwQT5D1x6Riv17gBQ==',
   'before-after': 'mXS8Arj-gdLXde1EQk7ebg==',
+  'voice-memo': 'KQ5LKMi3cWlU8zeGLcJSrw==',
 }
 
 // name · title · file · free? · Gumroad permalink · uses the Bot? · description
@@ -53,6 +54,7 @@ const ITEMS = [
   ['glass-tiles', 'Glass tiles', 'GlassTiles.tsx', false, 'glass_tiles', true, 'Drag over a picture to cover it with glass tiles, and save it as a PNG.'],
   ['card-swap', 'Card swap', 'CardSwap.tsx', false, 'card_swap', false, 'A stack of pictures in depth you press or fling to the back.'],
   ['before-after', 'Before / after', 'BeforeAfter.tsx', false, 'before_after', false, 'Compare two pictures with a jelly line you drag.'],
+  ['voice-memo', 'Voice memo', 'VoiceMemo.tsx', false, 'voice_memo', true, 'Trim a voice note. The Bot says it, and Save sends a ring of light through the card.'],
 ]
 
 const read = (f) => {
