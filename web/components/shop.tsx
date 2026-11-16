@@ -31,6 +31,7 @@ import { OtpInput } from './kit/otp-input'
 import { GlassTiles } from './kit/glass-tiles'
 import { CardSwap, type SwapCard } from './kit/card-swap'
 import { BeforeAfter } from './kit/before-after'
+import { VoiceMemo } from './kit/voice-memo'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -95,6 +96,8 @@ const COPY = {
     swapIncludes: ['Figma file with the stack and the cards', 'React + Tailwind code, no other libraries', 'Press, drag and fling, keyboard and screen readers', 'Your own cards, size, step and slant, auto-swap'],
     pillsLabel: 'Titles',
     compareAbout: 'Two pictures split by a line you drag. The line is jelly: the point you hold follows your hand and the ends trail behind, so a quick drag bends it and it wobbles a little as it settles. The edge of the picture bends with it. Press anywhere to jump there.',
+    memoAbout: 'A voice note you trim. Drag the two handles: the part you leave out shrinks into dots, and when you let go near a pause the handle glides into it, so you never cut a word in half. Press play and the Bot says the memo. Save sends a ring of light through the card.',
+    memoIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Reads any audio file: waveform and pauses', 'Mouse, touch and keyboard, works with screen readers'],
     compareIncludes: ['Figma file with the slider and its states', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard, works with screen readers', 'Your own pictures and labels, any size, how much it bends'],
     lineLabel: 'Line',
     jellyLabel: 'Jelly',
@@ -130,7 +133,7 @@ const COPY = {
     setup: 'Set up once after buying',
     setupJson: 'Add the StackD registry to components.json:',
     setupKey: 'Put the licence key from your Gumroad receipt in .env.local. Bought more than one? Separate the keys with commas.',
-    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation', media: 'Images' },
+    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation', media: 'Images', audio: 'Audio' },
   },
   es: {
     title: 'Componentes',
@@ -191,6 +194,8 @@ const COPY = {
     swapIncludes: ['Archivo de Figma con la pila y las cartas', 'Código en React + Tailwind, sin otras librerías', 'Pulsar, arrastrar y lanzar, teclado y lectores de pantalla', 'Tus propias cartas, tamaño, paso e inclinación, cambio automático'],
     pillsLabel: 'Títulos',
     compareAbout: 'Dos imágenes separadas por una línea que arrastras. La línea es de gelatina: el punto que agarras sigue tu mano y los extremos van detrás, así que un arrastre rápido la curva y tiembla un poco al quedarse quieta. El borde de la imagen se curva con ella. Pulsa en cualquier sitio para saltar ahí.',
+    memoAbout: 'Una nota de voz que recortas. Arrastra las dos asas: lo que dejas fuera se encoge en puntos, y si sueltas cerca de una pausa el asa se desliza hasta ella, así nunca cortas una palabra a medias. Dale a play y el Bot dice la nota. Guardar lanza un anillo de luz por la tarjeta.',
+    memoIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Lee cualquier archivo de audio: forma de onda y pausas', 'Ratón, táctil y teclado, funciona con lectores de pantalla'],
     compareIncludes: ['Archivo de Figma con el slider y sus estados', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado, funciona con lectores de pantalla', 'Tus propias imágenes y etiquetas, cualquier tamaño, cuánto se curva'],
     lineLabel: 'Línea',
     jellyLabel: 'Gelatina',
@@ -226,7 +231,7 @@ const COPY = {
     setup: 'Configúralo una vez tras comprar',
     setupJson: 'Añade el registro de StackD a components.json:',
     setupKey: 'Pon la clave de licencia del recibo de Gumroad en .env.local. ¿Compraste más de uno? Separa las claves con comas.',
-    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación', media: 'Imágenes' },
+    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación', media: 'Imágenes', audio: 'Audio' },
   },
 }
 
@@ -234,13 +239,14 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo'
 // Shop order (not the kit numbers): the liveliest first, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'swap', cat: 'media' },
   { id: 'bot', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
   { id: 'palette', cat: 'navigation' },
+  { id: 'memo', cat: 'audio' },
   { id: 'drop', cat: 'inputs' },
   { id: 'flap', cat: 'text' },
   { id: 'compare', cat: 'media' },
@@ -258,7 +264,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -293,6 +299,7 @@ const GUMROAD: Record<Id, string> = {
   glass: 'https://arnolop.gumroad.com/l/glass_tiles?wanted=true',
   swap: 'https://arnolop.gumroad.com/l/card_swap?wanted=true',
   compare: 'https://arnolop.gumroad.com/l/before_after?wanted=true',
+  memo: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -302,7 +309,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
-  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after',
+  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo',
 }
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
   (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
@@ -444,7 +451,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -2108,6 +2115,72 @@ function CompareTile({ t }: { t: T }) {
                   <span className="px-1">{t.on}</span>
                 </Pick>
                 <Pick on={!jelly} label={t.off} onClick={() => setJelly(false)}>
+                  <span className="px-1">{t.off}</span>
+                </Pick>
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 19 · Voice memo. The white card on a white tile; trim, play, save. */
+function MemoTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [bot, setBot] = useState(true)
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // The card at its real width, scaled to the tile
+  const fit = Math.min(1, (w - 40) / 380)
+  const theme = dark ? 'dark' : 'light'
+  const memo = (w: string) => <VoiceMemo src="/memo/memo.m4a" defaultStart={1.6} defaultEnd={9.4} theme={theme} bot={bot} width={w} onSave={() => {}} />
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Voice memo`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto w-[380px] shrink-0" style={{ transform: `scale(${fit})` }}>{memo('380px')}</div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.audio}
+          name="Voice memo"
+          about={t.memoAbout}
+          includes={t.memoIncludes}
+          usage={`<VoiceMemo src="/memo.m4a"${dark ? ' theme="dark"' : ''}${bot ? '' : ' bot={false}'} onSave={({ start, end }) => trim(start, end)} />`}
+          href={GUMROAD.memo}
+          price={PRICE.memo}
+          onClose={() => setOpen(false)}
+          stage={<div className="w-full max-w-[400px] self-start pt-4 sm:self-center sm:pt-0">{memo('100%')}</div>}
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.bot}>
+                <Pick on={bot} label={t.on} onClick={() => setBot(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+                <Pick on={!bot} label={t.off} onClick={() => setBot(false)}>
                   <span className="px-1">{t.off}</span>
                 </Pick>
               </Choice>
