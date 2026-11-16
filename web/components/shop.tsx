@@ -299,7 +299,7 @@ const GUMROAD: Record<Id, string> = {
   glass: 'https://arnolop.gumroad.com/l/glass_tiles?wanted=true',
   swap: 'https://arnolop.gumroad.com/l/card_swap?wanted=true',
   compare: 'https://arnolop.gumroad.com/l/before_after?wanted=true',
-  memo: '',
+  memo: 'https://arnolop.gumroad.com/l/voice_memo?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
