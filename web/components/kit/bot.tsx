@@ -53,6 +53,8 @@ type Props = {
   mood?: number
   /** How open its mouth is, 0 (closed, hidden) to 1 (wide open). */
   mouth?: number
+  /** Turn it around its vertical axis, in degrees: 180 shows its back, 360 its face again. Overrides where it looks sideways. */
+  turn?: number
   /** Only watch the cursor inside the nearest ancestor matching this selector (a card, say). Unset: the whole page. */
   within?: string
   className?: string
@@ -72,6 +74,7 @@ export function Bot({
   happy = false,
   mood = 0,
   mouth = 0,
+  turn,
   within,
   className = '',
 }: Props) {
@@ -85,8 +88,8 @@ export function Bot({
   // Where the face should point; the loop springs towards it
   const aim = useRef({ x: 0, y: 0, m: 0, o: 0 })
   const kick = useRef<() => void>(() => {})
-  const props = useRef({ follow, look, happy, mood, shape, eyeStyle })
-  props.current = { follow, look, happy, mood, shape, eyeStyle }
+  const props = useRef({ follow, look, happy, mood, shape, eyeStyle, turn })
+  props.current = { follow, look, happy, mood, shape, eyeStyle, turn }
 
   // A fixed look, a new shape or new eyes: redraw
   useEffect(() => {
@@ -94,7 +97,7 @@ export function Bot({
     aim.current.m = clamp(mood, -1, 1)
     aim.current.o = clamp(mouth, 0, 1)
     kick.current()
-  }, [look?.x, look?.y, happy, mood, mouth, shape, eyeStyle])
+  }, [look?.x, look?.y, happy, mood, mouth, shape, eyeStyle, turn])
 
   useEffect(() => {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -109,7 +112,8 @@ export function Bot({
       const eye = EYES[props.current.eyeStyle]
       const since = now - blinkAt
       const lid = since < 160 ? 1 - 0.9 * Math.sin((since / 160) * Math.PI) : 1
-      const yaw = Math.asin(clamp(t.x, -0.92, 0.92))
+      const spin = props.current.turn
+      const yaw = spin === undefined ? Math.asin(clamp(t.x, -0.92, 0.92)) : (spin * Math.PI) / 180
       const pitch = -Math.asin(clamp(t.y, -0.92, 0.92))
       const tilt = 60 * t.x * t.y // a diagonal look leans the pair
       const g = SPACING / body.rx
