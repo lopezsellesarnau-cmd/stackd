@@ -32,6 +32,7 @@ import { GlassTiles } from './kit/glass-tiles'
 import { CardSwap, type SwapCard } from './kit/card-swap'
 import { BeforeAfter } from './kit/before-after'
 import { VoiceMemo } from './kit/voice-memo'
+import { WorldClock } from './kit/world-clock'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -96,6 +97,10 @@ const COPY = {
     swapIncludes: ['Figma file with the stack and the cards', 'React + Tailwind code, no other libraries', 'Press, drag and fling, keyboard and screen readers', 'Your own cards, size, step and slant, auto-swap'],
     pillsLabel: 'Titles',
     compareAbout: 'Two pictures split by a line you drag. The line is jelly: the point you hold follows your hand and the ends trail behind, so a quick drag bends it and it wobbles a little as it settles. The edge of the picture bends with it. Press anywhere to jump there.',
+    clockAbout: 'A clock for each city. Drag the minute hand of any clock and all of them turn together, so you can find a time that works for everyone. Let go and it glides to the nearest quarter hour. When every city is at work, a small sign says so. Now springs back to the live time.',
+    clockIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Real time zones and summer time, any cities', 'White, black, or day and night per city'],
+    panelsLabel: 'Panels',
+    dayNight: 'Day / night',
     memoAbout: 'A voice note you trim. Drag the two handles: the part you leave out shrinks into dots, and when you let go near a pause the handle glides into it, so you never cut a word in half. Press play and the Bot says the memo. Save sends a ring of light through the card.',
     memoIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Reads any audio file: waveform and pauses', 'Mouse, touch and keyboard, works with screen readers'],
     compareIncludes: ['Figma file with the slider and its states', 'React + Tailwind code, no other libraries', 'Mouse, touch and keyboard, works with screen readers', 'Your own pictures and labels, any size, how much it bends'],
@@ -194,6 +199,10 @@ const COPY = {
     swapIncludes: ['Archivo de Figma con la pila y las cartas', 'Código en React + Tailwind, sin otras librerías', 'Pulsar, arrastrar y lanzar, teclado y lectores de pantalla', 'Tus propias cartas, tamaño, paso e inclinación, cambio automático'],
     pillsLabel: 'Títulos',
     compareAbout: 'Dos imágenes separadas por una línea que arrastras. La línea es de gelatina: el punto que agarras sigue tu mano y los extremos van detrás, así que un arrastre rápido la curva y tiembla un poco al quedarse quieta. El borde de la imagen se curva con ella. Pulsa en cualquier sitio para saltar ahí.',
+    clockAbout: 'Un reloj por ciudad. Arrastra el minutero de cualquiera y todos giran a la vez, así encuentras una hora que va bien a todos. Al soltar se desliza al cuarto de hora más cercano. Cuando todas las ciudades están en horario de trabajo, un pequeño aviso lo dice. Ahora vuelve a la hora real.',
+    clockIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Zonas horarias reales y horario de verano, cualquier ciudad', 'Blanco, negro, o día y noche por ciudad'],
+    panelsLabel: 'Paneles',
+    dayNight: 'Día / noche',
     memoAbout: 'Una nota de voz que recortas. Arrastra las dos asas: lo que dejas fuera se encoge en puntos, y si sueltas cerca de una pausa el asa se desliza hasta ella, así nunca cortas una palabra a medias. Dale a play y el Bot dice la nota. Guardar lanza un anillo de luz por la tarjeta.',
     memoIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'Lee cualquier archivo de audio: forma de onda y pausas', 'Ratón, táctil y teclado, funciona con lectores de pantalla'],
     compareIncludes: ['Archivo de Figma con el slider y sus estados', 'Código en React + Tailwind, sin otras librerías', 'Ratón, táctil y teclado, funciona con lectores de pantalla', 'Tus propias imágenes y etiquetas, cualquier tamaño, cuánto se curva'],
@@ -239,7 +248,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock'
 // Shop order (not the kit numbers): the liveliest first, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'swap', cat: 'media' },
@@ -250,6 +259,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'drop', cat: 'inputs' },
   { id: 'flap', cat: 'text' },
   { id: 'compare', cat: 'media' },
+  { id: 'clock', cat: 'widgets' },
   { id: 'dial', cat: 'inputs' },
   { id: 'pay', cat: 'buttons' },
   { id: 'tabs', cat: 'navigation' },
@@ -264,7 +274,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -300,6 +310,7 @@ const GUMROAD: Record<Id, string> = {
   swap: 'https://arnolop.gumroad.com/l/card_swap?wanted=true',
   compare: 'https://arnolop.gumroad.com/l/before_after?wanted=true',
   memo: 'https://arnolop.gumroad.com/l/voice_memo?wanted=true',
+  clock: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -309,7 +320,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
-  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo',
+  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock',
 }
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
   (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
@@ -451,7 +462,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -2185,6 +2196,68 @@ function MemoTile({ t }: { t: T }) {
                 </Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 20 · World clock. White panels on a white tile; drag a minute hand. */
+function ClockTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [theme, setTheme] = useState<'light' | 'auto' | 'dark'>('light')
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // The widget at its real size (340 × ~330), scaled to the tile
+  const fit = Math.min(1, (w - 40) / 340)
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} bg-paper`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} World clock`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto w-[340px] shrink-0" style={{ transform: `scale(${fit})` }}>
+            <WorldClock theme={theme} />
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.widgets}
+          name="World clock"
+          about={t.clockAbout}
+          includes={t.clockIncludes}
+          usage={`<WorldClock cities={[{ code: 'AMS', timeZone: 'Europe/Amsterdam' }, { code: 'NYC', timeZone: 'America/New_York' }]}${theme === 'light' ? '' : ` theme="${theme}"`} onChange={setMinutes} />`}
+          href={GUMROAD.clock}
+          price={PRICE.clock}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className="self-start pt-4 sm:self-center sm:pt-0">
+              <WorldClock theme={theme} />
+            </div>
+          }
+          options={
+            <Choice label={t.panelsLabel}>
+              <Pick on={theme === 'light'} label={t.light} onClick={() => setTheme('light')}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+              <Pick on={theme === 'auto'} label={t.dayNight} onClick={() => setTheme('auto')}>
+                <span className="px-1">{t.dayNight}</span>
+              </Pick>
+              <Pick on={theme === 'dark'} label={t.darkT} onClick={() => setTheme('dark')}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+            </Choice>
           }
         />
       ) : null}
