@@ -310,7 +310,7 @@ const GUMROAD: Record<Id, string> = {
   swap: 'https://arnolop.gumroad.com/l/card_swap?wanted=true',
   compare: 'https://arnolop.gumroad.com/l/before_after?wanted=true',
   memo: 'https://arnolop.gumroad.com/l/voice_memo?wanted=true',
-  clock: '',
+  clock: 'https://arnolop.gumroad.com/l/world_clock?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
