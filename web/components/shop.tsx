@@ -359,7 +359,7 @@ const GUMROAD: Record<Id, string> = {
   activity: 'https://arnolop.gumroad.com/l/activity?wanted=true',
   toast: 'https://arnolop.gumroad.com/l/toast?wanted=true',
   heat: 'https://arnolop.gumroad.com/l/heat_word?wanted=true',
-  ring: '',
+  ring: 'https://arnolop.gumroad.com/l/spending_ring?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
