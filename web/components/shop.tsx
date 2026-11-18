@@ -37,6 +37,7 @@ import { PullFeed } from './pull-feed'
 import { ActivityGrid } from './kit/activity-grid'
 import { ToastDemo } from './toast-demo'
 import { HeatWord, type HeatShape } from './kit/heat-word'
+import { SpendingRing } from './kit/spending-ring'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -113,6 +114,8 @@ const COPY = {
     toastIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'toast(), toast.success, toast.error and toast.promise', 'Undo buttons, pause on hover, screen reader support'],
     heatAbout: 'A word in solid ink with liquid edges. Bring the cursor and heat pools under it: the strokes swell, run into each other and glow from the rim to an ink core. Leave and it cools back. Press it for the next shape: your word, the Bot (it watches you and blinks) or a field of dots.',
     heatIncludes: ['Figma file with every state', 'React + Tailwind code, one canvas, no other libraries', 'Any word, the Bot or dots', 'Three palettes or your own colours'],
+    ringAbout: 'Where the money went, as a ring of thick ink pills sized by amount; the small ones roll into drops. Hover one and it swells while the middle counts to it. Tap it to leave it out: it pinches off and falls, the others flow together and the total counts down. Tap it under the ring to pour it back.',
+    ringIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your categories, icons, colours and currency', 'Keyboard and screen reader support'],
     shapeWord: 'Word',
     dotsLabel: 'Dots',
     paletteLabel: 'Palette',
@@ -230,6 +233,8 @@ const COPY = {
     toastIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'toast(), toast.success, toast.error y toast.promise', 'Botón de deshacer, pausa al pasar por encima, lectores de pantalla'],
     heatAbout: 'Una palabra en tinta sólida con bordes líquidos. Acerca el cursor y el calor se acumula debajo: los trazos se hinchan, se funden y brillan del borde a un núcleo de tinta. Al salir se enfría. Púlsala para cambiar de forma: tu palabra, el Bot (te mira y parpadea) o un campo de puntos.',
     heatIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, un canvas, sin otras librerías', 'Cualquier palabra, el Bot o puntos', 'Tres paletas o tus propios colores'],
+    ringAbout: 'En qué se fue el dinero: un anillo de píldoras de tinta, cada una del tamaño de su gasto; las pequeñas se enrollan en gotas. Pasa por encima y se hincha mientras el centro cuenta hasta su cifra. Tócala para dejarla fuera: se desprende y cae, las demás fluyen hasta cerrar el hueco y el total baja. Tócala bajo el anillo para devolverla.',
+    ringIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Tus categorías, iconos, colores y moneda', 'Teclado y lectores de pantalla'],
     shapeWord: 'Palabra',
     dotsLabel: 'Puntos',
     paletteLabel: 'Paleta',
@@ -282,7 +287,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring'
 // Shop order (not the kit numbers): the liveliest first, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'swap', cat: 'media' },
@@ -294,6 +299,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'pull', cat: 'loaders' },
   { id: 'toast', cat: 'notifications' },
   { id: 'heat', cat: 'text' },
+  { id: 'ring', cat: 'cards' },
   { id: 'flap', cat: 'text' },
   { id: 'compare', cat: 'media' },
   { id: 'clock', cat: 'widgets' },
@@ -312,7 +318,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -353,6 +359,7 @@ const GUMROAD: Record<Id, string> = {
   activity: 'https://arnolop.gumroad.com/l/activity?wanted=true',
   toast: 'https://arnolop.gumroad.com/l/toast?wanted=true',
   heat: 'https://arnolop.gumroad.com/l/heat_word?wanted=true',
+  ring: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -362,7 +369,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
-  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock', pull: 'pull-to-refresh', activity: 'activity-grid', toast: 'toast', heat: 'heat-word',
+  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock', pull: 'pull-to-refresh', activity: 'activity-grid', toast: 'toast', heat: 'heat-word', ring: 'spending-ring',
 }
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
   (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
@@ -504,7 +511,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -2589,6 +2596,63 @@ function HeatTile({ t }: { t: T }) {
                 </Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+function RingTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const box = useRef<HTMLElement>(null)
+  const card = useRef<HTMLDivElement>(null)
+  const [w, setW] = useState(280)
+  const [h, setH] = useState(440)
+  useEffect(() => {
+    const el = box.current, c = card.current
+    if (!el || !c) return
+    const ro = new ResizeObserver(() => { setW(el.clientWidth); setH(c.offsetHeight) })
+    ro.observe(el)
+    ro.observe(c)
+    return () => ro.disconnect()
+  }, [])
+  // The card at its real size (348 wide), scaled to fit the tile both ways
+  const fit = Math.min(1, (w - 32) / 348, (w - 32) / h)
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Spending ring`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div ref={card} className="pointer-events-auto shrink-0" style={{ transform: `scale(${fit})` }}>
+            {open ? null : <SpendingRing theme={dark ? 'dark' : 'light'} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.cards}
+          name="Spending ring"
+          about={t.ringAbout}
+          includes={t.ringIncludes}
+          usage={`<SpendingRing\n  data={[\n    { name: 'Home', amount: 840, icon: 'home' },\n    { name: 'Travel', amount: 590, icon: 'travel' },\n  ]}\n  currency="EUR"${dark ? '\n  theme="dark"' : ''}\n/>`}
+          href={GUMROAD.ring}
+          price={PRICE.ring}
+          onClose={() => setOpen(false)}
+          stage={<div className="origin-center scale-[.8] sm:scale-[.9]"><SpendingRing theme={dark ? 'dark' : 'light'} /></div>}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+            </Choice>
           }
         />
       ) : null}
