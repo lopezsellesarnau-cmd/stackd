@@ -40,6 +40,8 @@ type Props = {
   height?: number
   /** Press to change shape. Default true. */
   cycle?: boolean
+  /** Heat at a fixed point (0 to 1 across and down), with no cursor: for still images and empty states. */
+  glow?: { x: number; y: number }
   /** Called when a press changes the shape. */
   onShapeChange?: (shape: HeatShape) => void
   className?: string
@@ -85,6 +87,7 @@ export function HeatWord({
   width = 320,
   height = 180,
   cycle = true,
+  glow,
   onShapeChange,
   className = '',
 }: Props) {
@@ -117,7 +120,8 @@ export function HeatWord({
     st.tmp = st.tmp ?? document.createElement('canvas')
     st.tmp.width = w; st.tmp.height = h
     const u0 = Math.min(width / 320, height / 180)
-    const rad = Math.max(2, Math.round(7 * r * u0)) // blur radius of each pass, px
+    // Blur radius of each pass, px. Letters get less, so the holes in e, a and o stay open
+    const rad = Math.max(2, Math.round((shape === 'word' ? 4.5 : 7) * r * u0))
     const buf = new Float32Array(w * h)
     const out = c.getContext('2d')!
     const img = out.createImageData(w, h)
@@ -228,6 +232,7 @@ export function HeatWord({
     st.run = () => { if (!st.raf && live) { st.last = performance.now(); st.raf = requestAnimationFrame(frame) } }
 
     st.grow = 0
+    if (glow) { st.tx = st.x = glow.x; st.ty = st.y = glow.y; st.want = 1 }
     const go = () => { if (!live) return; draw(); st.run() }
     // The word waits for its font, or the first frame draws the fallback
     if (shape === 'word' && document.fonts) document.fonts.load('800 100px Inter').then(go, go)
@@ -247,10 +252,11 @@ export function HeatWord({
   return (
     <div
       className={`relative select-none ${cycle ? 'cursor-pointer' : ''} ${className}`}
-      style={{ width, height, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
+      // touch-action none: a finger painting on it stays on it, instead of scrolling the page
+      style={{ width, height, touchAction: 'none', WebkitTapHighlightColor: 'transparent' }}
       onPointerEnter={(e) => { aim(e); const st = s.current; st.x = st.tx; st.y = st.ty; st.want = 1; st.run() }}
       onPointerMove={(e) => { aim(e); s.current.want = 1; s.current.run() }}
-      onPointerLeave={() => { const st = s.current; st.want = 0; if (shape === 'bot' && !calm()) st.blink = 1; st.run() }}
+      onPointerLeave={() => { const st = s.current; st.want = glow ? 1 : 0; if (glow) { st.tx = glow.x; st.ty = glow.y }; if (shape === 'bot' && !calm()) st.blink = 1; st.run() }}
       onClick={cycle ? () => { const n = SHAPES[(SHAPES.indexOf(shape) + 1) % SHAPES.length]; setShape(n); onShapeChange?.(n) } : undefined}
       role={cycle ? 'button' : 'img'}
       aria-label={shape === 'word' ? text : shape === 'bot' ? 'The StackD Bot' : 'Dots'}
