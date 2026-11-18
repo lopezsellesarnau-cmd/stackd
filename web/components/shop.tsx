@@ -331,8 +331,8 @@ const GUMROAD: Record<Id, string> = {
   compare: 'https://arnolop.gumroad.com/l/before_after?wanted=true',
   memo: 'https://arnolop.gumroad.com/l/voice_memo?wanted=true',
   clock: 'https://arnolop.gumroad.com/l/world_clock?wanted=true',
-  pull: '',
-  activity: '',
+  pull: 'https://arnolop.gumroad.com/l/pull_to_refresh?wanted=true',
+  activity: 'https://arnolop.gumroad.com/l/activity?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
