@@ -36,6 +36,7 @@ import { WorldClock } from './kit/world-clock'
 import { PullFeed } from './pull-feed'
 import { ActivityGrid } from './kit/activity-grid'
 import { ToastDemo } from './toast-demo'
+import { HeatWord, type HeatShape } from './kit/heat-word'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -110,6 +111,11 @@ const COPY = {
     pullHint: 'Pull the list down',
     toastAbout: 'Every toast is the Bot. It lands as a drop of ink and unrolls into a pill with your message. Saved: it turns olive and smiles. Failed: wine, droopy eyes and one shake. Loading: it turns round until your promise is done. Older toasts roll into small drops; hover them to see the list.',
     toastIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'toast(), toast.success, toast.error and toast.promise', 'Undo buttons, pause on hover, screen reader support'],
+    heatAbout: 'A word in solid ink with liquid edges. Bring the cursor and heat pools under it: the strokes swell, run into each other and glow from the rim to an ink core. Leave and it cools back. Press it for the next shape: your word, the Bot (it watches you and blinks) or a field of dots.',
+    heatIncludes: ['Figma file with every state', 'React + Tailwind code, one canvas, no other libraries', 'Any word, the Bot or dots', 'Three palettes or your own colours'],
+    shapeWord: 'Word',
+    dotsLabel: 'Dots',
+    paletteLabel: 'Palette',
     clockAbout: 'A clock for each city. Drag the minute hand of any clock and all of them turn together, so you can find a time that works for everyone. Let go and it glides to the nearest quarter hour. When every city is at work, a small sign says so. Now springs back to the live time.',
     clockIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Real time zones and summer time, any cities', 'White, black, or day and night per city'],
     panelsLabel: 'Panels',
@@ -222,6 +228,11 @@ const COPY = {
     pullHint: 'Tira de la lista hacia abajo',
     toastAbout: 'Cada aviso es el Bot. Cae como una gota de tinta y se desenrolla en una píldora con tu mensaje. Guardado: se vuelve oliva y sonríe. Error: vino, ojos caídos y una sacudida. Cargando: gira sobre sí mismo hasta que tu promesa termina. Los avisos anteriores se enrollan en gotas pequeñas; pasa por encima para ver la lista.',
     toastIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, con el Bot', 'toast(), toast.success, toast.error y toast.promise', 'Botón de deshacer, pausa al pasar por encima, lectores de pantalla'],
+    heatAbout: 'Una palabra en tinta sólida con bordes líquidos. Acerca el cursor y el calor se acumula debajo: los trazos se hinchan, se funden y brillan del borde a un núcleo de tinta. Al salir se enfría. Púlsala para cambiar de forma: tu palabra, el Bot (te mira y parpadea) o un campo de puntos.',
+    heatIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, un canvas, sin otras librerías', 'Cualquier palabra, el Bot o puntos', 'Tres paletas o tus propios colores'],
+    shapeWord: 'Palabra',
+    dotsLabel: 'Puntos',
+    paletteLabel: 'Paleta',
     clockAbout: 'Un reloj por ciudad. Arrastra el minutero de cualquiera y todos giran a la vez, así encuentras una hora que va bien a todos. Al soltar se desliza al cuarto de hora más cercano. Cuando todas las ciudades están en horario de trabajo, un pequeño aviso lo dice. Ahora vuelve a la hora real.',
     clockIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Zonas horarias reales y horario de verano, cualquier ciudad', 'Blanco, negro, o día y noche por ciudad'],
     panelsLabel: 'Paneles',
@@ -271,7 +282,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat'
 // Shop order (not the kit numbers): the liveliest first, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'swap', cat: 'media' },
@@ -282,6 +293,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'drop', cat: 'inputs' },
   { id: 'pull', cat: 'loaders' },
   { id: 'toast', cat: 'notifications' },
+  { id: 'heat', cat: 'text' },
   { id: 'flap', cat: 'text' },
   { id: 'compare', cat: 'media' },
   { id: 'clock', cat: 'widgets' },
@@ -300,7 +312,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -340,6 +352,7 @@ const GUMROAD: Record<Id, string> = {
   pull: 'https://arnolop.gumroad.com/l/pull_to_refresh?wanted=true',
   activity: 'https://arnolop.gumroad.com/l/activity?wanted=true',
   toast: '',
+  heat: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -349,7 +362,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
-  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock', pull: 'pull-to-refresh', activity: 'activity-grid', toast: 'toast',
+  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock', pull: 'pull-to-refresh', activity: 'activity-grid', toast: 'toast', heat: 'heat-word',
 }
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
   (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
@@ -491,7 +504,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -2492,6 +2505,90 @@ function ToastTile({ t }: { t: T }) {
                 <span className="px-1">{t.darkT}</span>
               </Pick>
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+function HeatTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [shape, setShape] = useState<HeatShape>('word')
+  const [palette, setPalette] = useState<'ember' | 'moss' | 'lilac'>('moss')
+  const box = useRef<HTMLElement>(null)
+  const [w, setW] = useState(280)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const tw = Math.max(200, Math.round(w - 32))
+  const heat = (width: number) => (
+    <HeatWord text="Hello" shape={shape} onShapeChange={setShape} palette={palette} theme={dark ? 'dark' : 'light'} width={width} height={Math.round(width * 0.5625)} />
+  )
+
+  return (
+    <>
+      <article ref={box} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Heat word`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto">{open ? null : heat(tw)}</div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.text}
+          name="Heat word"
+          about={t.heatAbout}
+          includes={t.heatIncludes}
+          usage={`<HeatWord text="Hello" palette="${palette}"${shape === 'word' ? '' : ` shape="${shape}"`}${dark ? ' theme="dark"' : ''} />`}
+          href={GUMROAD.heat}
+          price={PRICE.heat}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className={`flex w-full max-w-[460px] items-center justify-center rounded-[24px] p-5 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+              {heat(400)}
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.shapeLabel}>
+                <Pick on={shape === 'word'} label={t.shapeWord} onClick={() => setShape('word')}>
+                  <span className="px-1">{t.shapeWord}</span>
+                </Pick>
+                <Pick on={shape === 'bot'} label="Bot" onClick={() => setShape('bot')}>
+                  <span className="px-1">Bot</span>
+                </Pick>
+                <Pick on={shape === 'dots'} label={t.dotsLabel} onClick={() => setShape('dots')}>
+                  <span className="px-1">{t.dotsLabel}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.paletteLabel}>
+                <Pick on={palette === 'moss'} label="Moss" onClick={() => setPalette('moss')}>
+                  <Swatch color="#6C8544" />
+                </Pick>
+                <Pick on={palette === 'ember'} label="Ember" onClick={() => setPalette('ember')}>
+                  <Swatch color="#BE9344" />
+                </Pick>
+                <Pick on={palette === 'lilac'} label="Lilac" onClick={() => setPalette('lilac')}>
+                  <Swatch color="#C9B8FF" />
+                </Pick>
+              </Choice>
+            </>
           }
         />
       ) : null}
