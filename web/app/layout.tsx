@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/components/language-context'
+import { Analytics } from '@vercel/analytics/react'
 
 // Sans = Helvetica (globals.css); IBM Plex Mono para índices, etiquetas y stacks.
 // Mismo estilo personal que arnau-lopez.com (vault Diseño/10-minimal-espacio-abierto), otra composición.
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <LanguageProvider>{children}</LanguageProvider>
+        <Analytics />
       </body>
     </html>
   )
