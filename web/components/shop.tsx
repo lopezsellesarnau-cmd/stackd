@@ -2355,6 +2355,7 @@ function ActivityTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [three, setThree] = useState(false)
   const [olive, setOlive] = useState(false)
+  const [dark, setDark] = useState(false)
   const box = useRef<HTMLElement>(null)
   const card = useRef<HTMLDivElement>(null)
   const [w, setW] = useState(280)
@@ -2371,11 +2372,11 @@ function ActivityTile({ t }: { t: T }) {
   const fit = Math.min(1, (w - 32) / 542, (w - 32) / h)
   const color = olive ? '#6C8544' : undefined
   // A new key when the view changes in the pop-up, so the grid starts in that view
-  const grid = (k: string) => <ActivityGrid key={k + (three ? '3d' : 'flat')} color={color} defaultView={three ? '3d' : 'flat'} />
+  const grid = (k: string) => <ActivityGrid key={k + (three ? '3d' : 'flat')} color={color} theme={dark ? 'dark' : 'light'} defaultView={three ? '3d' : 'flat'} />
 
   return (
     <>
-      <article ref={box} className={`group ${tile} bg-paper`}>
+      <article ref={box} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Activity`} className="absolute inset-0 cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div ref={card} className="pointer-events-auto shrink-0" style={{ transform: `scale(${fit})` }}>
@@ -2391,13 +2392,21 @@ function ActivityTile({ t }: { t: T }) {
           name="Activity"
           about={t.activityAbout}
           includes={t.activityIncludes}
-          usage={`<ActivityGrid data={days} unit="commits"${three ? ' defaultView="3d"' : ''}${olive ? ' color="#6C8544"' : ''} />`}
+          usage={`<ActivityGrid data={days} unit="commits"${dark ? ' theme="dark"' : ''}${three ? ' defaultView="3d"' : ''}${olive ? ' color="#6C8544"' : ''} />`}
           href={GUMROAD.activity}
           price={PRICE.activity}
           onClose={() => setOpen(false)}
           stage={<div className="origin-center scale-[.72] sm:scale-[.8]">{grid('stage')}</div>}
           options={
             <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
               <Choice label={t.viewLabel}>
                 <Pick on={!three} label={t.flat} onClick={() => setThree(false)}>
                   <span className="px-1">{t.flat}</span>
@@ -2408,7 +2417,7 @@ function ActivityTile({ t }: { t: T }) {
               </Choice>
               <Choice label={t.colourLabel}>
                 <Pick on={!olive} label="Ink" onClick={() => setOlive(false)}>
-                  <Swatch color="#141310" />
+                  <Swatch color={dark ? '#FFFFFF' : '#141310'} />
                 </Pick>
                 <Pick on={olive} label="Olive" onClick={() => setOlive(true)}>
                   <Swatch color="#6C8544" />
