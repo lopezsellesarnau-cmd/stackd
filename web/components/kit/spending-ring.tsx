@@ -65,6 +65,7 @@ const GAP = 16 / R // between pills, radians
 const DOT = T / R // the angle a round drop takes
 const TOP = -Math.PI / 2 + 0.35 // where the first pill starts
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
+const DISPLAY = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif'
 const calm = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const at = (a: number, r = R) => [C + Math.cos(a) * r, C + Math.sin(a) * r] as const
 
@@ -297,7 +298,7 @@ export function SpendingRing({
         {/* The middle: the total, or the pill you're on */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center" aria-live="polite">
           <p className="text-[13px]" style={{ opacity: 0.5 }}>{hotCat ? hotCat.name : label}</p>
-          <p className="mt-0.5 text-[40px] font-medium leading-none tracking-[-0.03em] tabular-nums">
+          <p className="mt-0.5 text-[40px] font-semibold leading-none tracking-[-0.02em] tabular-nums" style={{ fontFamily: DISPLAY }}>
             <Count value={hotCat ? hotCat.amount : total} format={(n) => money.format(n)} />
           </p>
           <p className="mt-1 text-[13px] tabular-nums" style={{ opacity: 0.5 }}>
