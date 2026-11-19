@@ -39,6 +39,7 @@ import { ToastDemo } from './toast-demo'
 import { HeatWord, type HeatShape } from './kit/heat-word'
 import { SpendingRing } from './kit/spending-ring'
 import { StackedBars } from './kit/stacked-bars'
+import { DotMorph } from './kit/dot-morph'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -118,6 +119,8 @@ const COPY = {
     ringAbout: 'Where the money went, as a ring of thick ink pills sized by amount; the small ones roll into drops. Hover one and it swells while the middle counts to it. Tap it to leave it out: it pinches off and falls, the others flow together and the total counts down. Tap it under the ring to pour it back.',
     ringIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your categories, icons, colours and currency', 'Keyboard and screen reader support'],
     barsAbout: 'A traffic card with one stacked bar per day, a capsule per source and the bounced part under the line. Run along it and the column opens: its capsules spread apart so each one reads, the big number counts to that day and the key fills in the breakdown. Day / Week regrows the bars in a wave.',
+    morphAbout: 'A shape made of dots: the StackD Bot, a heart, your word, a bolt and a star. Move over it and the dots swirl round the cursor like a finger in water. Tap and they spin out in a whirlpool, then curl into the next shape, starting where you pressed. Left alone, it changes shape by itself.',
+    morphIncludes: ['Figma file with every shape', 'React + Tailwind code, no other libraries', 'Your word, your shapes and order', 'Mouse and touch, respects reduced motion'],
     barsIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your days and weeks, series, names and colours', 'Mouse and touch, screen reader list'],
     shapeWord: 'Word',
     dotsLabel: 'Dots',
@@ -239,6 +242,8 @@ const COPY = {
     ringAbout: 'En qué se fue el dinero: un anillo de píldoras de tinta, cada una del tamaño de su gasto; las pequeñas se enrollan en gotas. Pasa por encima y se hincha mientras el centro cuenta hasta su cifra. Tócala para dejarla fuera: se desprende y cae, las demás fluyen hasta cerrar el hueco y el total baja. Tócala bajo el anillo para devolverla.',
     ringIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Tus categorías, iconos, colores y moneda', 'Teclado y lectores de pantalla'],
     barsAbout: 'Una tarjeta de tráfico con una barra apilada por día, una cápsula por fuente y la parte que rebotó bajo la línea. Recórrela y la columna se abre: sus cápsulas se separan para leer cada una, el número grande cuenta hasta ese día y la leyenda muestra el desglose. Día / Semana hace crecer las barras otra vez en ola.',
+    morphAbout: 'Una forma hecha de puntos: el Bot de StackD, un corazón, tu palabra, un rayo y una estrella. Pasa por encima y los puntos giran alrededor del cursor como un dedo en el agua. Toca y salen en remolino, y luego se enroscan en la siguiente forma, empezando donde pulsaste. Si lo dejas solo, cambia de forma por sí mismo.',
+    morphIncludes: ['Archivo de Figma con todas las formas', 'Código en React + Tailwind, sin otras librerías', 'Tu palabra, tus formas y su orden', 'Ratón y táctil, respeta el movimiento reducido'],
     barsIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Tus días y semanas, series, nombres y colores', 'Ratón y táctil, lista para lectores de pantalla'],
     shapeWord: 'Palabra',
     dotsLabel: 'Puntos',
@@ -292,7 +297,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph'
 // Shop order (not the kit numbers): the liveliest first, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'swap', cat: 'media' },
@@ -304,6 +309,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'pull', cat: 'loaders' },
   { id: 'toast', cat: 'notifications' },
   { id: 'heat', cat: 'text' },
+  { id: 'morph', cat: 'media' },
   { id: 'ring', cat: 'cards' },
   { id: 'bars', cat: 'cards' },
   { id: 'flap', cat: 'text' },
@@ -324,7 +330,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7', bars: '€7' }
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7', bars: '€7', morph: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -367,6 +373,7 @@ const GUMROAD: Record<Id, string> = {
   heat: 'https://arnolop.gumroad.com/l/heat_word?wanted=true',
   ring: 'https://arnolop.gumroad.com/l/spending_ring?wanted=true',
   bars: '',
+  morph: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -376,7 +383,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
-  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock', pull: 'pull-to-refresh', activity: 'activity-grid', toast: 'toast', heat: 'heat-word', ring: 'spending-ring', bars: 'stacked-bars',
+  glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock', pull: 'pull-to-refresh', activity: 'activity-grid', toast: 'toast', heat: 'heat-word', ring: 'spending-ring', bars: 'stacked-bars', morph: 'dot-morph',
 }
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
   (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
@@ -518,7 +525,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -2708,6 +2715,50 @@ function BarsTile({ t }: { t: T }) {
           price={PRICE.bars}
           onClose={() => setOpen(false)}
           stage={<div className="origin-center scale-[.8] sm:scale-[.9]"><StackedBars theme={dark ? 'dark' : 'light'} /></div>}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+            </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 27 · Dot morph. The dot shape on its own card, fit to the tile. */
+function MorphTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+
+  return (
+    <>
+      <article className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Dot morph`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
+          <div className="pointer-events-auto w-full max-w-[420px]">
+            {open ? null : <DotMorph theme={dark ? 'dark' : 'light'} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.media}
+          name="Dot morph"
+          about={t.morphAbout}
+          includes={t.morphIncludes}
+          usage={`<DotMorph\n  word="Hi"\n  shapes={['bot', 'heart', 'word', 'bolt', 'star']}${dark ? '\n  theme="dark"' : ''}\n/>`}
+          href={GUMROAD.morph}
+          price={PRICE.morph}
+          onClose={() => setOpen(false)}
+          stage={<div className="w-[min(480px,80vw)]"><DotMorph theme={dark ? 'dark' : 'light'} /></div>}
           options={
             <Choice label={t.theme}>
               <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
