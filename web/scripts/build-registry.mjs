@@ -33,7 +33,17 @@ const PRODUCT_IDS = {
   'before-after': 'mXS8Arj-gdLXde1EQk7ebg==',
   'voice-memo': 'KQ5LKMi3cWlU8zeGLcJSrw==',
   'world-clock': 'oZB-kMoA9s9FHR1OVBt9jA==',
+  'pull-to-refresh': 'KdQFp1EexriX3AE6BTmvAg==',
+  'activity-grid': '3J1jvqKnMaXtEk5IJ2JZvg==',
+  'toast': 'vUsBWXKOe-heq2HA_YxDnQ==',
+  'heat-word': 'ZZjiFSRtYaW3cWsEf0eUfA==',
+  'spending-ring': 'y_mnOO1ID-gm0Gx9h7l79Q==',
+  'stacked-bars': 's7G0V5flmtu8BinO58qBCw==',
+  'dot-morph': 'uKNTGhIuHfZ-S1pmZ4d_-g==',
 }
+
+// Release folders named differently from the registry (kit/release/stackd-<folder>)
+const RELEASE_DIR = { 'activity-grid': 'activity' }
 
 // name · title · file · free? · Gumroad permalink · uses the Bot? · description
 const ITEMS = [
@@ -57,6 +67,13 @@ const ITEMS = [
   ['before-after', 'Before / after', 'BeforeAfter.tsx', false, 'before_after', false, 'Compare two pictures with a jelly line you drag.'],
   ['voice-memo', 'Voice memo', 'VoiceMemo.tsx', false, 'voice_memo', true, 'Trim a voice note. The Bot says it, and Save sends a ring of light through the card.'],
   ['world-clock', 'World clock', 'WorldClock.tsx', false, 'world_clock', false, 'A clock per city. Drag one minute hand and every clock turns with it, to find a time that works for everyone.'],
+  ['pull-to-refresh', 'Pull to refresh', 'PullToRefresh.tsx', false, 'pull_to_refresh', true, 'Pull a list down and a strand of ink snaps into the Bot, which turns round while your refresh runs.'],
+  ['activity-grid', 'Activity', 'ActivityGrid.tsx', false, 'activity', false, 'A grid of days, darker for busier ones, with a lens under the cursor. Switch to 3D and every day rises into a bar.'],
+  ['toast', 'Toast', 'Toast.tsx', false, 'toast', true, 'Every toast is the Bot: a drop of ink that unrolls into a pill. Olive when saved, Wine when it fails, turning while a promise runs.'],
+  ['heat-word', 'Heat word', 'HeatWord.tsx', false, 'heat_word', false, 'A word in solid ink that melts under the cursor: strokes swell, fuse and glow. Or the Bot, or dots.'],
+  ['spending-ring', 'Spending ring', 'SpendingRing.tsx', false, 'spending_ring', false, 'Where the money went, as a ring of liquid ink pills. Hover to read one, tap to leave it out and the ring flows closed.'],
+  ['stacked-bars', 'Stacked bars', 'StackedBars.tsx', false, 'ptmot', false, 'A traffic card with a stacked bar per day. Run along it and the column opens to show the breakdown. Day / Week regrows the bars in a wave.'],
+  ['dot-morph', 'Dot morph', 'DotMorph.tsx', false, 'dot_morph', false, 'A swarm of dots that holds a shape. The cursor stirs it, a tap spins a whirlpool and the dots curl into the next shape.'],
 ]
 
 const read = (f) => {
@@ -91,7 +108,7 @@ for (const [name, title, f, free, permalink, bot, description] of ITEMS) {
   }
   writeFileSync(join(OUT, 'items', `${name}.json`), JSON.stringify(item, null, 2) + '\n')
   // The README from the release zip: how to use it and every prop (the MCP server sends it to agents)
-  const readme = readFileSync(join(KIT, 'release', `stackd-${name}`, 'README.md'), 'utf8')
+  const readme = readFileSync(join(KIT, 'release', `stackd-${RELEASE_DIR[name] ?? name}`, 'README.md'), 'utf8')
   index.push({ name, title, description, free, permalink, productId: PRODUCT_IDS[name] ?? '', readme })
 }
 

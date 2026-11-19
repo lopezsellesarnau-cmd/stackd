@@ -372,8 +372,8 @@ const GUMROAD: Record<Id, string> = {
   toast: 'https://arnolop.gumroad.com/l/toast?wanted=true',
   heat: 'https://arnolop.gumroad.com/l/heat_word?wanted=true',
   ring: 'https://arnolop.gumroad.com/l/spending_ring?wanted=true',
-  bars: '',
-  morph: '',
+  bars: 'https://arnolop.gumroad.com/l/ptmot',
+  morph: 'https://arnolop.gumroad.com/l/dot_morph',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
