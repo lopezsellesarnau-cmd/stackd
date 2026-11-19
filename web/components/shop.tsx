@@ -450,13 +450,16 @@ export function Shop() {
   const shown = ITEMS.filter((i) => cat === 'all' || i.cat === cat)
   // Fill the pattern: real components first, stand-ins after (only under "All")
   let next = 0
-  const cells = PATTERN.map((on, i) => {
-    if (!on) return { key: `void-${i}`, kind: 'void' as const }
+  // The pattern repeats until every component has a cell (it holds 19 per pass)
+  const cells = []
+  for (let i = 0; next < shown.length || i < PATTERN.length; i++) {
+    const on = PATTERN[i % PATTERN.length]
+    if (!on) { cells.push({ key: `void-${i}`, kind: 'void' as const }); continue }
     const item = shown[next]
     const n = next++
-    if (item) return { key: item.id, kind: 'item' as const, item }
-    return cat === 'all' ? { key: `soon-${n}`, kind: 'soon' as const } : { key: `void-${i}`, kind: 'void' as const }
-  })
+    if (item) cells.push({ key: item.id, kind: 'item' as const, item })
+    else cells.push(cat === 'all' ? { key: `soon-${n}`, kind: 'soon' as const } : { key: `void-${i}`, kind: 'void' as const })
+  }
 
   const filters: [Cat | 'all', string, number][] = [
     ['all', t.all, ITEMS.length],
