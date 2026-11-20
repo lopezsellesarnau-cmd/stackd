@@ -298,10 +298,10 @@ const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
 type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph'
-// Shop order (not the kit numbers): the liveliest first, the three picture ones kept apart
+// Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
-  { id: 'swap', cat: 'media' },
   { id: 'bot', cat: 'characters' },
+  { id: 'swap', cat: 'media' },
   { id: 'prompt', cat: 'ai' },
   { id: 'palette', cat: 'navigation' },
   { id: 'memo', cat: 'audio' },
@@ -554,7 +554,7 @@ const eyeKinds = Object.keys(EYES) as BotEyes[]
 
 /** The Bot, live. The tile opens the details, where its shape, eyes and colour can be changed. */
 function BotTile({ t }: { t: T }) {
-  const [cfg, setCfg] = useState<Config>({ shape: 'pill', eyes: 'tall', color: COLORS[0] })
+  const [cfg, setCfg] = useState<Config>({ shape: 'hexagon', eyes: 'tall', color: COLORS[0] })
   const [open, setOpen] = useState(false)
   const { shape, eyes, color } = cfg
   // A white bot sits on a dark tile
