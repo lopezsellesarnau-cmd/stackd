@@ -7,7 +7,7 @@ import { useEffect, useId, useRef } from 'react'
  * A bot whose eyes follow the cursor around the page, and blink now and then.
  * With `mood` its eyelids show how it feels: droopy when sad, smiling eyes when glad.
  * With `mouth` it opens its mouth (0 closed, 1 wide open); it sits on the sphere like the eyes.
- * Four bodies, four kinds of eyes, any colour.
+ * Nine bodies, four kinds of eyes, any colour.
  *
  * The eyes are points on a sphere: when the bot turns, an eye heading for the
  * edge moves less and gets narrower, so a flat shape reads as round.
@@ -21,6 +21,12 @@ export const SHAPES = {
   squircle: { d: 'M36 4h28c18 0 32 14 32 32v28c0 18-14 32-32 32H36C18 96 4 82 4 64V36C4 18 18 4 36 4Z', cx: 50, cy: 50, rx: 46, ry: 46 },
   pill: { d: 'M36 18h28a32 32 0 0 1 0 64H36a32 32 0 0 1 0-64Z', cx: 50, cy: 50, rx: 46, ry: 32 },
   arch: { d: 'M50 6c22 0 40 18 40 40v40c0 5.5-4.5 10-10 10H20c-5.5 0-10-4.5-10-10V46C10 24 28 6 50 6Z', cx: 50, cy: 52, rx: 40, ry: 44 },
+  drop: { d: 'M44 8c3-4 9-4 12 0C66 20 86 42 86 62a36 36 0 0 1-72 0C14 42 34 20 44 8Z', cx: 50, cy: 62, rx: 34, ry: 30 },
+  triangle: { d: 'M62 25.1L86 70.9Q98 94 72 94H28Q2 94 14 70.9L38 25.1Q50 2 62 25.1Z', cx: 50, cy: 66, rx: 30, ry: 22 },
+  /* Cloud and clover are overlapping circles, all drawn the same way round, so they fill as one shape. */
+  cloud: { d: 'M6 58a24 24 0 1 0 48 0a24 24 0 1 0-48 0ZM24 40a28 28 0 1 0 56 0a28 28 0 1 0-56 0ZM52 56a22 22 0 1 0 44 0a22 22 0 1 0-44 0ZM24 70a22 22 0 1 0 44 0a22 22 0 1 0-44 0ZM52 72a18 18 0 1 0 36 0a18 18 0 1 0-36 0Z', cx: 50, cy: 58, rx: 40, ry: 30 },
+  clover: { d: 'M8 32a24 24 0 1 0 48 0a24 24 0 1 0-48 0ZM44 32a24 24 0 1 0 48 0a24 24 0 1 0-48 0ZM8 68a24 24 0 1 0 48 0a24 24 0 1 0-48 0ZM44 68a24 24 0 1 0 48 0a24 24 0 1 0-48 0ZM16 50a34 34 0 1 0 68 0a34 34 0 1 0-68 0Z', cx: 50, cy: 50, rx: 40, ry: 40 },
+  hexagon: { d: 'M85.9 70.4L70.4 85.9Q61.9 94.4 50.3 91.3L29.1 85.6Q17.5 82.5 14.4 70.9L8.7 49.7Q5.6 38.1 14.1 29.6L29.6 14.1Q38.1 5.6 49.7 8.7L70.9 14.4Q82.5 17.5 85.6 29.1L91.3 50.3Q94.4 61.9 85.9 70.4Z', cx: 50, cy: 50, rx: 40, ry: 40 },
 } as const
 
 /* The eyes: width, height and corner, in the same units. */
