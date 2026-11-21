@@ -395,8 +395,7 @@ const GUMROAD: Record<Id, string> = {
   morph: 'https://arnolop.gumroad.com/l/dot_morph',
   squeeze: 'https://arnolop.gumroad.com/l/squeeze_button?wanted=true',
   split: 'https://arnolop.gumroad.com/l/split_list?wanted=true',
-  // Not on Gumroad yet: the button says Coming soon
-  tape: '',
+  tape: 'https://arnolop.gumroad.com/l/tape_measure?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'

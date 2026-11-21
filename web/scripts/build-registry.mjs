@@ -42,6 +42,7 @@ const PRODUCT_IDS = {
   'dot-morph': 'uKNTGhIuHfZ-S1pmZ4d_-g==',
   'squeeze-button': 'AZH4eLIUQ8Hbc3Pq3EE_Xw==',
   'split-list': 'VSWiXBQ5OEKkQZ3J-CV4Tg==',
+  'tape-measure': 'YiETVHiVxun_efJnAYniMA==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -78,6 +79,7 @@ const ITEMS = [
   ['dot-morph', 'Dot morph', 'DotMorph.tsx', false, 'dot_morph', false, 'A swarm of dots that holds a shape. The cursor stirs it, a tap spins a whirlpool and the dots curl into the next shape.'],
   ['squeeze-button', 'Squeeze button', 'SqueezeButton.tsx', true, 'squeeze_button', true, 'Words in ink blocks that squeeze each other on hover; click and they slide into one block with the Bot saying Sent.'],
   ['split-list', 'Split list', 'SplitList.tsx', true, 'split_list', false, 'A list split down the middle that parts around the cursor like a lens and turns bold there.'],
+  ['tape-measure', 'Tape measure', 'TapeMeasure.tsx', true, 'tape_measure', true, 'A slider you pull like a real tape measure: it whips back when you let go, or stays with the lock on. The Bot is the hub.'],
 ]
 
 const read = (f) => {

@@ -97,9 +97,16 @@ export function TapeMeasure({
     spin.current?.setAttribute("transform", `rotate(${((-L / ((R + HUB) / 2)) * (180 / Math.PI)).toFixed(1)} ${CASE / 2} ${CASE / 2})`);
   };
 
+  // The last value sent to onChange, so it's called once per change, not every frame
+  const sent = useRef<number | null>(null);
+  const report = (v: number) => {
+    if (v === sent.current) return;
+    sent.current = v;
+    onChange?.(v);
+  };
   const settle = (v: number) => {
     setShown(v);
-    onChange?.(v);
+    report(v);
   };
 
   const run = () => {
@@ -124,8 +131,9 @@ export function TapeMeasure({
         }
       }
       draw();
-      const v = valueOf(st.L);
-      setShown(Math.round(v / step) * step);
+      const v = Math.round(valueOf(st.L) / step) * step;
+      setShown(v);
+      report(v);
       // The Bot watches the hook
       const far = st.L / reach;
       setLook({ x: 0.35 + 0.5 * far, y: 0.1 });
