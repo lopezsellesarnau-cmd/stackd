@@ -40,6 +40,7 @@ import { HeatWord, type HeatShape } from './kit/heat-word'
 import { SpendingRing } from './kit/spending-ring'
 import { StackedBars } from './kit/stacked-bars'
 import { DotMorph } from './kit/dot-morph'
+import { SqueezeButton } from './kit/squeeze-button'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -64,6 +65,8 @@ const COPY = {
     promptIncludes: ['Figma file, desktop and mobile', 'React + Tailwind code, with the Bot', 'Works with any AI: Claude, GPT, your own', 'A ready /api/chat route for Next.js'],
     payAbout: 'A slide-to-confirm button for checkouts. Drag the handle to the end: it locks, shows a spinner while your payment runs, then fills and ticks. Let go early and it springs back. If the payment fails it shakes and resets.',
     payIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Works with mouse, touch and keyboard', 'Plug in any payment with one promise'],
+    squeezeAbout: 'A button made of words, each in its own ink block, and one block holds the Bot. Move over one and it swells while the others get squeezed: a block squeezed too thin turns its word on its side. Click and the blocks run together like ink, the Bot pops out smiling with "Sent", and it splits back into the words.',
+    squeezeIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Your words, the Bot in any block or none', 'One real button: keyboard and screen readers'],
     statAbout: 'A stat card for dashboards. The number counts up and the line draws itself in. Run along the line and the number follows you. In live mode a new point arrives and the old line flows into the new one.',
     statIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Works with mouse, touch and keyboard', 'Plug in your own data, or a live feed'],
     live: 'Live',
@@ -187,6 +190,8 @@ const COPY = {
     promptIncludes: ['Archivo de Figma, escritorio y móvil', 'Código en React + Tailwind, con el Bot', 'Funciona con cualquier IA: Claude, GPT o la tuya', 'Una ruta /api/chat lista para Next.js'],
     payAbout: 'Un botón de deslizar para confirmar el pago. Arrastra el asa hasta el final: se bloquea, muestra un spinner mientras se procesa el pago y luego se llena con un check. Si lo sueltas antes, vuelve atrás. Si el pago falla, tiembla y se reinicia.',
     payIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Funciona con ratón, táctil y teclado', 'Conecta cualquier pago con una promesa'],
+    squeezeAbout: 'Un botón hecho de palabras, cada una en su bloque de tinta, y un bloque lleva el Bot. Pasa por encima de uno y se hincha mientras los demás se aprietan: si un bloque queda demasiado estrecho, su palabra se pone de lado. Haz clic y los bloques se juntan como tinta, el Bot sale sonriendo con "Sent" y luego vuelven a separarse en palabras.',
+    squeezeIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Tus palabras, el Bot en cualquier bloque o en ninguno', 'Un botón real: teclado y lectores de pantalla'],
     statAbout: 'Una tarjeta de estadística para dashboards. El número sube y la línea se dibuja sola. Recorre la línea y el número te sigue. En modo en directo llega un punto nuevo y la línea vieja se transforma en la nueva.',
     statIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Funciona con ratón, táctil y teclado', 'Conecta tus datos o un feed en directo'],
     live: 'En directo',
@@ -297,11 +302,12 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'swap', cat: 'media' },
+  { id: 'squeeze', cat: 'buttons' },
   { id: 'prompt', cat: 'ai' },
   { id: 'palette', cat: 'navigation' },
   { id: 'memo', cat: 'audio' },
@@ -330,7 +336,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7', bars: '€7', morph: '€7' }
+const PRICE: Partial<Record<Id, string>> = { squeeze: '€7', flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7', bars: '€7', morph: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -374,12 +380,15 @@ const GUMROAD: Record<Id, string> = {
   ring: 'https://arnolop.gumroad.com/l/spending_ring?wanted=true',
   bars: 'https://arnolop.gumroad.com/l/ptmot',
   morph: 'https://arnolop.gumroad.com/l/dot_morph',
+  // Not on Gumroad yet: the button says Coming soon
+  squeeze: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
 
 // Each component's name in the shadcn registry (www.stackd.codes/r/{name}.json)
 const REGISTRY_NAME: Record<Id, string> = {
+  squeeze: 'squeeze-button',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
@@ -528,7 +537,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -668,7 +677,8 @@ function Detail({
             <code>{usage}</code>
           </pre>
 
-          {REGISTRY_BY_HREF[href] ? <Install t={t} name={REGISTRY_BY_HREF[href]} paid={!!price} /> : null}
+          {/* Only once it's on Gumroad (and so in the registry) */}
+          {href && REGISTRY_BY_HREF[href] ? <Install t={t} name={REGISTRY_BY_HREF[href]} paid={!!price} /> : null}
 
           <ul className="mt-5 space-y-1 text-fg-muted">
             {includes.map((i) => (
@@ -2771,6 +2781,74 @@ function MorphTile({ t }: { t: T }) {
                 <span className="px-1">{t.darkT}</span>
               </Pick>
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 28 · Squeeze button. Live in the tile: hover and click it there; the margin opens the details. */
+function SqueezeTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [bot, setBot] = useState(true)
+  const words = bot ? ['Keep', 'touch'] : ['Keep', 'in', 'touch']
+  // Sized to the tile (they go from ~240 px on a wide desktop grid to the full phone width)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(300)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(Math.min(320, e.contentRect.width - 32))))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Squeeze button`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
+          <div className="pointer-events-auto">
+            {open ? null : (
+              <SqueezeButton key={w} theme={dark ? 'dark' : 'light'} words={words} botAt={bot ? 1 : -1} width={w} height={Math.round(w * 0.32)} />
+            )}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.buttons}
+          name="Squeeze button"
+          about={t.squeezeAbout}
+          includes={t.squeezeIncludes}
+          usage={`<SqueezeButton\n  words={[${words.map((w) => `'${w}'`).join(', ')}]}${bot ? '\n  botAt={1}' : '\n  botAt={-1}'}\n  label="Keep in touch"${dark ? '\n  theme="dark"' : ''}\n  onClick={sendMessage}\n/>`}
+          href={GUMROAD.squeeze}
+          price={PRICE.squeeze}
+          onClose={() => setOpen(false)}
+          stage={<SqueezeButton theme={dark ? 'dark' : 'light'} words={words} botAt={bot ? 1 : -1} width={340} height={108} />}
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label="Bot">
+                <Pick on={bot} label={t.on} onClick={() => setBot(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+                <Pick on={!bot} label={t.off} onClick={() => setBot(false)}>
+                  <span className="px-1">{t.off}</span>
+                </Pick>
+              </Choice>
+            </>
           }
         />
       ) : null}
