@@ -40,6 +40,7 @@ const PRODUCT_IDS = {
   'spending-ring': 'y_mnOO1ID-gm0Gx9h7l79Q==',
   'stacked-bars': 's7G0V5flmtu8BinO58qBCw==',
   'dot-morph': 'uKNTGhIuHfZ-S1pmZ4d_-g==',
+  'squeeze-button': 'AZH4eLIUQ8Hbc3Pq3EE_Xw==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -74,6 +75,7 @@ const ITEMS = [
   ['spending-ring', 'Spending ring', 'SpendingRing.tsx', false, 'spending_ring', false, 'Where the money went, as a ring of liquid ink pills. Hover to read one, tap to leave it out and the ring flows closed.'],
   ['stacked-bars', 'Stacked bars', 'StackedBars.tsx', false, 'ptmot', false, 'A traffic card with a stacked bar per day. Run along it and the column opens to show the breakdown. Day / Week regrows the bars in a wave.'],
   ['dot-morph', 'Dot morph', 'DotMorph.tsx', false, 'dot_morph', false, 'A swarm of dots that holds a shape. The cursor stirs it, a tap spins a whirlpool and the dots curl into the next shape.'],
+  ['squeeze-button', 'Squeeze button', 'SqueezeButton.tsx', true, 'squeeze_button', true, 'Words in ink blocks that squeeze each other on hover; click and they slide into one block with the Bot saying Sent.'],
 ]
 
 const read = (f) => {

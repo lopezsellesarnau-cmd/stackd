@@ -342,7 +342,8 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 ]
 
 // The paid ones; everything else is free
-const PRICE: Partial<Record<Id, string>> = { squeeze: '€7', split: '€7', flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7', bars: '€7', morph: '€7' }
+// Squeeze button and Split list are free, like the next new ones for now
+const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7', bars: '€7', morph: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
 const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -386,8 +387,8 @@ const GUMROAD: Record<Id, string> = {
   ring: 'https://arnolop.gumroad.com/l/spending_ring?wanted=true',
   bars: 'https://arnolop.gumroad.com/l/ptmot',
   morph: 'https://arnolop.gumroad.com/l/dot_morph',
+  squeeze: 'https://arnolop.gumroad.com/l/squeeze_button?wanted=true',
   // Not on Gumroad yet: the button says Coming soon
-  squeeze: '',
   split: '',
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bot, type BotShape } from "./bot";
 
 /**
@@ -8,9 +8,9 @@ import { Bot, type BotShape } from "./bot";
  * A button made of words, each in its own rounded ink block, side by side, and one block holds the Bot.
  * Move over one and it swells while the others get squeezed; a block squeezed thinner than its word turns
  * the word on its side, and the Bot shrinks with its block (its eyes follow the cursor all along).
- * Every blob springs, so they push back a little. Click and the blobs run together into one drop of ink,
- * the Bot pops out of it smiling with "Sent", and after a moment it splits back into the words.
- * If `onClick` throws, the blobs shake and come apart again.
+ * Every block springs, so they push back a little. Click and the blocks slide together into one whole
+ * block, the Bot pops out of it smiling with "Sent", and after a moment it splits back into the words.
+ * If `onClick` throws, the blocks shake and come apart again.
  * One real <button>, so the keyboard and screen readers work. React + Tailwind and the StackD Bot,
  * no other libraries. Respects reduced motion.
  */
@@ -59,7 +59,6 @@ export function SqueezeButton({
   const dark = theme === "dark";
   const ink = dark ? "#FFFFFF" : "#141310";
   const paper = dark ? "#141310" : "#FFFFFF";
-  const goo = `goo-${useId().replace(/:/g, "")}`;
 
   const [status, setStatus] = useState<Status>("idle");
   const root = useRef<HTMLButtonElement>(null);
@@ -73,7 +72,7 @@ export function SqueezeButton({
   // The words grow with the button: 22 px at the default 120 px tall
   const font = Math.round(height * 0.183);
   const layer = useRef<HTMLDivElement>(null);
-  const blur = useRef<SVGFEGaussianBlurElement>(null);
+  const whole = useRef<HTMLDivElement>(null);
   const done = useRef<HTMLDivElement>(null);
   // What the loop springs towards: which blob is swollen, and how far the blobs have run together
   const aim = useRef({ hover: -1, merge: 0 });
@@ -127,10 +126,12 @@ export function SqueezeButton({
         }
         x += bw + gap;
       }
-      // The ink filter only while they run together; at rest the blobs stay crisp and apart
-      const g = layer.current
-      if (g) g.style.filter = m > 0.02 ? `url(#${goo})` : "none";
-      blur.current?.setAttribute("stdDeviation", (2 + m * 9).toFixed(2));
+      // Running together: one whole block fades in over the blocks as they meet, so the merged
+      // button is a single shape (no filter: switching one on and off made it flicker)
+      const k = Math.min(1, Math.max(0, (m - 0.45) / 0.35));
+      if (whole.current) whole.current.style.opacity = k.toFixed(3);
+      // The blocks stay solid underneath until it's whole, so nothing shows through mid-way
+      if (layer.current) layer.current.style.opacity = k < 1 ? "1" : "0";
       const d = done.current;
       if (d) {
         const k = Math.max(0, (m - 0.6) / 0.4);
@@ -182,7 +183,7 @@ export function SqueezeButton({
     };
     draw();
     return () => cancelAnimationFrame(raf);
-  }, [items.map((x) => x ?? "@bot").join("|"), width, height, goo]);
+  }, [items.map((x) => x ?? "@bot").join("|"), width, height]);
 
   const over = (clientX: number) => {
     if (status !== "idle") return;
@@ -247,13 +248,14 @@ export function SqueezeButton({
       className="relative block cursor-pointer select-none rounded-[28px] outline-none focus-visible:ring-2 focus-visible:ring-offset-4"
       style={{ width, height, ["--tw-ring-color" as string]: ink, ["--tw-ring-offset-color" as string]: paper }}
     >
-      <svg aria-hidden width="0" height="0" className="absolute">
-        {/* sRGB, or the blur shifts the ink's colour and leaves a muddy ring inside */}
-        <filter id={goo} colorInterpolationFilters="sRGB">
-          <feGaussianBlur ref={blur} in="SourceGraphic" stdDeviation="2" />
-          <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" />
-        </filter>
-      </svg>
+      {/* The whole block they become: rounded on the left like the word blocks, round on the right
+          like the last one */}
+      <div
+        ref={whole}
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: ink, opacity: 0, borderRadius: `${height * 0.28}px ${height / 2}px ${height / 2}px ${height * 0.28}px` }}
+      />
 
       {/* The blocks: rounded rectangles that become pills when they're thin */}
       <div ref={layer} aria-hidden className="absolute inset-0">
@@ -269,14 +271,14 @@ export function SqueezeButton({
         ))}
       </div>
 
-      {/* The Bot in its block, outside the ink filter so it stays sharp */}
+      {/* The Bot in its block, on top of the blocks */}
       {botAt >= 0 ? (
         <div ref={face} aria-hidden className="pointer-events-none absolute top-1/2">
           <Bot size={botSize} shape={bot} eyes="tall" color={paper} eyeColor={ink} poke={false} />
         </div>
       ) : null}
 
-      {/* The words, outside the ink filter so they stay sharp */}
+      {/* The words, on top of the blocks */}
       {items.map((word, i) => word === null ? null : (
         <span
           key={word + i}
@@ -298,7 +300,8 @@ export function SqueezeButton({
         className="pointer-events-none absolute top-1/2 left-1/2 flex items-center gap-3"
         style={{ opacity: 0, color: paper }}
       >
-        <Bot size={Math.round(height * 0.42)} shape={bot} eyes="tall" color={paper} eyeColor={ink} happy={status === "done"} poke={false} />
+        {/* Facing you while it says it */}
+        <Bot size={Math.round(height * 0.42)} shape={bot} eyes="tall" color={paper} eyeColor={ink} happy={status === "done"} look={{ x: 0, y: 0 }} poke={false} />
         <span className="font-medium uppercase tracking-[-0.01em]" style={{ fontSize: font }}>{doneLabel}</span>
       </div>
     </button>
