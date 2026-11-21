@@ -22,6 +22,8 @@ type Props = {
   gap?: number;
   /** How many lines above and below it reaches (roughly). */
   reach?: number;
+  /** Hold the gap open at this line (0 = first), without a cursor: for covers and still mockups. */
+  at?: number;
   theme?: "light" | "dark";
   className?: string;
 };
@@ -33,7 +35,7 @@ const LIGHT = 340;
 const HEAVY = 820;
 const FONT = '"SF Pro Display", -apple-system, system-ui, "Helvetica Neue", sans-serif';
 
-export function SplitList({ rows, size = 30, gap: gapProp, reach = 2.6, theme = "light", className = "" }: Props) {
+export function SplitList({ rows, size = 30, gap: gapProp, reach = 2.6, at: holdAt, theme = "light", className = "" }: Props) {
   const dark = theme === "dark";
   const gap = gapProp ?? size * 5;
   const ink = dark ? "#FFFFFF" : "#141310";
@@ -99,12 +101,17 @@ export function SplitList({ rows, size = 30, gap: gapProp, reach = 2.6, theme = 
     kick.current = () => {
       if (!raf) raf = requestAnimationFrame(tick);
     };
+    // Held open at a line
+    if (holdAt !== undefined && mids[holdAt] !== undefined) {
+      aim.current = { y: mids[holdAt], open: 1 };
+      kick.current();
+    }
     window.addEventListener("resize", measure);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", measure);
     };
-  }, [rows, gap, reach, size]);
+  }, [rows, gap, reach, size, holdAt]);
 
   const at = (clientY: number) => {
     const r = box.current?.getBoundingClientRect();
@@ -120,7 +127,7 @@ export function SplitList({ rows, size = 30, gap: gapProp, reach = 2.6, theme = 
       style={{ color: ink }}
       onPointerMove={(e) => e.pointerType === "mouse" && at(e.clientY)}
       onPointerLeave={(e) => {
-        if (e.pointerType !== "mouse") return;
+        if (e.pointerType !== "mouse" || holdAt !== undefined) return;
         aim.current.open = 0;
         kick.current();
       }}

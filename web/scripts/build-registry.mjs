@@ -41,6 +41,7 @@ const PRODUCT_IDS = {
   'stacked-bars': 's7G0V5flmtu8BinO58qBCw==',
   'dot-morph': 'uKNTGhIuHfZ-S1pmZ4d_-g==',
   'squeeze-button': 'AZH4eLIUQ8Hbc3Pq3EE_Xw==',
+  'split-list': 'VSWiXBQ5OEKkQZ3J-CV4Tg==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -76,6 +77,7 @@ const ITEMS = [
   ['stacked-bars', 'Stacked bars', 'StackedBars.tsx', false, 'ptmot', false, 'A traffic card with a stacked bar per day. Run along it and the column opens to show the breakdown. Day / Week regrows the bars in a wave.'],
   ['dot-morph', 'Dot morph', 'DotMorph.tsx', false, 'dot_morph', false, 'A swarm of dots that holds a shape. The cursor stirs it, a tap spins a whirlpool and the dots curl into the next shape.'],
   ['squeeze-button', 'Squeeze button', 'SqueezeButton.tsx', true, 'squeeze_button', true, 'Words in ink blocks that squeeze each other on hover; click and they slide into one block with the Bot saying Sent.'],
+  ['split-list', 'Split list', 'SplitList.tsx', true, 'split_list', false, 'A list split down the middle that parts around the cursor like a lens and turns bold there.'],
 ]
 
 const read = (f) => {

@@ -388,8 +388,7 @@ const GUMROAD: Record<Id, string> = {
   bars: 'https://arnolop.gumroad.com/l/ptmot',
   morph: 'https://arnolop.gumroad.com/l/dot_morph',
   squeeze: 'https://arnolop.gumroad.com/l/squeeze_button?wanted=true',
-  // Not on Gumroad yet: the button says Coming soon
-  split: '',
+  split: 'https://arnolop.gumroad.com/l/split_list?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
