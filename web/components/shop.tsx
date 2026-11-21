@@ -3041,7 +3041,7 @@ function TapeTile({ t }: { t: T }) {
   )
 }
 
-/** 31 · Label maker. Live in the tile (drawn at 420 and scaled to fit); the margin opens the details. */
+/** 31 · Label maker. Live in the tile (drawn at 340 and scaled to fit); the margin opens the details. */
 function LabelTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(false)
@@ -3056,9 +3056,9 @@ function LabelTile({ t }: { t: T }) {
   }, [])
   const [stageW, setStageW] = useState(520)
   useEffect(() => {
-    if (open) setStageW(Math.min(560, window.innerWidth - 64))
+    if (open) setStageW(Math.min(440, window.innerWidth - 64))
   }, [open])
-  const BASE = 420
+  const BASE = 340
 
   return (
     <>

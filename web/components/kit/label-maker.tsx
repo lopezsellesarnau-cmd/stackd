@@ -125,7 +125,7 @@ export function LabelMaker({
         @media (prefers-reduced-motion:reduce){[data-lm] *{animation:none!important}}
       `}</style>
 
-      <div data-lm className="relative" style={{ height: TOP + MACHINE.h + 22 }}>
+      <div data-lm className="relative" style={{ height: TOP + MACHINE.h + 12 }}>
         {/* The tape: grows out of the machine to the left, the newest letter at the mouth */}
         <div className="absolute" style={{ right: width - mouth + 6, top: tapeTop, height: TAPE_H }}>
           {text || cutting ? (
@@ -205,8 +205,8 @@ export function LabelMaker({
         ) : null}
       </div>
 
-      {/* The labels: neat tags in a row */}
-      <ul className="m-0 flex list-none flex-wrap gap-2 p-0" aria-label="Labels">
+      {/* The labels: neat tags right under the machine, lined up on its side */}
+      <ul className="m-0 flex list-none flex-wrap justify-end gap-2 p-0" aria-label="Labels">
         {labels.map((l, i) => (
           <li key={l.id}>
             <button
