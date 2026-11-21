@@ -7,6 +7,7 @@ import { useEffect, useId, useRef } from 'react'
  * A bot whose eyes follow the cursor around the page, and blink now and then.
  * With `mood` its eyelids show how it feels: droopy when sad, smiling eyes when glad.
  * With `mouth` it opens its mouth (0 closed, 1 wide open); it sits on the sphere like the eyes.
+ * Click or tap it and it squashes down, bounces back and smiles for a moment (`poke`, on by default).
  * Nine bodies, four kinds of eyes, any colour.
  *
  * The eyes are points on a sphere: when the bot turns, an eye heading for the
@@ -63,10 +64,16 @@ type Props = {
   turn?: number
   /** Only watch the cursor inside the nearest ancestor matching this selector (a card, say). Unset: the whole page. */
   within?: string
+  /** Click or tap it: it squashes, bounces back and smiles for a moment. Default true. */
+  poke?: boolean
+  /** Called when it's clicked or tapped. */
+  onPoke?: () => void
   className?: string
 }
 
 const SPACING = 13 // from the centre to each eye, in units
+const POKE_SQUASH = 650 // ms the squash wobbles for
+const POKE_SMILE = 850 // ms it smiles for
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
 export function Bot({
@@ -82,6 +89,8 @@ export function Bot({
   mouth = 0,
   turn,
   within,
+  poke = true,
+  onPoke,
   className = '',
 }: Props) {
   const ball = useRef<SVGSVGElement>(null)
@@ -90,6 +99,9 @@ export function Bot({
   const tops = useRef<(SVGRectElement | null)[]>([])
   const bottoms = useRef<(SVGEllipseElement | null)[]>([])
   const mouthEl = useRef<SVGRectElement>(null)
+  const squash = useRef<SVGGElement>(null)
+  // When it was last poked (performance.now()), and the loop's way in
+  const pokedAt = useRef(-1e9)
   const clip = `bot-${useId().replace(/:/g, '')}`
   // Where the face should point; the loop springs towards it
   const aim = useRef({ x: 0, y: 0, m: 0, o: 0 })
@@ -115,6 +127,14 @@ export function Bot({
 
     const draw = (now: number) => {
       const body = SHAPES[props.current.shape]
+      // Poked: it squashes onto its base and wobbles back (a damped spring), the base stays put
+      const sq = squash.current
+      if (sq) {
+        const k = (now - pokedAt.current) / POKE_SQUASH
+        // Presses down over the first ~100 ms, springs up past round, settles
+        const s = still || k >= 1 ? 0 : 0.2 * Math.exp(-3.5 * k) * Math.sin(k * Math.PI * 3.2)
+        sq.setAttribute('transform', s ? `translate(50 98) scale(${(1 + s).toFixed(4)} ${(1 - s).toFixed(4)}) translate(-50 -98)` : '')
+      }
       const eye = EYES[props.current.eyeStyle]
       const since = now - blinkAt
       const lid = since < 160 ? 1 - 0.9 * Math.sin((since / 160) * Math.PI) : 1
@@ -138,7 +158,7 @@ export function Bot({
         const k = 0.45 + 0.55 * near
         let w = eye.w * k * (0.7 + 0.3 * near)
         let h = Math.max(0.8, eye.h * k * lid)
-        if (props.current.happy) {
+        if (props.current.happy || now - pokedAt.current < POKE_SMILE) {
           w = Math.max(w, 17 * k) * 1.1
           h = 5
         }
@@ -156,7 +176,7 @@ export function Bot({
         // lower lid that pushes up, so the eye smiles. Hidden at 0 and on happy eyes.
         const top = tops.current[i]
         const bottom = bottoms.current[i]
-        const m = props.current.happy ? 0 : t.m
+        const m = props.current.happy || now - pokedAt.current < POKE_SMILE ? 0 : t.m
         const H = eye.h * k // the open height, so a blink doesn't move the lids
         if (top) {
           const cut = Math.max(0, -m) * 0.42 * H
@@ -231,7 +251,7 @@ export function Bot({
       draw(now)
       const settled =
         Math.abs(tx - t.x) + Math.abs(ty - t.y) + Math.abs(t.vx) + Math.abs(t.vy) + Math.abs(tm - t.m) + Math.abs(t.vm) + Math.abs(to - t.o) + Math.abs(t.vo) < 0.002
-      if (settled && now - blinkAt > 160) {
+      if (settled && now - blinkAt > 160 && now - pokedAt.current > POKE_SMILE) {
         raf = 0
         prev = 0
         return
@@ -292,12 +312,31 @@ export function Bot({
 
   const body = SHAPES[shape]
   return (
-    <svg ref={ball} aria-hidden viewBox="0 0 100 100" width={size} height={size} className={className}>
+    <svg
+      ref={ball}
+      aria-hidden
+      viewBox="0 0 100 100"
+      width={size}
+      height={size}
+      className={className}
+      style={poke ? { cursor: 'pointer', touchAction: 'manipulation' } : undefined}
+      onPointerDown={
+        poke
+          ? () => {
+              pokedAt.current = performance.now()
+              kick.current()
+              onPoke?.()
+            }
+          : undefined
+      }
+    >
       <defs>
         <clipPath id={clip}>
           <path d={body.d} />
         </clipPath>
       </defs>
+      {/* Everything squashes together when it's poked */}
+      <g ref={squash}>
       <path d={body.d} fill={color} />
       <g clipPath={`url(#${clip})`} fill={eyeColor}>
         {[0, 1].map((i) => (
@@ -330,6 +369,7 @@ export function Bot({
           </g>
         ))}
         <rect ref={mouthEl} style={{ display: 'none' }} />
+      </g>
       </g>
     </svg>
   )
