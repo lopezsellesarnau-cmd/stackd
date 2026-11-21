@@ -42,6 +42,7 @@ import { StackedBars } from './kit/stacked-bars'
 import { DotMorph } from './kit/dot-morph'
 import { SqueezeButton } from './kit/squeeze-button'
 import { SplitList } from './kit/split-list'
+import { TapeMeasure } from './kit/tape-measure'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -122,6 +123,8 @@ const COPY = {
     heatIncludes: ['Figma file with every state', 'React + Tailwind code, one canvas, no other libraries', 'Any word, the Bot or dots', 'Three palettes or your own colours'],
     splitAbout: 'A long list split down the middle: on each line one name ends at the centre and the next one starts there. Move over it and the lines part around the cursor like under a lens, and the same lens makes them bold: light far away, heavy where you are. It follows the cursor up and down.',
     splitIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your list, your size and how far it opens', 'Mouse and touch, respects reduced motion'],
+    tapeAbout: 'A slider you pull like a real tape measure. Grab the hook and pull: the tape runs out of its case with its marks sliding past, the coil gets thinner in the window, and the reading at the case\'s mouth is the value. Let go and it whips back in; with the lock on, it stays where you leave it. The Bot is the hub of the coil and watches the hook.',
+    tapeIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Your units, min, max and step', 'Keyboard, screen readers and reduced motion'],
     ringAbout: 'Where the money went, as a ring of thick ink pills sized by amount; the small ones roll into drops. Hover one and it swells while the middle counts to it. Tap it to leave it out: it pinches off and falls, the others flow together and the total counts down. Tap it under the ring to pour it back.',
     ringIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your categories, icons, colours and currency', 'Keyboard and screen reader support'],
     barsAbout: 'A traffic card with one stacked bar per day, a capsule per source and the bounced part under the line. Run along it and the column opens: its capsules spread apart so each one reads, the big number counts to that day and the key fills in the breakdown. Day / Week regrows the bars in a wave.',
@@ -249,6 +252,8 @@ const COPY = {
     heatIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, un canvas, sin otras librerías', 'Cualquier palabra, el Bot o puntos', 'Tres paletas o tus propios colores'],
     splitAbout: 'Una lista larga partida por el centro: en cada línea un nombre termina en el centro y el siguiente empieza ahí. Pasa por encima y las líneas se separan alrededor del cursor como bajo una lupa, y la misma lupa las vuelve negritas: finas lejos, gruesas donde estás. Sigue al cursor arriba y abajo.',
     splitIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Tu lista, tu tamaño y lo que se abre', 'Ratón y táctil, respeta el movimiento reducido'],
+    tapeAbout: 'Un slider que se tira como una cinta métrica de verdad. Agarra el gancho y tira: la cinta sale de su caja con las marcas pasando, la bobina se ve adelgazar por la ventana y la lectura en la boca de la caja es el valor. Suéltala y vuelve de golpe; con el bloqueo puesto, se queda donde la dejas. El Bot es el eje de la bobina y mira el gancho.',
+    tapeIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Tus unidades, mínimo, máximo y paso', 'Teclado, lectores de pantalla y movimiento reducido'],
     ringAbout: 'En qué se fue el dinero: un anillo de píldoras de tinta, cada una del tamaño de su gasto; las pequeñas se enrollan en gotas. Pasa por encima y se hincha mientras el centro cuenta hasta su cifra. Tócala para dejarla fuera: se desprende y cae, las demás fluyen hasta cerrar el hueco y el total baja. Tócala bajo el anillo para devolverla.',
     ringIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Tus categorías, iconos, colores y moneda', 'Teclado y lectores de pantalla'],
     barsAbout: 'Una tarjeta de tráfico con una barra apilada por día, una cápsula por fuente y la parte que rebotó bajo la línea. Recórrela y la columna se abre: sus cápsulas se separan para leer cada una, el número grande cuenta hasta ese día y la leyenda muestra el desglose. Día / Semana hace crecer las barras otra vez en ola.',
@@ -307,13 +312,14 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'swap', cat: 'media' },
   { id: 'squeeze', cat: 'buttons' },
   { id: 'split', cat: 'text' },
+  { id: 'tape', cat: 'inputs' },
   { id: 'prompt', cat: 'ai' },
   { id: 'palette', cat: 'navigation' },
   { id: 'memo', cat: 'audio' },
@@ -389,6 +395,8 @@ const GUMROAD: Record<Id, string> = {
   morph: 'https://arnolop.gumroad.com/l/dot_morph',
   squeeze: 'https://arnolop.gumroad.com/l/squeeze_button?wanted=true',
   split: 'https://arnolop.gumroad.com/l/split_list?wanted=true',
+  // Not on Gumroad yet: the button says Coming soon
+  tape: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -397,6 +405,7 @@ const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
 const REGISTRY_NAME: Record<Id, string> = {
   squeeze: 'squeeze-button',
   split: 'split-list',
+  tape: 'tape-measure',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
@@ -545,7 +554,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -2938,6 +2947,85 @@ function SplitTile({ t }: { t: T }) {
                 <span className="px-1">{t.darkT}</span>
               </Pick>
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+/** 30 · Tape measure. Live in the tile (pull it there); the margin opens the details. */
+function TapeTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [locked, setLocked] = useState(false)
+  const [inch, setInch] = useState(false)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(300)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width - 28)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const [stageW, setStageW] = useState(520)
+  useEffect(() => {
+    if (open) setStageW(Math.min(560, window.innerWidth - 64))
+  }, [open])
+  const units = inch ? { max: 80, unit: 'in' } : { max: 200, unit: 'cm' }
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Tape measure`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-3.5">
+          <div className="pointer-events-auto">
+            {/* Starts pulled partway out, so it reads as a tape measure at a glance */}
+            {open ? null : <TapeMeasure key={w} width={w} defaultValue={120} theme={dark ? 'dark' : 'light'} label="Length" />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.inputs}
+          name="Tape measure"
+          about={t.tapeAbout}
+          includes={t.tapeIncludes}
+          usage={`<TapeMeasure\n  min={0}\n  max={${units.max}}\n  unit="${units.unit}"${locked ? '\n  defaultLocked' : ''}${dark ? '\n  theme="dark"' : ''}\n  onChange={setLength}\n/>`}
+          href={GUMROAD.tape}
+          price={PRICE.tape}
+          onClose={() => setOpen(false)}
+          stage={<TapeMeasure key={`${locked}${inch}${stageW}`} width={stageW} max={units.max} unit={units.unit} defaultValue={Math.round(units.max * 0.6)} defaultLocked={locked} theme={dark ? 'dark' : 'light'} />}
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label="Lock">
+                <Pick on={!locked} label={t.off} onClick={() => setLocked(false)}>
+                  <span className="px-1">{t.off}</span>
+                </Pick>
+                <Pick on={locked} label={t.on} onClick={() => setLocked(true)}>
+                  <span className="px-1">{t.on}</span>
+                </Pick>
+              </Choice>
+              <Choice label="Unit">
+                <Pick on={!inch} label="cm" onClick={() => setInch(false)}>
+                  <span className="px-1">cm</span>
+                </Pick>
+                <Pick on={inch} label="in" onClick={() => setInch(true)}>
+                  <span className="px-1">in</span>
+                </Pick>
+              </Choice>
+            </>
           }
         />
       ) : null}
