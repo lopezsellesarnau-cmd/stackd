@@ -95,6 +95,8 @@ export function HeatWord({
   useEffect(() => setShape(start), [start])
   const dark = theme === 'dark'
   const canvas = useRef<HTMLCanvasElement>(null)
+  // Where a press started, to tell a tap (change shape) from painting with a finger
+  const press = useRef<{ x: number; y: number; at: number; moved: boolean } | null>(null)
   const knobs = useRef({ palette, heat, dark })
   knobs.current = { palette, heat, dark }
 
@@ -255,9 +257,12 @@ export function HeatWord({
       // touch-action none: a finger painting on it stays on it, instead of scrolling the page
       style={{ width, height, touchAction: 'none', WebkitTapHighlightColor: 'transparent' }}
       onPointerEnter={(e) => { aim(e); const st = s.current; st.x = st.tx; st.y = st.ty; st.want = 1; st.run() }}
-      onPointerMove={(e) => { aim(e); s.current.want = 1; s.current.run() }}
+      onPointerMove={(e) => { const p = press.current; if (p && Math.hypot(e.clientX - p.x, e.clientY - p.y) > 10) p.moved = true; aim(e); s.current.want = 1; s.current.run() }}
       onPointerLeave={() => { const st = s.current; st.want = glow ? 1 : 0; if (glow) { st.tx = glow.x; st.ty = glow.y }; if (shape === 'bot' && !calm()) st.blink = 1; st.run() }}
-      onClick={cycle ? () => { const n = SHAPES[(SHAPES.indexOf(shape) + 1) % SHAPES.length]; setShape(n); onShapeChange?.(n) } : undefined}
+      onPointerDown={(e) => { press.current = { x: e.clientX, y: e.clientY, at: performance.now(), moved: false } }}
+      onPointerUp={(e) => { const p = press.current; if (p && Math.hypot(e.clientX - p.x, e.clientY - p.y) > 10) p.moved = true }}
+      // Only a quick tap changes the shape: painting with a finger and lifting it doesn't
+      onClick={cycle ? () => { const p = press.current; press.current = null; if (p && (p.moved || performance.now() - p.at > 350)) return; const n = SHAPES[(SHAPES.indexOf(shape) + 1) % SHAPES.length]; setShape(n); onShapeChange?.(n) } : undefined}
       role={cycle ? 'button' : 'img'}
       aria-label={shape === 'word' ? text : shape === 'bot' ? 'The StackD Bot' : 'Dots'}
     >

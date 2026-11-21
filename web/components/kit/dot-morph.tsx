@@ -171,6 +171,10 @@ export function DotMorph({
         nx[i] = h[0]
         ny[i] = h[1]
         at[i] = from && !still ? now + (Math.hypot(x[i] - from.x, y[i] - from.y) / WAVE) * 1000 : 0
+        if (still) {
+          x[i] = hx[i] = h[0]
+          y[i] = hy[i] = h[1]
+        }
       })
       opts.current.onShapeChange?.(s)
     }
@@ -281,8 +285,12 @@ export function DotMorph({
       const r = c.getBoundingClientRect()
       return { x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H }
     }
+    // A finger stirs like the mouse; only a quick tap that doesn't move changes the shape,
+    // so on a phone you can drag through the dots without it turning into the next shape
+    let press: { x: number; y: number; at: number; moved: boolean } | null = null
     const move = (e: PointerEvent) => {
-      if (still || e.pointerType !== 'mouse') return
+      if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 10) press.moved = true
+      if (still || (e.pointerType !== 'mouse' && !press)) return
       hand = where(e)
       touched = performance.now()
       wake()
@@ -291,10 +299,25 @@ export function DotMorph({
       hand = null
       wake()
     }
-    const down = (e: PointerEvent) => burst(where(e))
+    const down = (e: PointerEvent) => {
+      press = { x: e.clientX, y: e.clientY, at: performance.now(), moved: false }
+      if (e.pointerType !== 'mouse') c.setPointerCapture?.(e.pointerId)
+    }
+    const up = (e: PointerEvent) => {
+      const p = press
+      press = null
+      if (p && !p.moved && performance.now() - p.at < 350) burst(where(e))
+      if (e.pointerType !== 'mouse') leave()
+    }
+    const cancel = () => {
+      press = null
+      leave()
+    }
     c.addEventListener('pointermove', move)
     c.addEventListener('pointerleave', leave)
     c.addEventListener('pointerdown', down)
+    c.addEventListener('pointerup', up)
+    c.addEventListener('pointercancel', cancel)
 
     // first reveal: dots fly in from all over and gather into the shape
     const io = new IntersectionObserver(([e]) => {
@@ -327,6 +350,8 @@ export function DotMorph({
       c.removeEventListener('pointermove', move)
       c.removeEventListener('pointerleave', leave)
       c.removeEventListener('pointerdown', down)
+      c.removeEventListener('pointerup', up)
+      c.removeEventListener('pointercancel', cancel)
     }
   }, [])
 
@@ -349,7 +374,8 @@ export function DotMorph({
         role="img"
         aria-label="A shape made of dots. Tap to change the shape."
         className="absolute inset-0 h-full w-full cursor-pointer"
-        style={{ touchAction: 'manipulation' }}
+        // none: a finger dragging through the dots stays on them instead of scrolling the page
+        style={{ touchAction: 'none' }}
       />
     </div>
   )
