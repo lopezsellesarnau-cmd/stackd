@@ -108,8 +108,6 @@ export function LabelMaker({
     if (el && focused) el.setSelectionRange(el.value.length, el.value.length);
   }, [text, focused]);
 
-  const mouth = width - MACHINE.w; // where the tape comes out (its right end)
-  const tapeTop = TOP + MACHINE.h / 2 - TAPE_H / 2;
   // The tape: ink with white letters; on a dark page, white with ink letters
   const tapeBg = ink;
   const letter = paper;
@@ -125,50 +123,9 @@ export function LabelMaker({
         @media (prefers-reduced-motion:reduce){[data-lm] *{animation:none!important}}
       `}</style>
 
-      <div data-lm className="relative" style={{ height: TOP + MACHINE.h + 12 }}>
-        {/* The tape: grows out of the machine to the left, the newest letter at the mouth */}
-        <div className="absolute" style={{ right: width - mouth + 6, top: tapeTop, height: TAPE_H }}>
-          {text || cutting ? (
-            <div
-              key={cutting ? `cut-${cutting}` : text.length}
-              className="flex h-full items-center px-3"
-              style={{
-                ...tagStyle(tapeBg, letter, dark, false),
-                animation: cutting ? "lm-cut .42s cubic-bezier(.5,0,.6,1) forwards" : text ? "lm-feed .14s ease-out" : undefined,
-              }}
-            >
-              {(cutting ?? text).split("").map((ch, i, all) => (
-                <span key={i} className="inline-block" style={{ animation: !cutting && i === all.length - 1 ? "lm-letter .18s ease-out" : undefined }}>
-                  {ch === " " ? " " : ch}
-                </span>
-              ))}
-            </div>
-          ) : null}
-        </div>
-
-        {/* The machine: a slim pill with the Bot sitting on top */}
-        <div ref={machine} className="absolute right-0" style={{ top: TOP, width: MACHINE.w, height: MACHINE.h }}>
-          <div className="absolute inset-0 rounded-full" style={{ background: ink }} />
-          {/* The slot the tape comes out of */}
-          <div className="absolute rounded-full" style={{ left: 8, top: MACHINE.h / 2 - 9, width: 3, height: 18, background: dark ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.22)" }} />
-          <span className="absolute left-[22px] top-1/2 -translate-y-1/2 text-[11px] font-medium tabular-nums" style={{ color: dark ? "rgba(20,19,16,.5)" : "rgba(255,255,255,.5)" }} aria-hidden>
-            {text.length}/{max}
-          </span>
-          <button
-            type="button"
-            onClick={cut}
-            disabled={!text.trim()}
-            className="absolute right-[8px] top-1/2 h-[36px] -translate-y-1/2 rounded-full px-4 text-[12px] font-semibold outline-none transition-opacity focus-visible:ring-2 disabled:opacity-35"
-            style={{ background: paper, color: ink, ["--tw-ring-color" as string]: paper }}
-          >
-            Cut
-          </button>
-          <div className="absolute left-1/2 -translate-x-1/2" style={{ top: -BOT - 4 }}>
-            <Bot size={BOT} shape={bot} eyes="tall" color={ink} eyeColor={paper} look={{ x: -0.6, y: 0.2 }} happy={blink || !!cutting} poke={false} />
-          </div>
-        </div>
-
-        {/* The one real input, over the tape */}
+      {/* The tape and the machine, always centred: the tape grows out of the machine's left side, so the
+          row widens both ways from the middle */}
+      <div data-lm className="relative flex items-start justify-center gap-1.5" style={{ minHeight: TOP + MACHINE.h, marginBottom: 12 }}>
         <input
           ref={input}
           value={text}
@@ -187,26 +144,67 @@ export function LabelMaker({
           autoComplete="off"
           spellCheck={false}
           maxLength={max * 2}
-          className="absolute cursor-text bg-transparent text-transparent caret-transparent outline-none"
-          style={{ left: 0, top: tapeTop, width: mouth, height: TAPE_H, fontSize: 16 }}
+          // Over the whole row, under the machine (so Cut stays clickable)
+          className="absolute inset-0 z-0 cursor-text bg-transparent text-transparent caret-transparent outline-none"
+          style={{ fontSize: 16 }}
         />
         <span id={help} className="sr-only">
           Type a label and press Enter to cut it.
         </span>
-        {!text && !cutting ? (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute flex items-center gap-2 text-[13px]"
-            style={{ right: width - mouth + 14, top: tapeTop, height: TAPE_H, opacity: focused ? 0.7 : 0.4 }}
-          >
-            {focused ? <span className="inline-block h-[16px] w-[1.5px] animate-pulse rounded-full" style={{ background: ink }} /> : null}
-            <span>{focused ? "Type, then Enter" : "Click to add a label"}</span>
+        {/* The tape (or, before anything is typed, where to type) */}
+        <div className="pointer-events-none relative z-[1] flex items-center" style={{ marginTop: TOP + MACHINE.h / 2 - TAPE_H / 2, height: TAPE_H }}>
+          {text || cutting ? (
+            <div
+              key={cutting ? `cut-${cutting}` : text.length}
+              className="flex h-full items-center px-3"
+              style={{
+                ...tagStyle(tapeBg, letter, dark, false),
+                animation: cutting ? "lm-cut .42s cubic-bezier(.5,0,.6,1) forwards" : text ? "lm-feed .14s ease-out" : undefined,
+              }}
+            >
+              {(cutting ?? text).split("").map((ch, i, all) => (
+                <span key={i} className="inline-block" style={{ animation: !cutting && i === all.length - 1 ? "lm-letter .18s ease-out" : undefined }}>
+                  {ch === " " ? " " : ch}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          {!text && !cutting ? (
+            <div aria-hidden className="flex items-center gap-2 pr-1 text-[13px]" style={{ opacity: focused ? 0.7 : 0.4 }}>
+              {focused ? <span className="inline-block h-[16px] w-[1.5px] animate-pulse rounded-full" style={{ background: ink }} /> : null}
+              <span className="whitespace-nowrap">{focused ? "Type, then Enter" : "Click to add a label"}</span>
+            </div>
+          ) : null}
+        </div>
+
+        {/* The machine: a slim pill with the Bot sitting on top */}
+        {/* Clicks go through to the input (to type), except on Cut */}
+        <div className="pointer-events-none relative z-[2] shrink-0" style={{ paddingTop: TOP }}>
+          <div ref={machine} className="relative" style={{ width: MACHINE.w, height: MACHINE.h }}>
+          <div className="absolute inset-0 rounded-full" style={{ background: ink }} />
+            {/* The slot the tape comes out of */}
+            <div className="absolute rounded-full" style={{ left: 8, top: MACHINE.h / 2 - 9, width: 3, height: 18, background: dark ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.22)" }} />
+            <span className="absolute left-[22px] top-1/2 -translate-y-1/2 text-[11px] font-medium tabular-nums" style={{ color: dark ? "rgba(20,19,16,.5)" : "rgba(255,255,255,.5)" }} aria-hidden>
+              {text.length}/{max}
+            </span>
+            <button
+              type="button"
+              onClick={cut}
+              disabled={!text.trim()}
+              className="pointer-events-auto absolute right-[8px] top-1/2 h-[36px] -translate-y-1/2 rounded-full px-4 text-[12px] font-semibold outline-none transition-opacity focus-visible:ring-2 disabled:opacity-35"
+              style={{ background: paper, color: ink, ["--tw-ring-color" as string]: paper }}
+            >
+              Cut
+            </button>
+            <div className="absolute left-1/2 -translate-x-1/2" style={{ top: -BOT - 4 }}>
+              <Bot size={BOT} shape={bot} eyes="tall" color={ink} eyeColor={paper} look={{ x: -0.6, y: 0.2 }} happy={blink || !!cutting} poke={false} />
+            </div>
           </div>
-        ) : null}
+        </div>
       </div>
 
-      {/* The labels: neat tags right under the machine, lined up on its side */}
-      <ul className="m-0 flex list-none flex-wrap justify-end gap-2 p-0" aria-label="Labels">
+      {/* The labels: neat tags, centred under the machine */}
+      <ul className="m-0 flex list-none flex-wrap justify-center gap-2 p-0" aria-label="Labels">
         {labels.map((l, i) => (
           <li key={l.id}>
             <button
