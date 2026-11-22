@@ -416,10 +416,10 @@ const GUMROAD: Record<Id, string> = {
   squeeze: 'https://arnolop.gumroad.com/l/squeeze_button?wanted=true',
   split: 'https://arnolop.gumroad.com/l/split_list?wanted=true',
   tape: 'https://arnolop.gumroad.com/l/tape_measure?wanted=true',
+  ascii: 'https://arnolop.gumroad.com/l/ascii_bot?wanted=true',
+  radial: 'https://arnolop.gumroad.com/l/radial_menu?wanted=true',
   // Not on Gumroad yet: the button says Coming soon
   label: '',
-  ascii: '',
-  radial: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'

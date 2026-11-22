@@ -43,6 +43,8 @@ const PRODUCT_IDS = {
   'squeeze-button': 'AZH4eLIUQ8Hbc3Pq3EE_Xw==',
   'split-list': 'VSWiXBQ5OEKkQZ3J-CV4Tg==',
   'tape-measure': 'YiETVHiVxun_efJnAYniMA==',
+  'ascii-bot': 'sJvuuap0SAxc3iMaOMfE5A==',
+  'radial-menu': '-s4xg9UOsOxt3ZEZf4xdWg==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -80,6 +82,8 @@ const ITEMS = [
   ['squeeze-button', 'Squeeze button', 'SqueezeButton.tsx', true, 'squeeze_button', true, 'Words in ink blocks that squeeze each other on hover; click and they slide into one block with the Bot saying Sent.'],
   ['split-list', 'Split list', 'SplitList.tsx', true, 'split_list', false, 'A list split down the middle that parts around the cursor like a lens and turns bold there.'],
   ['tape-measure', 'Tape measure', 'TapeMeasure.tsx', true, 'tape_measure', true, 'A slider you pull like a real tape measure: it whips back when you let go, or stays with the lock on. The Bot is the hub.'],
+  ['ascii-bot', 'ASCII Bot', 'AsciiBot.tsx', true, 'ascii_bot', true, 'The Bot as a halftone of ink dots that turn into characters under the cursor and cool back along the trail.'],
+  ['radial-menu', 'Radial menu', 'RadialMenu.tsx', true, 'radial_menu', true, 'A round menu cut like a citrus around the Bot: segments fill like jelly when pointed at and open into their own rings.'],
 ]
 
 const read = (f) => {

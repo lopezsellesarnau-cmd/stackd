@@ -39,6 +39,8 @@ type Props = {
   /** Called with the item chosen and the path to it. */
   onSelect?: (item: RadialItem, path: RadialItem[]) => void
   theme?: 'dark' | 'light'
+  /** Keep this item full, by id, as if pointed at. For covers and mock-ups. */
+  highlight?: string
   /** Diameter, px. */
   size?: number
   bot?: boolean
@@ -112,6 +114,7 @@ export function RadialMenu({
   items,
   onSelect,
   theme = 'dark',
+  highlight,
   size = 320,
   bot = true,
   className = '',
@@ -138,8 +141,8 @@ export function RadialMenu({
   const segs = useRef<Seg[]>([])
   const raf = useRef(0)
   const press = useRef({ i: -1, id: -1, leaving: false })
-  const live = useRef({ hover, held, focus })
-  live.current = { hover, held, focus }
+  const live = useRef({ hover, held, focus, highlight })
+  live.current = { hover, held, focus, highlight }
   const reduce = useRef(false)
 
   const draw = useCallback(() => {
@@ -171,16 +174,18 @@ export function RadialMenu({
     const tick = (t: number) => {
       const dt = Math.min(0.033, (t - prev) / 1000)
       prev = t
-      const { hover: h, held: hd, focus: fo } = live.current
+      const { hover: h, held: hd, focus: fo, highlight: hl } = live.current
       let busy = false
       segs.current.forEach((s, i) => {
         const pressed = press.current.i === i
         if (!press.current.leaving) {
-          s.flesh.to = pressed || h === i || fo === i || hd === i ? FLESH.full : FLESH.rest
+          s.flesh.to = pressed || h === i || fo === i || hd === i || s.item.id === hl ? FLESH.full : FLESH.rest
           s.bulge.to = pressed ? 0 : h === i || fo === i ? 2 : 0
           s.squash.to = pressed ? 0.9 : 1
         }
         if (s.wait > 0) { s.wait -= dt; busy = true; return }
+        // reduced motion: no springs, everything goes straight where it's going
+        if (reduce.current) { for (const q of [s.grow, s.flesh, s.bulge, s.squash, s.sway]) { q.x = q.to; q.v = 0 } return }
         // small steps, so the loose spring stays steady
         for (let k = 0; k < 4; k++) {
           const q = dt / 4
@@ -215,7 +220,7 @@ export function RadialMenu({
     run()
   }, [level, draw, run])
 
-  useEffect(() => { run() }, [hover, held, focus, run])
+  useEffect(() => { run() }, [hover, held, focus, highlight, run])
   // reset the handle too: React's dev double mount would otherwise leave the loop thinking it still runs
   useEffect(() => () => { cancelAnimationFrame(raf.current); raf.current = 0 }, [])
 
@@ -306,8 +311,8 @@ export function RadialMenu({
 
   // The Bot looks at the segment you point at, else the chosen one
   const n = level.length
-  const at = hover >= 0 ? hover : focus >= 0 ? focus : held
-  const look = at >= 0 ? { x: Math.cos(mid(at, n)) * 0.9, y: Math.sin(mid(at, n)) * 0.9 } : { x: 0, y: 0 }
+  const at = hover >= 0 ? hover : focus >= 0 ? focus : held >= 0 ? held : level.findIndex((x) => x.id === highlight)
+  const look = at >= 0 ? { x: Math.cos(mid(at, n)) * 0.55, y: Math.sin(mid(at, n)) * 0.55 } : { x: 0, y: 0 }
 
   return (
     <div
@@ -330,6 +335,7 @@ export function RadialMenu({
           const a = mid(i, n), a0 = a - Math.PI / n, a1 = a + Math.PI / n
           const lx = Math.cos(a) * LABEL_R, ly = Math.sin(a) * LABEL_R
           const big = size / 13
+          const ic = Math.max(20, size / 14) // icons grow with the menu
           return (
             <g
               key={`${stack.length}-${it.id}`}
@@ -347,7 +353,7 @@ export function RadialMenu({
                 {it.count != null ? (
                   <text y={-3} textAnchor="middle" fill="currentColor" fontSize={big} fontWeight={600} fontFamily={FONT} style={{ fontVariantNumeric: 'tabular-nums' }}>{it.count}</text>
                 ) : it.icon ? (
-                  <g transform={`translate(-11 ${-big * 1.02}) scale(${22 / 24})`}>
+                  <g transform={`translate(${-ic / 2} ${-big * 0.4 - ic * 0.75}) scale(${ic / 24})`}>
                     <Icon icon={it.icon} id={`${uid}-${stack.length}-${i}`} />
                   </g>
                 ) : null}

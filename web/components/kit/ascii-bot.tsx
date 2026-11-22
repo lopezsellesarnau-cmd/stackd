@@ -51,6 +51,8 @@ type Props = {
   trail?: number
   /** Ink colour. Defaults to the CSS `color` it sits in. */
   ink?: string
+  /** A hand held still at this point (0 to 1 across and down), for covers and mock-ups. */
+  glow?: { x: number; y: number }
   className?: string
 }
 
@@ -64,6 +66,7 @@ export function AsciiBot({
   reach = 45,
   trail = 1.1,
   ink,
+  glow,
   className = '',
 }: Props) {
   const cv = useRef<HTMLCanvasElement>(null)
@@ -270,6 +273,31 @@ export function AsciiBot({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shape, width, height, size, ink])
   useEffect(() => { paint() }, [glyphs, eyes]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A still hand: its patch of characters stays, and the eyes look at it
+  useEffect(() => {
+    if (!glow) return
+    const s = st.current
+    s.hx = glow.x * s.W; s.hy = glow.y * s.H
+    s.near = 1; s.inside = true; s.still = true
+    // and the trail it came along, cooling the further back it goes: a curve from the other side
+    s.heat.fill(0)
+    const x0 = (1 - glow.x) * s.W, y0 = Math.min(0.9, glow.y + 0.18) * s.H
+    const cx = 0.5 * s.W, cy = Math.min(0.95, Math.max(glow.y, glow.y + 0.18) + 0.2) * s.H
+    const rad = radius()
+    for (let k = 0; k <= 40; k++) {
+      const t = k / 40
+      const x = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * cx + t * t * s.hx
+      const y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cy + t * t * s.hy
+      stamp(x, y, rad * (0.7 + 0.3 * t), 0.06 + 0.14 * t * t)
+    }
+    const dx = glow.x - 0.5, dy = glow.y - 0.5, d = Math.hypot(dx, dy) || 1
+    const f = Math.min(1, d * 2.2)
+    s.look.x = s.look.tx = (dx / d) * f
+    s.look.y = s.look.ty = (dy / d) * f
+    paint()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [glow?.x, glow?.y, shape, size, width, height, ink])
 
   useEffect(() => {
     const s = st.current
