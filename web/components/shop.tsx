@@ -46,6 +46,8 @@ import { TapeMeasure } from './kit/tape-measure'
 import { LabelMaker } from './kit/label-maker'
 import { AsciiBot, type AsciiGlyphs } from './kit/ascii-bot'
 import { RadialMenu, type RadialItem, type RadialIcon } from './kit/radial-menu'
+import { Generate, type GenerateImage } from './kit/generate'
+import { ImageAccordion, type AccordionImage, type AccordionLayout } from './kit/image-accordion'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -133,6 +135,17 @@ const COPY = {
     asciiAbout: 'The Bot printed as a halftone: a ball of ink dots, shaded as if lit from the top left, with its eyes left blank. They follow your cursor around the page and blink now and then. Move over it and the dots under your hand turn into characters, densest right under it, thinning back to dots along the trail as it cools. Press and a wave of characters rolls out.',
     asciiIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nine bodies, four kinds of eyes, four glyph sets', 'Light and dark, respects reduced motion'],
     glyphsLabel: 'Glyphs',
+    genAbout: "An empty frame with one pill in it. Press Generate and, while your model works, a soft haze drifts and the count crawls, with the Bot scanning the frame from the pill. When the picture arrives it forms the way a generated image does: a few soft masses under a liquid surface, then the forms find their edges, then the fine grain lands as ink dots and melts into the photo. The count climbs unevenly, like real work, and holds 100 for a beat. If it fails, the haze dries into ink dots, the Bot looks down and the pill says so, with Try again.",
+    genIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Plugs into any model: resolve with the picture or throw', 'Light and dark, respects reduced motion'],
+    resultLabel: 'Result',
+    works: 'Works',
+    fails: 'Fails',
+    accAbout: "Pictures sharing one fixed frame. Point at one and it opens; the others give up exactly the room it takes, and its neighbours open a little too, so the whole set leans toward you on a jelly spring. In a grid, the picture opens its column and its row at once, like a lens over a contact sheet. The pictures are cropped, never stretched, and nothing is laid over them: the title sits underneath.",
+    accIncludes: ['Figma file with every state', 'React + Tailwind code', 'Grid, rows or columns; open, reach, bounce and gap', 'Mouse, touch and keyboard; respects reduced motion'],
+    layoutLabel: 'Layout',
+    gridL: 'Grid',
+    rowsL: 'Rows',
+    columnsL: 'Columns',
     radialAbout: 'A round menu cut like a citrus, always on screen: thick segments around a hollow middle where the Bot sits and looks where you point. Each segment holds a small pill of flesh; point at it or press it and the pill swells until it fills the segment, like jelly, then shrinks back when you leave. A press lands with a squash and nudges the neighbours. Segments with more inside turn the ring into that section; press the Bot to go back. Big numbers for counts, filled icons otherwise.',
     radialIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nested sections, counts and filled icons', 'Mouse, touch and keyboard; respects reduced motion'],
     ringAbout: 'Where the money went, as a ring of thick ink pills sized by amount; the small ones roll into drops. Hover one and it swells while the middle counts to it. Tap it to leave it out: it pinches off and falls, the others flow together and the total counts down. Tap it under the ring to pour it back.',
@@ -269,6 +282,17 @@ const COPY = {
     asciiAbout: 'El Bot impreso en trama: una bola de puntos de tinta, sombreada como si le diera la luz desde arriba a la izquierda, con los ojos en blanco. Siguen tu cursor por la página y parpadean de vez en cuando. Pasa por encima y los puntos bajo tu mano se vuelven caracteres, más densos justo debajo, y vuelven a ser puntos a lo largo del rastro mientras se enfría. Pulsa y sale una onda de caracteres.',
     asciiIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Nueve cuerpos, cuatro tipos de ojos, cuatro juegos de glifos', 'Claro y oscuro, respeta el movimiento reducido'],
     glyphsLabel: 'Glifos',
+    genAbout: 'Un marco vacío con una píldora. Pulsa Generate y, mientras tu modelo trabaja, una neblina se mueve y el contador avanza, con el Bot escaneando el marco desde la píldora. Cuando llega la imagen se forma como una imagen generada: primero unas masas suaves bajo una superficie líquida, luego las formas encuentran sus bordes y al final el grano cae en puntos de tinta y se funde en la foto. El contador sube a trompicones, como un trabajo de verdad, y se queda un momento en 100. Si falla, la neblina se seca en puntos de tinta, el Bot mira abajo y la píldora lo dice, con Reintentar.',
+    genIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Se conecta a cualquier modelo: resuelve con la imagen o lanza un error', 'Claro y oscuro, respeta el movimiento reducido'],
+    resultLabel: 'Resultado',
+    works: 'Funciona',
+    fails: 'Falla',
+    accAbout: 'Fotos que comparten un marco fijo. Apunta a una y se abre; las demás ceden justo el espacio que gana, y sus vecinas se abren un poco también, así que todo el conjunto se inclina hacia ti con un muelle de gelatina. En la cuadrícula, la foto abre su columna y su fila a la vez, como una lupa sobre una hoja de contactos. Las fotos se recortan, nunca se estiran, y no hay nada encima: el título va debajo.',
+    accIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind', 'Cuadrícula, filas o columnas; apertura, alcance, rebote y separación', 'Ratón, táctil y teclado; respeta el movimiento reducido'],
+    layoutLabel: 'Diseño',
+    gridL: 'Cuadrícula',
+    rowsL: 'Filas',
+    columnsL: 'Columnas',
     radialAbout: 'Un menú redondo cortado como un cítrico, siempre en pantalla: gajos gruesos alrededor de un centro hueco donde está el Bot, que mira adonde apuntas. Cada gajo tiene una pequeña pastilla de pulpa; apunta o pulsa y la pastilla se hincha hasta llenar el gajo, como gelatina, y vuelve a encogerse al salir. Al pulsar se aplasta y empuja a los vecinos. Los gajos con más dentro convierten el anillo en esa sección; pulsa el Bot para volver. Números grandes para contadores e iconos rellenos para el resto.',
     radialIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Secciones anidadas, contadores e iconos rellenos', 'Ratón, táctil y teclado; respeta el movimiento reducido'],
     ringAbout: 'En qué se fue el dinero: un anillo de píldoras de tinta, cada una del tamaño de su gasto; las pequeñas se enrollan en gotas. Pasa por encima y se hincha mientras el centro cuenta hasta su cifra. Tócala para dejarla fuera: se desprende y cae, las demás fluyen hasta cerrar el hueco y el total baja. Tócala bajo el anillo para devolverla.',
@@ -329,7 +353,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
@@ -340,9 +364,11 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'label', cat: 'inputs' },
   { id: 'ascii', cat: 'characters' },
   { id: 'radial', cat: 'navigation' },
+  { id: 'gen', cat: 'ai' },
   { id: 'prompt', cat: 'ai' },
   { id: 'palette', cat: 'navigation' },
   { id: 'memo', cat: 'audio' },
+  { id: 'acc', cat: 'media' },
   { id: 'drop', cat: 'inputs' },
   { id: 'pull', cat: 'loaders' },
   { id: 'toast', cat: 'notifications' },
@@ -420,6 +446,8 @@ const GUMROAD: Record<Id, string> = {
   radial: 'https://arnolop.gumroad.com/l/radial_menu?wanted=true',
   // Not on Gumroad yet: the button says Coming soon
   label: '',
+  gen: '',
+  acc: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -432,6 +460,8 @@ const REGISTRY_NAME: Record<Id, string> = {
   label: 'label-maker',
   ascii: 'ascii-bot',
   radial: 'radial-menu',
+  gen: 'generate',
+  acc: 'image-accordion',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
@@ -580,7 +610,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3282,6 +3312,152 @@ function RadialTile({ t }: { t: T }) {
                 <span className="px-1">{t.light}</span>
               </Pick>
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Generate: the pictures it makes in the demo, one per press
+const GEN_IMAGES: GenerateImage[] = [
+  { src: '/glass/street.jpg', alt: 'An impressionist street painting' },
+  { src: '/glass/autumn.jpg', alt: 'An abstract painting in orange and blue' },
+  { src: '/glass/abstract.jpg', alt: 'An abstract painting with bold strokes' },
+]
+// …and a model that's busy, to show the failure
+const genFails = async (): Promise<GenerateImage> => {
+  await new Promise((r) => setTimeout(r, 2600))
+  throw new Error('The model is busy')
+}
+
+function GenTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [fails, setFails] = useState(false)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const theme = dark ? 'dark' : 'light'
+  const props = fails ? { onGenerate: genFails } : { images: GEN_IMAGES }
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Generate`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          {/* Drawn at one size and scaled to the tile; you can generate right in the tile */}
+          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 32) / 300)})` }}>
+            {open ? null : <Generate key={`${theme}-${fails}`} {...props} theme={theme} width={240} height={300} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.ai}
+          name="Generate"
+          about={t.genAbout}
+          includes={t.genIncludes}
+          usage={`<Generate${dark ? ' theme="dark"' : ''}\n  onGenerate={async () => {\n    const { url } = await makePicture(prompt)\n    return { src: url, alt: prompt }\n  }}\n/>`}
+          href={GUMROAD.gen}
+          price={PRICE.gen}
+          onClose={() => setOpen(false)}
+          stage={<Generate key={`${theme}-${fails}`} {...props} theme={theme} width={320} height={400} />}
+          options={
+            <>
+              <Choice label={t.resultLabel}>
+                <Pick on={!fails} label={t.works} onClick={() => setFails(false)}><span className="px-1">{t.works}</span></Pick>
+                <Pick on={fails} label={t.fails} onClick={() => setFails(true)}><span className="px-1">{t.fails}</span></Pick>
+              </Choice>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+              </Choice>
+            </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Image accordion: the paintings, repeated until there are more pictures
+const ACC_PICS: AccordionImage[] = [
+  { src: '/glass/street.jpg', alt: 'An impressionist street painting', title: 'Street' },
+  { src: '/glass/autumn.jpg', alt: 'An abstract painting in orange and blue', title: 'Autumn' },
+  { src: '/glass/abstract.jpg', alt: 'An abstract painting with bold strokes', title: 'Strokes' },
+  { src: '/glass/street-raw.jpg', alt: 'The street painting, unretouched', title: 'Street, raw' },
+]
+const ACC_COUNT: Record<AccordionLayout, number> = { grid: 9, rows: 4, columns: 5 }
+const accImages = (layout: AccordionLayout) =>
+  Array.from({ length: ACC_COUNT[layout] }, (_, i) => ({ ...ACC_PICS[i % ACC_PICS.length], title: `${ACC_PICS[i % ACC_PICS.length].title} ${i + 1}` }))
+
+function AccTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [layout, setLayout] = useState<AccordionLayout>('grid')
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const BASE = 300
+  const theme = dark ? 'dark' : 'light'
+  const pics = accImages(layout)
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Image accordion`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          {/* Drawn at one size and scaled to the tile; you can point at it right in the tile */}
+          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 48) / BASE)})` }}>
+            {open ? null : <ImageAccordion key={`${theme}-${layout}`} images={pics} layout={layout} theme={theme} width={BASE} height={layout === 'grid' ? BASE : 260} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.media}
+          name="Image accordion"
+          about={t.accAbout}
+          includes={t.accIncludes}
+          usage={`<ImageAccordion\n  images={pictures}${layout === 'columns' ? '' : `\n  layout="${layout}"`}${dark ? '\n  theme="dark"' : ''}\n/>`}
+          href={GUMROAD.acc}
+          price={PRICE.acc}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className={`flex w-full max-w-[460px] items-center justify-center rounded-[24px] p-6 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+              <ImageAccordion key={`${theme}-${layout}`} images={pics} layout={layout} theme={theme} width={340} />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.layoutLabel}>
+                {(['grid', 'rows', 'columns'] as const).map((l) => {
+                  const name = l === 'grid' ? t.gridL : l === 'rows' ? t.rowsL : t.columnsL
+                  return <Pick key={l} on={layout === l} label={name} onClick={() => setLayout(l)}><span className="px-1">{name}</span></Pick>
+                })}
+              </Choice>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+              </Choice>
+            </>
           }
         />
       ) : null}
