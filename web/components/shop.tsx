@@ -44,6 +44,7 @@ import { SqueezeButton } from './kit/squeeze-button'
 import { SplitList } from './kit/split-list'
 import { TapeMeasure } from './kit/tape-measure'
 import { LabelMaker } from './kit/label-maker'
+import { AsciiBot, type AsciiGlyphs } from './kit/ascii-bot'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -128,6 +129,9 @@ const COPY = {
     tapeIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Your units, min, max and step', 'Keyboard, screen readers and reduced motion'],
     labelAbout: 'A tag input that works like an embossing label maker, kept minimal. Type and every letter is punched into the ink tape: the machine gives a little kerchunk, the Bot sitting on it blinks, and the tape feeds out. Backspace pulls a letter back in. Press Enter and the tape is cut: the label drops onto the row as a neat tag. Click a tag to peel it off.',
     labelIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'One real input: paste, mobile keyboards, screen readers', 'Light and dark, respects reduced motion'],
+    asciiAbout: 'The Bot printed as a halftone: a ball of ink dots, shaded as if lit from the top left, with its eyes left blank. They follow your cursor around the page and blink now and then. Move over it and the dots under your hand turn into characters, densest right under it, thinning back to dots along the trail as it cools. Press and a wave of characters rolls out.',
+    asciiIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nine bodies, four kinds of eyes, four glyph sets', 'Light and dark, respects reduced motion'],
+    glyphsLabel: 'Glyphs',
     ringAbout: 'Where the money went, as a ring of thick ink pills sized by amount; the small ones roll into drops. Hover one and it swells while the middle counts to it. Tap it to leave it out: it pinches off and falls, the others flow together and the total counts down. Tap it under the ring to pour it back.',
     ringIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your categories, icons, colours and currency', 'Keyboard and screen reader support'],
     barsAbout: 'A traffic card with one stacked bar per day, a capsule per source and the bounced part under the line. Run along it and the column opens: its capsules spread apart so each one reads, the big number counts to that day and the key fills in the breakdown. Day / Week regrows the bars in a wave.',
@@ -259,6 +263,9 @@ const COPY = {
     tapeIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Tus unidades, mínimo, máximo y paso', 'Teclado, lectores de pantalla y movimiento reducido'],
     labelAbout: 'Un campo de etiquetas que funciona como una etiquetadora de relieve, en versión minimal. Escribe y cada letra se troquela en la cinta de tinta: la máquina hace un pequeño clac, el Bot que lleva encima parpadea y la cinta avanza. Retroceso recoge la última letra. Pulsa Enter y la cinta se corta: la etiqueta cae en la fila como una etiqueta limpia. Haz clic en una para despegarla.',
     labelIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Un input real: pegar, teclado móvil, lectores de pantalla', 'Claro y oscuro, respeta el movimiento reducido'],
+    asciiAbout: 'El Bot impreso en trama: una bola de puntos de tinta, sombreada como si le diera la luz desde arriba a la izquierda, con los ojos en blanco. Siguen tu cursor por la página y parpadean de vez en cuando. Pasa por encima y los puntos bajo tu mano se vuelven caracteres, más densos justo debajo, y vuelven a ser puntos a lo largo del rastro mientras se enfría. Pulsa y sale una onda de caracteres.',
+    asciiIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Nueve cuerpos, cuatro tipos de ojos, cuatro juegos de glifos', 'Claro y oscuro, respeta el movimiento reducido'],
+    glyphsLabel: 'Glifos',
     ringAbout: 'En qué se fue el dinero: un anillo de píldoras de tinta, cada una del tamaño de su gasto; las pequeñas se enrollan en gotas. Pasa por encima y se hincha mientras el centro cuenta hasta su cifra. Tócala para dejarla fuera: se desprende y cae, las demás fluyen hasta cerrar el hueco y el total baja. Tócala bajo el anillo para devolverla.',
     ringIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Tus categorías, iconos, colores y moneda', 'Teclado y lectores de pantalla'],
     barsAbout: 'Una tarjeta de tráfico con una barra apilada por día, una cápsula por fuente y la parte que rebotó bajo la línea. Recórrela y la columna se abre: sus cápsulas se separan para leer cada una, el número grande cuenta hasta ese día y la leyenda muestra el desglose. Día / Semana hace crecer las barras otra vez en ola.',
@@ -317,7 +324,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
@@ -326,6 +333,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'split', cat: 'text' },
   { id: 'tape', cat: 'inputs' },
   { id: 'label', cat: 'inputs' },
+  { id: 'ascii', cat: 'characters' },
   { id: 'prompt', cat: 'ai' },
   { id: 'palette', cat: 'navigation' },
   { id: 'memo', cat: 'audio' },
@@ -404,6 +412,7 @@ const GUMROAD: Record<Id, string> = {
   tape: 'https://arnolop.gumroad.com/l/tape_measure?wanted=true',
   // Not on Gumroad yet: the button says Coming soon
   label: '',
+  ascii: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -414,6 +423,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   split: 'split-list',
   tape: 'tape-measure',
   label: 'label-maker',
+  ascii: 'ascii-bot',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
@@ -562,7 +572,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3093,6 +3103,83 @@ function LabelTile({ t }: { t: T }) {
                 <span className="px-1">{t.darkT}</span>
               </Pick>
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+function AsciiTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [glyphs, setGlyphs] = useState<AsciiGlyphs>('binary')
+  const [shape, setShape] = useState<'hexagon' | 'circle' | 'squircle'>('hexagon')
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const BASE = 340
+  const ink = dark ? '#FFFFFF' : '#141310'
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} ASCII Bot`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          {/* Drawn at one size and scaled to the tile, so the halftone keeps its grain */}
+          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 24) / BASE)})` }}>
+            {open ? null : <AsciiBot shape={shape} glyphs={glyphs} ink={ink} width={BASE} height={BASE} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.characters}
+          name="ASCII Bot"
+          about={t.asciiAbout}
+          includes={t.asciiIncludes}
+          usage={`<AsciiBot${shape === 'hexagon' ? '' : ` shape="${shape}"`}${glyphs === 'binary' ? '' : ` glyphs="${glyphs}"`} />`}
+          href={GUMROAD.ascii}
+          price={PRICE.ascii}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className={`flex w-full max-w-[460px] items-center justify-center rounded-[24px] p-5 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+              <AsciiBot shape={shape} glyphs={glyphs} ink={ink} width={380} height={300} />
+            </div>
+          }
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                  <span className="px-1">{t.light}</span>
+                </Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                  <span className="px-1">{t.darkT}</span>
+                </Pick>
+              </Choice>
+              <Choice label={t.shapeLabel}>
+                {(['hexagon', 'circle', 'squircle'] as const).map((s) => (
+                  <Pick key={s} on={shape === s} label={s} onClick={() => setShape(s)}>
+                    <span className="px-1 capitalize">{s}</span>
+                  </Pick>
+                ))}
+              </Choice>
+              <Choice label={t.glyphsLabel}>
+                {(['binary', 'classic', 'blocks', 'code'] as const).map((g) => (
+                  <Pick key={g} on={glyphs === g} label={g} onClick={() => setGlyphs(g)}>
+                    <span className="px-1 capitalize">{g}</span>
+                  </Pick>
+                ))}
+              </Choice>
+            </>
           }
         />
       ) : null}
