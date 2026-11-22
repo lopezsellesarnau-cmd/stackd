@@ -45,6 +45,7 @@ import { SplitList } from './kit/split-list'
 import { TapeMeasure } from './kit/tape-measure'
 import { LabelMaker } from './kit/label-maker'
 import { AsciiBot, type AsciiGlyphs } from './kit/ascii-bot'
+import { RadialMenu, type RadialItem, type RadialIcon } from './kit/radial-menu'
 import { useLanguage } from './language-context'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
@@ -132,6 +133,8 @@ const COPY = {
     asciiAbout: 'The Bot printed as a halftone: a ball of ink dots, shaded as if lit from the top left, with its eyes left blank. They follow your cursor around the page and blink now and then. Move over it and the dots under your hand turn into characters, densest right under it, thinning back to dots along the trail as it cools. Press and a wave of characters rolls out.',
     asciiIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nine bodies, four kinds of eyes, four glyph sets', 'Light and dark, respects reduced motion'],
     glyphsLabel: 'Glyphs',
+    radialAbout: 'A round menu cut like a citrus, always on screen: thick segments around a hollow middle where the Bot sits and looks where you point. Each segment holds a small pill of flesh; point at it or press it and the pill swells until it fills the segment, like jelly, then shrinks back when you leave. A press lands with a squash and nudges the neighbours. Segments with more inside turn the ring into that section; press the Bot to go back. Big numbers for counts, filled icons otherwise.',
+    radialIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nested sections, counts and filled icons', 'Mouse, touch and keyboard; respects reduced motion'],
     ringAbout: 'Where the money went, as a ring of thick ink pills sized by amount; the small ones roll into drops. Hover one and it swells while the middle counts to it. Tap it to leave it out: it pinches off and falls, the others flow together and the total counts down. Tap it under the ring to pour it back.',
     ringIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your categories, icons, colours and currency', 'Keyboard and screen reader support'],
     barsAbout: 'A traffic card with one stacked bar per day, a capsule per source and the bounced part under the line. Run along it and the column opens: its capsules spread apart so each one reads, the big number counts to that day and the key fills in the breakdown. Day / Week regrows the bars in a wave.',
@@ -266,6 +269,8 @@ const COPY = {
     asciiAbout: 'El Bot impreso en trama: una bola de puntos de tinta, sombreada como si le diera la luz desde arriba a la izquierda, con los ojos en blanco. Siguen tu cursor por la página y parpadean de vez en cuando. Pasa por encima y los puntos bajo tu mano se vuelven caracteres, más densos justo debajo, y vuelven a ser puntos a lo largo del rastro mientras se enfría. Pulsa y sale una onda de caracteres.',
     asciiIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Nueve cuerpos, cuatro tipos de ojos, cuatro juegos de glifos', 'Claro y oscuro, respeta el movimiento reducido'],
     glyphsLabel: 'Glifos',
+    radialAbout: 'Un menú redondo cortado como un cítrico, siempre en pantalla: gajos gruesos alrededor de un centro hueco donde está el Bot, que mira adonde apuntas. Cada gajo tiene una pequeña pastilla de pulpa; apunta o pulsa y la pastilla se hincha hasta llenar el gajo, como gelatina, y vuelve a encogerse al salir. Al pulsar se aplasta y empuja a los vecinos. Los gajos con más dentro convierten el anillo en esa sección; pulsa el Bot para volver. Números grandes para contadores e iconos rellenos para el resto.',
+    radialIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Secciones anidadas, contadores e iconos rellenos', 'Ratón, táctil y teclado; respeta el movimiento reducido'],
     ringAbout: 'En qué se fue el dinero: un anillo de píldoras de tinta, cada una del tamaño de su gasto; las pequeñas se enrollan en gotas. Pasa por encima y se hincha mientras el centro cuenta hasta su cifra. Tócala para dejarla fuera: se desprende y cae, las demás fluyen hasta cerrar el hueco y el total baja. Tócala bajo el anillo para devolverla.',
     ringIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind, sin otras librerías', 'Tus categorías, iconos, colores y moneda', 'Teclado y lectores de pantalla'],
     barsAbout: 'Una tarjeta de tráfico con una barra apilada por día, una cápsula por fuente y la parte que rebotó bajo la línea. Recórrela y la columna se abre: sus cápsulas se separan para leer cada una, el número grande cuenta hasta ese día y la leyenda muestra el desglose. Día / Semana hace crecer las barras otra vez en ola.',
@@ -324,7 +329,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii'
+type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
@@ -334,6 +339,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'tape', cat: 'inputs' },
   { id: 'label', cat: 'inputs' },
   { id: 'ascii', cat: 'characters' },
+  { id: 'radial', cat: 'navigation' },
   { id: 'prompt', cat: 'ai' },
   { id: 'palette', cat: 'navigation' },
   { id: 'memo', cat: 'audio' },
@@ -413,6 +419,7 @@ const GUMROAD: Record<Id, string> = {
   // Not on Gumroad yet: the button says Coming soon
   label: '',
   ascii: '',
+  radial: '',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
@@ -424,6 +431,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   tape: 'tape-measure',
   label: 'label-maker',
   ascii: 'ascii-bot',
+  radial: 'radial-menu',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
@@ -572,7 +580,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3180,6 +3188,100 @@ function AsciiTile({ t }: { t: T }) {
                 ))}
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// The Radial menu's demo items: counts, filled icons, two sections
+const RI: Record<string, RadialIcon> = {
+  plus: { fill: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z', cut: 'M12 8v8M8 12h8' },
+  edit: { fill: 'M15.3 4.5a2 2 0 0 1 2.8 0l1.4 1.4a2 2 0 0 1 0 2.8L9.6 18.6 4.8 20l1.4-4.8z', cut: 'M13.6 6.4l4 4' },
+  share: { line: 'M12 3.8V14M8.6 7.2 12 3.8l3.4 3.4M8.8 10.2H7.6a2.1 2.1 0 0 0-2.1 2.1v6.1a2.1 2.1 0 0 0 2.1 2.1h8.8a2.1 2.1 0 0 0 2.1-2.1v-6.1a2.1 2.1 0 0 0-2.1-2.1h-1.2' },
+  trash: { fill: 'M6.4 8.2h11.2l-.8 10.9a2.1 2.1 0 0 1-2.1 1.9H9.3a2.1 2.1 0 0 1-2.1-1.9zM5.2 5h3.6v-.4A1.6 1.6 0 0 1 10.4 3h3.2a1.6 1.6 0 0 1 1.6 1.6V5h3.6a.8.8 0 0 1 0 1.6H5.2a.8.8 0 0 1 0-1.6z', cut: 'M10.2 11.2v6.4M13.8 11.2v6.4' },
+  copy: { fill: 'M10.6 8h7.3a2.3 2.3 0 0 1 2.3 2.3v8.4a2.3 2.3 0 0 1-2.3 2.3h-7.3a2.3 2.3 0 0 1-2.3-2.3v-8.4A2.3 2.3 0 0 1 10.6 8z', line: 'M15.8 5.2A2.2 2.2 0 0 0 13.6 3H6.4a2.2 2.2 0 0 0-2.2 2.2v8.2a2.2 2.2 0 0 0 2.2 2.2' },
+  doc: { fill: 'M7.2 3h5.6v4.6a2.4 2.4 0 0 0 2.4 2.4h3.6v8.8a2.2 2.2 0 0 1-2.2 2.2H7.2A2.2 2.2 0 0 1 5 18.8V5.2A2.2 2.2 0 0 1 7.2 3zM14.4 3.4l4.2 4.3a.6.6 0 0 1-.4 1h-3a1.4 1.4 0 0 1-1.4-1.4V3.8a.6.6 0 0 1 .6-.4z', cut: 'M8.6 13.8h6.8M8.6 17h4.4' },
+  frame: { fill: 'M5.2 4h4.6A1.2 1.2 0 0 1 11 5.2v4.6A1.2 1.2 0 0 1 9.8 11H5.2A1.2 1.2 0 0 1 4 9.8V5.2A1.2 1.2 0 0 1 5.2 4zM14.2 4h4.6A1.2 1.2 0 0 1 20 5.2v4.6a1.2 1.2 0 0 1-1.2 1.2h-4.6A1.2 1.2 0 0 1 13 9.8V5.2A1.2 1.2 0 0 1 14.2 4zM5.2 13h4.6a1.2 1.2 0 0 1 1.2 1.2v4.6A1.2 1.2 0 0 1 9.8 20H5.2A1.2 1.2 0 0 1 4 18.8v-4.6A1.2 1.2 0 0 1 5.2 13zM14.2 13h4.6a1.2 1.2 0 0 1 1.2 1.2v4.6a1.2 1.2 0 0 1-1.2 1.2h-4.6a1.2 1.2 0 0 1-1.2-1.2v-4.6a1.2 1.2 0 0 1 1.2-1.2z' },
+  folder: { fill: 'M3.5 7.2A2.2 2.2 0 0 1 5.7 5h3.6c.6 0 1.1.2 1.5.6L12.2 7h6.1a2.2 2.2 0 0 1 2.2 2.2v8.6a2.2 2.2 0 0 1-2.2 2.2H5.7a2.2 2.2 0 0 1-2.2-2.2z', cut: 'M3.6 9.6h16.8' },
+  link: { line: 'M10.4 13.6a3.4 3.4 0 0 0 4.8 0l3-3a3.4 3.4 0 0 0-4.8-4.8l-.9.9M13.6 10.4a3.4 3.4 0 0 0-4.8 0l-3 3a3.4 3.4 0 0 0 4.8 4.8l.9-.9' },
+  mail: { fill: 'M5.5 5h13A2.5 2.5 0 0 1 21 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16.5v-9A2.5 2.5 0 0 1 5.5 5z', cut: 'M4.2 7.2 12 12.8l7.8-5.6' },
+  export: { fill: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z', cut: 'M12 7.6v8.2M8.6 12.6 12 16l3.4-3.4' },
+}
+
+const RADIAL_ITEMS: RadialItem[] = [
+  { id: 'inbox', label: 'Inbox', count: 12 },
+  { id: 'drafts', label: 'Drafts', count: 3 },
+  { id: 'share', label: 'Share', icon: RI.share, children: [
+    { id: 'link', label: 'Copy link', icon: RI.link },
+    { id: 'mail', label: 'Email', icon: RI.mail },
+    { id: 'export', label: 'Export', icon: RI.export },
+  ] },
+  { id: 'comments', label: 'Comments', count: 5 },
+  { id: 'new', label: 'New', icon: RI.plus, children: [
+    { id: 'doc', label: 'Document', icon: RI.doc },
+    { id: 'frame', label: 'Frame', icon: RI.frame },
+    { id: 'folder', label: 'Folder', icon: RI.folder },
+    { id: 'dup', label: 'Duplicate', icon: RI.copy },
+  ] },
+  { id: 'edit', label: 'Edit', icon: RI.edit },
+  { id: 'archive', label: 'Archive', count: 48 },
+  { id: 'trash', label: 'Delete', icon: RI.trash },
+]
+
+function RadialTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(true)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const BASE = 320
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Radial menu`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          {/* Drawn at one size and scaled to the tile; you can use it right in the tile */}
+          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 40) / BASE)})` }}>
+            {open ? null : <RadialMenu key={theme} items={RADIAL_ITEMS} theme={theme} size={BASE} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.navigation}
+          name="Radial menu"
+          about={t.radialAbout}
+          includes={t.radialIncludes}
+          usage={`<RadialMenu\n  items={items}${dark ? '' : '\n  theme="light"'}\n  onSelect={(item, path) => run(item.id)}\n/>`}
+          href={GUMROAD.radial}
+          price={PRICE.radial}
+          onClose={() => setOpen(false)}
+          stage={
+            <div className={`flex w-full max-w-[460px] items-center justify-center rounded-[24px] p-5 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+              <RadialMenu key={theme} items={RADIAL_ITEMS} theme={theme} size={360} />
+            </div>
+          }
+          options={
+            <Choice label={t.theme}>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}>
+                <span className="px-1">{t.darkT}</span>
+              </Pick>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}>
+                <span className="px-1">{t.light}</span>
+              </Pick>
+            </Choice>
           }
         />
       ) : null}
