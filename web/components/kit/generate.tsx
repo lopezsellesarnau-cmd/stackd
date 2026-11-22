@@ -44,6 +44,9 @@ type Props = {
   onDone?: (image: GenerateImage) => void
   /** Called when it fails, with what was thrown. */
   onFail?: (error: unknown) => void
+  /** Hold one still moment, for covers and mock-ups: a picture part-formed
+      (`at` from 0 to 1), or the failed print. Nothing can be pressed. */
+  freeze?: { image: GenerateImage; at: number } | 'failed'
   className?: string
 }
 
@@ -147,6 +150,7 @@ export function Generate({
   failText = "Couldn't generate",
   onDone,
   onFail,
+  freeze,
   className = '',
 }: Props) {
   const c = THEMES[theme]
@@ -210,6 +214,34 @@ export function Generate({
   const clearDots = () => {
     const cv = grain.current
     cv?.getContext('2d')?.clearRect(0, 0, cv.width, cv.height)
+  }
+
+  /* One moment of the forming, t from 0 to 1. Returns how far the forms are. */
+  const formAt = (t: number, dots: Dot[] | null) => {
+    const mass = ease(0, 0.28, t)
+    const form = ease(0.08, 0.8, t)
+    const fine = ease(0.66, 0.96, t)
+    const settle = ease(0.9, 1, t)
+    if (haze.current) haze.current.style.opacity = String(0.55 * (1 - ease(0, 0.3, t)))
+    if (!still.current) {
+      // blur lets go fast, then crawls through the small radii where the detail is
+      const sd = lerp(18, 0.8, 1 - Math.pow(1 - form, 2.3))
+      const k = lerp(2.2, 1, form)
+      const cut = (PIVOT - PIVOT * k).toFixed(3)
+      const warp = (clamp(ripple, 0, 100) / 100) * 30 * Math.pow(1 - ease(0.04, 0.88, t), 1.4)
+      const f = 0.0065 + 0.002 * Math.sin(t * 5)
+      turb.current?.setAttribute('baseFrequency', `${f.toFixed(4)} ${(f * 1.4).toFixed(4)}`)
+      disp.current?.setAttribute('scale', warp.toFixed(2))
+      blur.current?.setAttribute('stdDeviation', sd.toFixed(2))
+      funcs.current.forEach((fn) => { fn?.setAttribute('slope', k.toFixed(3)); fn?.setAttribute('intercept', cut) })
+      if (soft.current) {
+        soft.current.style.opacity = String(mass * lerp(0.75, 1, form))
+        soft.current.style.transform = `scale(${lerp(1.05, 1, ease(0, 0.9, t))})`
+      }
+      if (dots) drawDots(dots, fine, 0.9 * (1 - settle))
+    }
+    if (sharp.current) sharp.current.style.opacity = String(still.current ? t : settle)
+    return form
   }
 
   const fail = (me: number, error: unknown) => {
@@ -284,29 +316,7 @@ export function Generate({
     loop((now) => {
       if (!start) start = now
       const t = Math.min(1, (now - start) / total)
-      const mass = ease(0, 0.28, t)
-      const form = ease(0.08, 0.8, t)
-      const fine = ease(0.66, 0.96, t)
-      const settle = ease(0.9, 1, t)
-      if (haze.current) haze.current.style.opacity = String(0.55 * (1 - ease(0, 0.3, t)))
-      if (!still.current) {
-        // blur lets go fast, then crawls through the small radii where the detail is
-        const sd = lerp(18, 0.8, 1 - Math.pow(1 - form, 2.3))
-        const k = lerp(2.2, 1, form)
-        const cut = (PIVOT - PIVOT * k).toFixed(3)
-        const warp = (clamp(ripple, 0, 100) / 100) * 30 * Math.pow(1 - ease(0.04, 0.88, t), 1.4)
-        const f = 0.0065 + 0.002 * Math.sin(t * 5)
-        turb.current?.setAttribute('baseFrequency', `${f.toFixed(4)} ${(f * 1.4).toFixed(4)}`)
-        disp.current?.setAttribute('scale', warp.toFixed(2))
-        blur.current?.setAttribute('stdDeviation', sd.toFixed(2))
-        funcs.current.forEach((fn) => { fn?.setAttribute('slope', k.toFixed(3)); fn?.setAttribute('intercept', cut) })
-        if (soft.current) {
-          soft.current.style.opacity = String(mass * lerp(0.75, 1, form))
-          soft.current.style.transform = `scale(${lerp(1.05, 1, ease(0, 0.9, t))})`
-        }
-        if (dots) drawDots(dots, fine, 0.9 * (1 - settle))
-      }
-      if (sharp.current) sharp.current.style.opacity = String(still.current ? t : settle)
+      const form = formAt(t, dots)
       const n = Math.min(99, Math.floor(lerp(from, 100, climb(t))))
       if (n !== shown) { shown = n; setCount(n) }
       const a = (now - start) / 1000
@@ -321,6 +331,33 @@ export function Generate({
       return false
     })
   }
+
+  // a still moment, for covers: set it up, then paint it once it's on screen
+  const held = useRef<Dot[] | null | undefined>(undefined)
+  useEffect(() => {
+    if (!freeze) return
+    run.current++
+    if (freeze === 'failed') {
+      setPhase('failed')
+      setLook({ x: 0, y: 0.6 })
+      drawDots(hazeDots(width, height, cell), 1, 1)
+      return
+    }
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = freeze.image.src
+    img.decode().then(() => {
+      held.current = pictureDots(img, width, height, cell, light)
+      setPic(freeze.image)
+      setPhase('forming')
+      setCount(Math.min(99, Math.round(freeze.at * 100)))
+      setLook({ x: 0.5, y: 0.2 })
+    }).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  useEffect(() => {
+    if (freeze && freeze !== 'failed' && phase === 'forming' && held.current !== undefined) formAt(freeze.at, held.current)
+  })
 
   const forming = phase === 'forming'
   const failed = phase === 'failed'
@@ -369,7 +406,7 @@ export function Generate({
       {/* The pill: Generate when idle, the Bot and the count while it works, what went wrong when it fails */}
       <button
         type="button"
-        onClick={generate}
+        onClick={freeze ? undefined : generate}
         disabled={busy}
         aria-label={busy ? `Generating, ${count}%` : failed ? `${failText}. Try again` : phase === 'made' ? 'Generate another' : 'Generate'}
         className={

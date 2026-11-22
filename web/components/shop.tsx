@@ -446,7 +446,7 @@ const GUMROAD: Record<Id, string> = {
   radial: 'https://arnolop.gumroad.com/l/radial_menu?wanted=true',
   // Not on Gumroad yet: the button says Coming soon
   label: '',
-  gen: '',
+  gen: 'https://arnolop.gumroad.com/l/generate?wanted=true',
   acc: '',
 }
 

@@ -45,6 +45,7 @@ const PRODUCT_IDS = {
   'tape-measure': 'YiETVHiVxun_efJnAYniMA==',
   'ascii-bot': 'sJvuuap0SAxc3iMaOMfE5A==',
   'radial-menu': '-s4xg9UOsOxt3ZEZf4xdWg==',
+  generate: 'eaZAXVCCrSfLjCPEdFyyNA==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -84,6 +85,7 @@ const ITEMS = [
   ['tape-measure', 'Tape measure', 'TapeMeasure.tsx', true, 'tape_measure', true, 'A slider you pull like a real tape measure: it whips back when you let go, or stays with the lock on. The Bot is the hub.'],
   ['ascii-bot', 'ASCII Bot', 'AsciiBot.tsx', true, 'ascii_bot', true, 'The Bot as a halftone of ink dots that turn into characters under the cursor and cool back along the trail.'],
   ['radial-menu', 'Radial menu', 'RadialMenu.tsx', true, 'radial_menu', true, 'A round menu cut like a citrus around the Bot: segments fill like jelly when pointed at and open into their own rings.'],
+  ['generate', 'Generate', 'Generate.tsx', true, 'generate', true, 'A picture forming like a generated image, with the Bot as the loader in the pill; a failure dries the haze into ink dots.'],
 ]
 
 const read = (f) => {
