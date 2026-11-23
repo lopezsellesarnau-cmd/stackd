@@ -36,6 +36,9 @@ type Props = {
   link?: { label: string; lessLabel?: string; href?: string; onClick?: () => void }
   theme?: 'light' | 'dark'
   width?: number
+  /** Start with one legend stat pressed (0 = the warmest), or with the rows open. For covers and mock-ups too. */
+  defaultStat?: number
+  defaultMore?: boolean
   className?: string
 }
 
@@ -59,14 +62,16 @@ export function HexPerformance({
   link = { label: 'More analysis' },
   theme = 'light',
   width = 400,
+  defaultStat = -1,
+  defaultMore = false,
   className = '',
 }: Props) {
   const c = THEMES[theme]
   const [r, setR] = useState(0)
   const [at, setAt] = useState(-1) // the hexagon pointed at
   const [hover, setHover] = useState(-1) // the legend stat pointed at (0 = warmest)
-  const [locked, setLocked] = useState(-1) // the legend stat pressed
-  const [more, setMore] = useState(false) // the rows, behind "More analysis"
+  const [locked, setLocked] = useState(defaultStat) // the legend stat pressed
+  const [more, setMore] = useState(defaultMore) // the rows, behind "More analysis"
   const [open, setOpen] = useState(-1)
   const [switched, setSwitched] = useState(false) // after the first range change, hexagons squish instead of popping in
   const range = ranges[r]

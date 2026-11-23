@@ -48,6 +48,7 @@ const PRODUCT_IDS = {
   'radial-menu': '-s4xg9UOsOxt3ZEZf4xdWg==',
   generate: 'eaZAXVCCrSfLjCPEdFyyNA==',
   'image-accordion': 'FuQEX7Y8ljC2y2j7ryCI3Q==',
+  'hex-performance': 'FgdZBFfq9LKzOZXJBv-8kg==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -90,6 +91,7 @@ const ITEMS = [
   ['radial-menu', 'Radial menu', 'RadialMenu.tsx', true, 'radial_menu', true, 'A round menu cut like a citrus around the Bot: segments fill like jelly when pointed at and open into their own rings.'],
   ['generate', 'Generate', 'Generate.tsx', true, 'generate', true, 'A picture forming like a generated image, with the Bot as the loader in the pill; a failure dries the haze into ink dots.'],
   ['image-accordion', 'Image accordion', 'ImageAccordion.tsx', true, 'image_accordion', false, 'Pictures that share one fixed frame: the one you point at opens on a jelly spring and the rest give up the room. Grid, rows or columns.'],
+  ['hex-performance', 'Hex performance', 'HexPerformance.tsx', true, 'hex_performance', false, 'A honeycomb heatmap card for dashboards: hexagons with soft corners, a jelly legend that lights one stat, and spongy motion.'],
 ]
 
 const read = (f) => {

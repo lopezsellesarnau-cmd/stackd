@@ -456,7 +456,7 @@ const GUMROAD: Record<Id, string> = {
   // Not on Gumroad yet: the button says Coming soon
   label: 'https://arnolop.gumroad.com/l/label_maker?wanted=true',
   gen: 'https://arnolop.gumroad.com/l/generate?wanted=true',
-  hex: '',
+  hex: 'https://arnolop.gumroad.com/l/hex_performance?wanted=true',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
