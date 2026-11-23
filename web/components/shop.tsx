@@ -48,6 +48,7 @@ import { AsciiBot, type AsciiGlyphs } from './kit/ascii-bot'
 import { RadialMenu, type RadialItem, type RadialIcon } from './kit/radial-menu'
 import { Generate, type GenerateImage } from './kit/generate'
 import { ImageAccordion, type AccordionImage, type AccordionLayout } from './kit/image-accordion'
+import { HexPerformance, demoCells, type HexRange } from './kit/hex-performance'
 import { useLanguage } from './language-context'
 import { Hero } from './hero'
 
@@ -136,6 +137,8 @@ const COPY = {
     asciiAbout: 'The Bot printed as a halftone: a ball of ink dots, shaded as if lit from the top left, with its eyes left blank. They follow your cursor around the page and blink now and then. Move over it and the dots under your hand turn into characters, densest right under it, thinning back to dots along the trail as it cools. Press and a wave of characters rolls out.',
     asciiIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nine bodies, four kinds of eyes, four glyph sets', 'Light and dark, respects reduced motion'],
     glyphsLabel: 'Glyphs',
+    hexAbout: 'A dashboard card with a honeycomb heatmap: the hotter the data, the warmer the colour. It bounces in from the centre. Point at a hexagon and it wobbles up while its neighbours give way; point at a stat in the legend and only its hexagons stay lit. Switch the range and the honeycomb squishes and recolours. More analysis opens the rows with the detail.',
+    hexIncludes: ['Figma file with every state', 'React + Tailwind code, no other libraries', 'Your data: any number of hexagons and ranges', 'Mouse, touch and keyboard'],
     genAbout: "An empty frame with one pill in it. Press Generate and, while your model works, a soft haze drifts and the count crawls, with the Bot scanning the frame from the pill. When the picture arrives it forms the way a generated image does: a few soft masses under a liquid surface, then the forms find their edges, then the fine grain lands as ink dots and melts into the photo. The count climbs unevenly, like real work, and holds 100 for a beat. If it fails, the haze dries into ink dots, the Bot looks down and the pill says so, with Try again.",
     genIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Plugs into any model: resolve with the picture or throw', 'Light and dark, respects reduced motion'],
     resultLabel: 'Result',
@@ -283,6 +286,8 @@ const COPY = {
     asciiAbout: 'El Bot impreso en trama: una bola de puntos de tinta, sombreada como si le diera la luz desde arriba a la izquierda, con los ojos en blanco. Siguen tu cursor por la página y parpadean de vez en cuando. Pasa por encima y los puntos bajo tu mano se vuelven caracteres, más densos justo debajo, y vuelven a ser puntos a lo largo del rastro mientras se enfría. Pulsa y sale una onda de caracteres.',
     asciiIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Nueve cuerpos, cuatro tipos de ojos, cuatro juegos de glifos', 'Claro y oscuro, respeta el movimiento reducido'],
     glyphsLabel: 'Glifos',
+    hexAbout: 'Una tarjeta de panel con un panal de hexágonos: cuanto más caliente el dato, más cálido el color. Aparece con rebote desde el centro. Señala un hexágono y sube con un bamboleo mientras los vecinos ceden; señala un dato de la leyenda y solo sus hexágonos quedan encendidos. Cambia el rango y el panal se aplasta y cambia de color. More analysis abre las filas con el detalle.',
+    hexIncludes: ['Archivo de Figma con cada estado', 'Código React + Tailwind, sin otras librerías', 'Tus datos: cualquier número de hexágonos y rangos', 'Ratón, táctil y teclado'],
     genAbout: 'Un marco vacío con una píldora. Pulsa Generate y, mientras tu modelo trabaja, una neblina se mueve y el contador avanza, con el Bot escaneando el marco desde la píldora. Cuando llega la imagen se forma como una imagen generada: primero unas masas suaves bajo una superficie líquida, luego las formas encuentran sus bordes y al final el grano cae en puntos de tinta y se funde en la foto. El contador sube a trompicones, como un trabajo de verdad, y se queda un momento en 100. Si falla, la neblina se seca en puntos de tinta, el Bot mira abajo y la píldora lo dice, con Reintentar.',
     genIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Se conecta a cualquier modelo: resuelve con la imagen o lanza un error', 'Claro y oscuro, respeta el movimiento reducido'],
     resultLabel: 'Resultado',
@@ -354,13 +359,14 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'heat', cat: 'text' },
   { id: 'gen', cat: 'ai' },
+  { id: 'hex', cat: 'cards' },
   { id: 'radial', cat: 'navigation' },
   { id: 'swap', cat: 'media' },
   { id: 'ascii', cat: 'characters' },
@@ -450,6 +456,7 @@ const GUMROAD: Record<Id, string> = {
   // Not on Gumroad yet: the button says Coming soon
   label: 'https://arnolop.gumroad.com/l/label_maker?wanted=true',
   gen: 'https://arnolop.gumroad.com/l/generate?wanted=true',
+  hex: '',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
@@ -464,6 +471,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   ascii: 'ascii-bot',
   radial: 'radial-menu',
   gen: 'generate',
+  hex: 'hex-performance',
   acc: 'image-accordion',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
@@ -474,6 +482,7 @@ const REGISTRY_NAME: Record<Id, string> = {
 const FIND: Record<Id, [string, string]> = {
   bot: ['Bot', 'bot mascot character avatar eyes follow cursor face robot personaje mascota ojos cara'],
   heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
+  hex: ['Hex performance', 'hex hexagon honeycomb heatmap performance dashboard analytics chart email stats metrics card hexagono panal mapa calor rendimiento panel analitica grafico metricas tarjeta'],
   gen: ['Generate', 'generate ai image picture generation loading halftone model genera imagen ia foto carga'],
   radial: ['Radial menu', 'radial menu round circle navigation actions wheel pie nav menu redondo circular navegacion acciones'],
   swap: ['Card swap', 'card swap stack cards pictures gallery carousel deck tarjetas cartas fotos galeria carrusel'],
@@ -663,7 +672,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3511,6 +3520,81 @@ function AccTile({ t }: { t: T }) {
                 <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Hex performance: made-up email stats over two ranges
+const HEX_RANGES: HexRange[] = [
+  {
+    label: '7 days', columns: 15, cells: demoCells(15, 14, 3),
+    stats: [{ label: 'Opened', value: '24.1%' }, { label: 'Clicked', value: '16.1%' }, { label: 'Converted', value: '12.5%' }],
+    rows: [
+      { label: 'Sent', value: '0.1%', delta: 0.3 },
+      { label: 'Unsubscribed', value: '0.2%', delta: 0.1 },
+      { label: 'Archived', value: '0.3%', delta: 0.7 },
+      { label: 'Marked as spam', value: '0.4%', delta: -1.5 },
+    ],
+  },
+  {
+    label: '30 days', columns: 15, cells: demoCells(15, 14, 8),
+    stats: [{ label: 'Opened', value: '31.8%' }, { label: 'Clicked', value: '19.4%' }, { label: 'Converted', value: '14.2%' }],
+    rows: [
+      { label: 'Sent', value: '0.4%', delta: 1.2 },
+      { label: 'Unsubscribed', value: '0.3%', delta: -0.2 },
+      { label: 'Archived', value: '0.6%', delta: 0.4 },
+      { label: 'Marked as spam', value: '0.2%', delta: -0.9 },
+    ],
+  },
+]
+const hexOpened = (v: number) => `${Math.round(v * 100)}% opened`
+
+/** Hex performance: the white card, drawn at 400 and scaled to the tile; it works right in the tile */
+function HexTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Hex performance`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 20) / 470)})` }}>
+            {open ? null : <HexPerformance key={theme} ranges={HEX_RANGES} theme={theme} format={hexOpened} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.cards}
+          name="Hex performance"
+          about={t.hexAbout}
+          includes={t.hexIncludes}
+          usage={`<HexPerformance${dark ? ' theme="dark"' : ''}\n  title="Performance"\n  ranges={[{ label: '7 days', columns: 15, cells, stats, rows }]}\n  format={(v) => \`\${Math.round(v * 100)}% opened\`}\n/>`}
+          href={GUMROAD.hex}
+          price={PRICE.hex}
+          onClose={() => setOpen(false)}
+          stage={<HexPerformance key={theme} ranges={HEX_RANGES} theme={theme} format={hexOpened} width={380} />}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+            </Choice>
           }
         />
       ) : null}
