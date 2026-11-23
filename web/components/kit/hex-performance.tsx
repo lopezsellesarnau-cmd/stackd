@@ -123,15 +123,17 @@ export function HexPerformance({
   }
 
   const pick = (e: React.PointerEvent<SVGSVGElement>) => {
+    // in the honeycomb's own units, even when the card is drawn scaled (in a tile, a preview…)
     const box = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - box.left, y = e.clientY - box.top
-    let best = -1, bd = rad * rad
+    const k = inner / box.width
+    const x = (e.clientX - box.left) * k, y = (e.clientY - box.top) * k
+    let best = -1, bd = rad * rad * 1.1
     cells.forEach((q, i) => {
       if (q.v == null) return
       const dd = (q.x - x) ** 2 + (q.y - y) ** 2
       if (dd < bd) { bd = dd; best = i }
     })
-    setAt(best)
+    if (best !== at) setAt(best)
   }
   const onKey = (e: React.KeyboardEvent) => {
     const step = (dc: number, dr: number) => {
@@ -216,7 +218,7 @@ export function HexPerformance({
             const wave = (q.d / maxD) * 460
             return (
               // the group leans when a neighbour is pointed at; the shape inside does the squash and bounce
-              <g key={i} style={{ transform: `translate(${q.x}px, ${q.y}px) scale(${lean(q, i)})`, transition: 'transform 520ms cubic-bezier(.34,1.8,.5,1)' }}>
+              <g key={i} style={{ transform: `translate(${q.x}px, ${q.y}px) scale(${lean(q, i)})`, transition: 'transform 380ms cubic-bezier(.34,1.8,.5,1)' }}>
                 <path
                   d={shape}
                   className={`hx-cell ${switched ? (r % 2 ? 'hx-b' : 'hx-c') : ''}`}
