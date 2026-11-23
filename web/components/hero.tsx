@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PromptBar } from './kit/prompt-bar'
+import { AsciiBot } from './kit/ascii-bot'
 
 /**
  * The top of the shop: what StackD is, a Prompt bar that finds components in the grid below, and the
@@ -9,6 +10,7 @@ import { PromptBar } from './kit/prompt-bar'
  */
 
 const MCP = 'https://www.stackd.codes/mcp'
+const FADE = 'linear-gradient(to right, black 0%, black 8%, transparent 27%, transparent 73%, black 92%, black 100%)'
 
 // What each agent needs to reach the MCP server
 const AGENTS = [
@@ -87,6 +89,16 @@ export function Hero<Id extends string>({
   const [agent, setAgent] = useState<(typeof AGENTS)[number]['id']>('claude')
   const [copied, setCopied] = useState(false)
   const current = AGENTS.find((a) => a.id === agent)!
+  // The ASCII Bot behind it all: sized to the hero, bigger than it so the sphere fills the edges
+  const box = useRef<HTMLElement>(null)
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setSize({ w: Math.round(e.contentRect.width), h: Math.round(e.contentRect.height) }))
+    ro.observe(el, { box: 'border-box' })
+    return () => ro.disconnect()
+  }, [])
 
   const answer = async (prompt: string) => {
     const ids = findComponents(prompt, index)
@@ -104,13 +116,26 @@ export function Hero<Id extends string>({
   }
 
   return (
-    <section className="mb-3 rounded-[18px] bg-paper px-5 py-10 sm:px-10 sm:py-14">
-      <div className="mx-auto flex max-w-[640px] flex-col items-center text-center">
+    <section ref={box} className="relative mb-3 overflow-hidden rounded-[18px] bg-paper px-5 py-10 sm:px-10 sm:py-14">
+      {size ? (
+        // Two ASCII Bots peeking in from the sides; they fade out before the text and the bar
+        <div aria-hidden className="pointer-events-none absolute inset-0 hidden text-ink opacity-70 lg:block" style={{ maskImage: FADE, WebkitMaskImage: FADE }}>
+          {(['hexagon', 'drop'] as const).map((shape, i) => {
+            const d = Math.round(size.h * 1.05)
+            return (
+              <div key={shape} className="absolute top-1/2 -translate-y-1/2" style={i ? { right: -d * 0.3 } : { left: -d * 0.3 }}>
+                <AsciiBot shape={shape} glyphs="binary" width={d} height={d} size={9} reach={70} />
+              </div>
+            )
+          })}
+        </div>
+      ) : null}
+      <div className="relative mx-auto flex max-w-[640px] flex-col items-center text-center">
         <h2 className="text-[30px] font-semibold leading-[1.1] tracking-[-0.03em] sm:text-[40px]">{t.title}</h2>
         <p className="mt-3 max-w-[52ch] text-[14px] text-fg-dim">{t.intro}</p>
 
         <div className="mt-7 w-full text-left">
-          <PromptBar compact bot onSend={answer} placeholder={t.placeholder} />
+          <PromptBar compact bot={{ shape: 'drop' }} onSend={answer} placeholder={t.placeholder} />
         </div>
 
         <div className="mt-6 w-full text-left">
