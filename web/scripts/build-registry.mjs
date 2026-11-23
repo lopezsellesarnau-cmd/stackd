@@ -49,6 +49,7 @@ const PRODUCT_IDS = {
   generate: 'eaZAXVCCrSfLjCPEdFyyNA==',
   'image-accordion': 'FuQEX7Y8ljC2y2j7ryCI3Q==',
   'hex-performance': 'FgdZBFfq9LKzOZXJBv-8kg==',
+  'hero-card': '-lTUBbHNWxHxJdPY1Ucmgg==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -92,6 +93,7 @@ const ITEMS = [
   ['generate', 'Generate', 'Generate.tsx', true, 'generate', true, 'A picture forming like a generated image, with the Bot as the loader in the pill; a failure dries the haze into ink dots.'],
   ['image-accordion', 'Image accordion', 'ImageAccordion.tsx', true, 'image_accordion', false, 'Pictures that share one fixed frame: the one you point at opens on a jelly spring and the rest give up the room. Grid, rows or columns.'],
   ['hex-performance', 'Hex performance', 'HexPerformance.tsx', true, 'hex_performance', false, 'A honeycomb heatmap card for dashboards: hexagons with soft corners, a jelly legend that lights one stat, and spongy motion.'],
+  ['hero-card', 'Hero card', 'HeroCard.tsx', true, 'hero_card', false, 'A mobile hero with a living picture: a breathing halo, a pixel gradient that sharpens where you touch, or colour behind reeded glass.'],
 ]
 
 const read = (f) => {

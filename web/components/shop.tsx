@@ -465,7 +465,7 @@ const GUMROAD: Record<Id, string> = {
   label: 'https://arnolop.gumroad.com/l/label_maker?wanted=true',
   gen: 'https://arnolop.gumroad.com/l/generate?wanted=true',
   hex: 'https://arnolop.gumroad.com/l/hex_performance?wanted=true',
-  hero: '',
+  hero: 'https://arnolop.gumroad.com/l/hero_card?wanted=true',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 

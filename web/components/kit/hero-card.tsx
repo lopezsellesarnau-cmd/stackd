@@ -331,8 +331,9 @@ export function HeroCard({
           <PixelArt w={width} h={heroH} palette={pal} pixel={pixel} base={c.base} glow={glow} />
           {pill(true)}
           <div className="flex flex-col px-6 pt-6" style={{ height: height - heroH }}>
-            <h2 className="text-[25px] font-semibold leading-[1.12] tracking-[-0.025em]">{words(H, 120)}</h2>
-            {B ? <p className="mt-5 text-[20px] font-medium leading-[1.2] tracking-[-0.015em]" style={{ color: c.dim }}>{words(B, 200)}</p> : null}
+            {/* the type follows the card's width (25 and 20 px at 360), so it fits a narrow phone too */}
+            <h2 className="font-semibold leading-[1.12] tracking-[-0.025em]" style={{ fontSize: Math.round(width / 14.4) }}>{words(H, 120)}</h2>
+            {B ? <p className="mt-4 font-medium leading-[1.2] tracking-[-0.015em]" style={{ color: c.dim, fontSize: Math.round(width / 18) }}>{words(B, 200)}</p> : null}
             <p className="mb-6 mt-auto text-[12.5px] leading-[1.4]">{words(F, 260)}</p>
           </div>
         </>
