@@ -447,7 +447,7 @@ const GUMROAD: Record<Id, string> = {
   // Not on Gumroad yet: the button says Coming soon
   label: '',
   gen: 'https://arnolop.gumroad.com/l/generate?wanted=true',
-  acc: '',
+  acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'

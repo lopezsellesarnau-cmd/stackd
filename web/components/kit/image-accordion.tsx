@@ -46,6 +46,8 @@ type Props = {
   captions?: boolean
   /** Called with the open picture's index, or -1 when it closes. */
   onOpen?: (index: number) => void
+  /** Hold one picture open without a pointer, for covers and mock-ups. */
+  at?: number
   className?: string
 }
 
@@ -77,6 +79,7 @@ export function ImageAccordion({
   theme = 'light',
   captions = true,
   onOpen,
+  at: holdAt,
   className = '',
 }: Props) {
   const n = images.length
@@ -86,7 +89,7 @@ export function ImageAccordion({
   const rows = Math.ceil(n / cols)
   const h = height ?? (grid ? Math.round((width / cols) * rows) : 300)
 
-  const [at, setAt] = useState(-1)
+  const [at, setAt] = useState(holdAt ?? -1)
   const [focused, setFocused] = useState(false)
   const frame = useRef<HTMLDivElement>(null)
   const cells = useRef<(HTMLDivElement | null)[]>([])
@@ -159,6 +162,8 @@ export function ImageAccordion({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cols, rows])
 
+  // a held picture stays open whatever the pointer does
+  useEffect(() => { if (holdAt != null) setAt(clamp(holdAt, -1, n - 1)) }, [holdAt, n])
   useEffect(() => { run(); told.current?.(at) }, [at]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { run() }, [open, reach]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -207,11 +212,11 @@ export function ImageAccordion({
           if (i >= 0 && i !== at) setAt(i)
         }}
         onPointerDown={(e) => { const i = under(e.clientX, e.clientY); if (i >= 0) setAt(i) }}
-        onPointerLeave={(e) => { if (e.pointerType === 'mouse' && !focused) setAt(-1) }}
-        onPointerCancel={() => setAt(-1)}
+        onPointerLeave={(e) => { if (e.pointerType === 'mouse' && !focused) setAt(holdAt ?? -1) }}
+        onPointerCancel={() => setAt(holdAt ?? -1)}
         onKeyDown={onKey}
         onFocus={() => setFocused(true)}
-        onBlur={() => { setFocused(false); setAt(-1) }}
+        onBlur={() => { setFocused(false); setAt(holdAt ?? -1) }}
       >
         {images.map((img, i) => (
           <div

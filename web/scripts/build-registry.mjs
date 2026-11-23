@@ -46,6 +46,7 @@ const PRODUCT_IDS = {
   'ascii-bot': 'sJvuuap0SAxc3iMaOMfE5A==',
   'radial-menu': '-s4xg9UOsOxt3ZEZf4xdWg==',
   generate: 'eaZAXVCCrSfLjCPEdFyyNA==',
+  'image-accordion': 'FuQEX7Y8ljC2y2j7ryCI3Q==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -86,6 +87,7 @@ const ITEMS = [
   ['ascii-bot', 'ASCII Bot', 'AsciiBot.tsx', true, 'ascii_bot', true, 'The Bot as a halftone of ink dots that turn into characters under the cursor and cool back along the trail.'],
   ['radial-menu', 'Radial menu', 'RadialMenu.tsx', true, 'radial_menu', true, 'A round menu cut like a citrus around the Bot: segments fill like jelly when pointed at and open into their own rings.'],
   ['generate', 'Generate', 'Generate.tsx', true, 'generate', true, 'A picture forming like a generated image, with the Bot as the loader in the pill; a failure dries the haze into ink dots.'],
+  ['image-accordion', 'Image accordion', 'ImageAccordion.tsx', true, 'image_accordion', false, 'Pictures that share one fixed frame: the one you point at opens on a jelly spring and the rest give up the room. Grid, rows or columns.'],
 ]
 
 const read = (f) => {
