@@ -49,6 +49,7 @@ import { RadialMenu, type RadialItem, type RadialIcon } from './kit/radial-menu'
 import { Generate, type GenerateImage } from './kit/generate'
 import { ImageAccordion, type AccordionImage, type AccordionLayout } from './kit/image-accordion'
 import { useLanguage } from './language-context'
+import { Hero } from './hero'
 
 const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif'
 
@@ -355,35 +356,36 @@ const CATS = Object.keys(COPY.en.cats) as Cat[]
 // The live components, with their category
 type Id = 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
+// Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
-  { id: 'swap', cat: 'media' },
-  { id: 'squeeze', cat: 'buttons' },
-  { id: 'split', cat: 'text' },
-  { id: 'tape', cat: 'inputs' },
-  { id: 'label', cat: 'inputs' },
-  { id: 'ascii', cat: 'characters' },
-  { id: 'radial', cat: 'navigation' },
+  { id: 'heat', cat: 'text' },
   { id: 'gen', cat: 'ai' },
-  { id: 'prompt', cat: 'ai' },
-  { id: 'palette', cat: 'navigation' },
-  { id: 'memo', cat: 'audio' },
+  { id: 'radial', cat: 'navigation' },
+  { id: 'swap', cat: 'media' },
+  { id: 'ascii', cat: 'characters' },
   { id: 'acc', cat: 'media' },
-  { id: 'drop', cat: 'inputs' },
+  { id: 'memo', cat: 'audio' },
+  { id: 'morph', cat: 'media' },
   { id: 'pull', cat: 'loaders' },
   { id: 'toast', cat: 'notifications' },
-  { id: 'heat', cat: 'text' },
-  { id: 'morph', cat: 'media' },
+  { id: 'palette', cat: 'navigation' },
+  { id: 'prompt', cat: 'ai' },
+  { id: 'compare', cat: 'media' },
+  { id: 'label', cat: 'inputs' },
+  { id: 'tape', cat: 'inputs' },
+  { id: 'split', cat: 'text' },
   { id: 'ring', cat: 'cards' },
   { id: 'bars', cat: 'cards' },
-  { id: 'flap', cat: 'text' },
-  { id: 'compare', cat: 'media' },
-  { id: 'clock', cat: 'widgets' },
   { id: 'activity', cat: 'cards' },
+  { id: 'clock', cat: 'widgets' },
+  { id: 'flap', cat: 'text' },
   { id: 'dial', cat: 'inputs' },
-  { id: 'pay', cat: 'buttons' },
-  { id: 'tabs', cat: 'navigation' },
   { id: 'glass', cat: 'media' },
+  { id: 'drop', cat: 'inputs' },
+  { id: 'tabs', cat: 'navigation' },
+  { id: 'pay', cat: 'buttons' },
+  { id: 'squeeze', cat: 'buttons' },
   { id: 'login', cat: 'inputs' },
   { id: 'notify', cat: 'notifications' },
   { id: 'stat', cat: 'cards' },
@@ -467,6 +469,44 @@ const REGISTRY_NAME: Record<Id, string> = {
   feedback: 'bot-feedback', palette: 'command-palette', drop: 'file-drop', loader: 'bot-loader', otp: 'otp-input',
   glass: 'glass-tiles', swap: 'card-swap', compare: 'before-after', memo: 'voice-memo', clock: 'world-clock', pull: 'pull-to-refresh', activity: 'activity-grid', toast: 'toast', heat: 'heat-word', ring: 'spending-ring', bars: 'stacked-bars', morph: 'dot-morph',
 }
+// What the hero's Prompt bar searches: each component's name and the words it answers to (English and Spanish)
+const FIND: Record<Id, [string, string]> = {
+  bot: ['Bot', 'bot mascot character avatar eyes follow cursor face robot personaje mascota ojos cara'],
+  heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
+  gen: ['Generate', 'generate ai image picture generation loading halftone model genera imagen ia foto carga'],
+  radial: ['Radial menu', 'radial menu round circle navigation actions wheel pie nav menu redondo circular navegacion acciones'],
+  swap: ['Card swap', 'card swap stack cards pictures gallery carousel deck tarjetas cartas fotos galeria carrusel'],
+  ascii: ['ASCII Bot', 'ascii bot characters terminal halftone hero 404 empty state retro caracteres'],
+  acc: ['Image accordion', 'image accordion gallery grid pictures photos portfolio expand galeria fotos imagenes acordeon'],
+  memo: ['Voice memo', 'voice memo audio record recording waveform trim sound voz audio grabar grabacion onda'],
+  morph: ['Dot morph', 'dot morph dots particles shape image animation puntos particulas forma'],
+  pull: ['Pull to refresh', 'pull refresh list feed mobile reload loading loader tirar refrescar lista recargar carga'],
+  toast: ['Toast', 'toast notification alert message snackbar success error promise aviso notificacion alerta mensaje'],
+  palette: ['Command palette', 'command palette search menu cmdk keyboard shortcut spotlight launcher buscar comandos busqueda teclado'],
+  prompt: ['AI prompt bar', 'ai prompt chat input assistant llm message gpt claude send ia chat entrada asistente mensaje'],
+  compare: ['Before / after', 'before after compare slider image comparison pictures antes despues comparar imagen'],
+  label: ['Label maker', 'label maker tags tag input chips keywords etiquetas etiqueta entrada'],
+  tape: ['Tape measure', 'tape measure slider range height value ruler cinta metrica deslizador altura regla'],
+  split: ['Split list', 'split list names hover text menu links lista nombres texto enlaces'],
+  ring: ['Spending ring', 'spending ring chart donut budget finance money expenses gastos grafico anillo presupuesto dinero finanzas'],
+  bars: ['Stacked bars', 'stacked bars chart graph data analytics dashboard barras grafico datos analitica'],
+  activity: ['Activity', 'activity grid heatmap calendar contributions chart 3d days actividad calendario grafico dias'],
+  clock: ['World clock', 'world clock time zones timezone meeting widget reloj horas zonas horarias reunion'],
+  flap: ['Split flap', 'split flap departure board text counter price airport letters tablero contador precio letras'],
+  dial: ['Rotary dial', 'rotary dial knob volume input range thermostat control pomo volumen termostato'],
+  glass: ['Glass tiles', 'glass tiles image blur privacy censor redact cristal imagen difuminar privacidad'],
+  drop: ['File drop', 'file drop upload dropzone attach files images bot subir archivos arrastrar ficheros'],
+  tabs: ['Elastic tabs', 'elastic tabs tab bar navigation segmented control pestanas navegacion'],
+  pay: ['Slide to pay', 'slide pay checkout payment button confirm swipe pagar pago boton confirmar deslizar'],
+  squeeze: ['Squeeze button', 'squeeze button contact send cta words boton enviar contacto'],
+  login: ['Bot login', 'login sign in auth password email form bot iniciar sesion contrasena formulario'],
+  notify: ['Notification stack', 'notification stack notifications inbox alerts swipe notificaciones avisos alertas'],
+  stat: ['Live stat card', 'stat card dashboard kpi metric number chart line live analytics tarjeta metrica numero grafico panel'],
+  timer: ['Focus timer', 'focus timer pomodoro countdown island notch bot temporizador cuenta atras'],
+  loader: ['Bot loader', 'loader loading progress steps spinner bot wait carga cargando progreso pasos'],
+  otp: ['OTP input', 'otp code verification 2fa pin input bot codigo verificacion'],
+  feedback: ['Bot feedback', 'feedback rating review stars survey bot opinion valoracion encuesta'],
+}
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
   (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
 )
@@ -528,8 +568,11 @@ export function Shop() {
   const { lang, setLang } = useLanguage()
   const t = COPY[lang]
   const [cat, setCat] = useState<Cat | 'all'>('all')
+  // What the hero's Prompt bar found: those components first, in its order
+  const [found, setFound] = useState<Id[] | null>(null)
 
-  const shown = ITEMS.filter((i) => cat === 'all' || i.cat === cat)
+  const inCat = ITEMS.filter((i) => cat === 'all' || i.cat === cat)
+  const shown = found ? [...found.map((id) => ITEMS.find((i) => i.id === id)!), ...inCat.filter((i) => !found.includes(i.id))] : inCat
   // Fill the pattern: real components first, stand-ins after (only under "All")
   let next = 0
   // The pattern repeats until every component has a cell (it holds 19 per pass)
@@ -606,6 +649,15 @@ export function Shop() {
         </aside>
 
         <main id="contenido">
+          <Hero lang={lang} index={FIND} onFind={setFound} />
+          {found ? (
+            <p className="mb-3 flex items-center gap-2 px-1 text-fg-dim">
+              {lang === 'es' ? `${found.length} encontrados, primero` : `${found.length} found, shown first`}
+              <button onClick={() => setFound(null)} className="rounded-full bg-paper px-2.5 py-0.5 text-ink transition-colors hover:bg-ink hover:text-paper">
+                {lang === 'es' ? 'Orden normal' : 'Usual order'}
+              </button>
+            </p>
+          ) : null}
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cells.map((c) =>
               c.kind === 'item' ? (
