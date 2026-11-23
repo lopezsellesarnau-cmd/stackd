@@ -528,6 +528,11 @@ const FIND: Record<Id, [string, string]> = {
   otp: ['OTP input', 'otp code verification 2fa pin input bot codigo verificacion'],
   feedback: ['Bot feedback', 'feedback rating review stars survey bot opinion valoracion encuesta'],
 }
+/** For a tile whose component covers it: a click on the component opens the details, except on its own controls */
+const openFrom = (setOpen: (v: boolean) => void) => (e: React.MouseEvent) => {
+  if (!(e.target as HTMLElement).closest('button, a, input, textarea, [role="slider"], [role="tab"]')) setOpen(true)
+}
+
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
   (Object.keys(GUMROAD) as Id[]).map((id) => [GUMROAD[id], REGISTRY_NAME[id]]),
 )
@@ -3244,7 +3249,7 @@ function AsciiTile({ t }: { t: T }) {
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} ASCII Bot`} className="absolute inset-0 cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           {/* Drawn at one size and scaled to the tile, so the halftone keeps its grain */}
-          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 24) / BASE)})` }}>
+          <div className="pointer-events-auto cursor-pointer" onClick={openFrom(setOpen)} style={{ transform: `scale(${Math.min(1, (w - 24) / BASE)})` }}>
             {open ? null : <AsciiBot shape={shape} glyphs={glyphs} ink={ink} width={BASE} height={BASE} />}
           </div>
         </div>
@@ -3638,7 +3643,7 @@ function HeroTile({ t }: { t: T }) {
       <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-card'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Hero card`} className="absolute inset-0 cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="pointer-events-auto">
+          <div className="pointer-events-auto cursor-pointer" onClick={openFrom(setOpen)}>
             {open || side < 200 ? null : (
               <HeroCard key={`${art}-${theme}-${side}`} art={art} theme={theme} width={side} height={side} caption={caption}
                 footnote="Figma file and React code for every state." body={art === 'pixel' ? '' : undefined} />
