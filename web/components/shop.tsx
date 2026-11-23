@@ -400,7 +400,8 @@ const ITEMS: { id: Id; cat: Cat }[] = [
 const PRICE: Partial<Record<Id, string>> = { flap: '€7', dial: '€7', timer: '€7', login: '€7', tabs: '€7', feedback: '€7', palette: '€7', drop: '€7', loader: '€7', otp: '€7', glass: '€7', swap: '€7', compare: '€7', memo: '€7', clock: '€7', pull: '€7', activity: '€7', toast: '€7', heat: '€7', ring: '€7', bars: '€7', morph: '€7' }
 
 // The desktop grid, row by row: 1 = a tile, 0 = an empty cell
-const PATTERN = [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
+// About one empty cell in seven: still a rhythm, without spreading the components out
+const PATTERN = [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1]
 
 // Body colour, and the eye colour that reads on it
 const COLORS = [
@@ -575,7 +576,7 @@ export function Shop() {
   const shown = found ? [...found.map((id) => ITEMS.find((i) => i.id === id)!), ...inCat.filter((i) => !found.includes(i.id))] : inCat
   // Fill the pattern: real components first, stand-ins after (only under "All")
   let next = 0
-  // The pattern repeats until every component has a cell (it holds 19 per pass)
+  // The pattern repeats until every component has a cell (it holds 20 per pass)
   const cells = []
   for (let i = 0; next < shown.length || i < PATTERN.length; i++) {
     const on = PATTERN[i % PATTERN.length]
