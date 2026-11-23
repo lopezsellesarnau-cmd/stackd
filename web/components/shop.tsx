@@ -50,6 +50,7 @@ import { Generate, type GenerateImage } from './kit/generate'
 import { ImageAccordion, type AccordionImage, type AccordionLayout } from './kit/image-accordion'
 import { HexPerformance, demoCells, type HexRange } from './kit/hex-performance'
 import { HeroCard, type HeroArt } from './kit/hero-card'
+import { WorkflowCanvas, type FlowEdge, type FlowNode } from './kit/workflow-canvas'
 import { useLanguage } from './language-context'
 import { Hero } from './hero'
 
@@ -138,6 +139,8 @@ const COPY = {
     asciiAbout: 'The Bot printed as a halftone: a ball of ink dots, shaded as if lit from the top left, with its eyes left blank. They follow your cursor around the page and blink now and then. Move over it and the dots under your hand turn into characters, densest right under it, thinning back to dots along the trail as it cools. Press and a wave of characters rolls out.',
     asciiIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nine bodies, four kinds of eyes, four glyph sets', 'Light and dark, respects reduced motion'],
     glyphsLabel: 'Glyphs',
+    flowAbout: 'An automation canvas: node cards on a dotted board, joined by soft wires. Drag a node and its wires follow like jelly. Press Run and the Bot rides the wires from node to node, stretching as it speeds up and squashing as it lands; each node works, logs its time and gets a tick, and the condition picks the green or the red branch.',
+    flowIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Your nodes, wires and conditions; onStep for real work', 'Mouse, touch and keyboard'],
     heroAbout: 'A mobile hero: a pill with your name and a menu that swells into a panel, a headline and a living picture. Three arts: a halo that breathes and leans toward your finger (press it for a ripple), a pixel gradient that sharpens where you touch, and colour clouds behind reeded glass. The text comes in word by word.',
     heroIncludes: ['Figma file with the three arts', 'React + Tailwind code, no other libraries', 'Your texts, links and colours', 'Mouse, touch and keyboard'],
     artLabel: 'Art',
@@ -290,6 +293,8 @@ const COPY = {
     asciiAbout: 'El Bot impreso en trama: una bola de puntos de tinta, sombreada como si le diera la luz desde arriba a la izquierda, con los ojos en blanco. Siguen tu cursor por la página y parpadean de vez en cuando. Pasa por encima y los puntos bajo tu mano se vuelven caracteres, más densos justo debajo, y vuelven a ser puntos a lo largo del rastro mientras se enfría. Pulsa y sale una onda de caracteres.',
     asciiIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Nueve cuerpos, cuatro tipos de ojos, cuatro juegos de glifos', 'Claro y oscuro, respeta el movimiento reducido'],
     glyphsLabel: 'Glifos',
+    flowAbout: 'Un lienzo de automatización: nodos sobre un tablero de puntos, unidos por cables suaves. Arrastra un nodo y sus cables le siguen como gelatina. Pulsa Run y el Bot recorre los cables de nodo en nodo, estirándose al acelerar y aplastándose al llegar; cada nodo trabaja, marca su tiempo y su tick, y la condición elige rama verde o roja.',
+    flowIncludes: ['Archivo de Figma con cada estado', 'Código React + Tailwind, con el Bot', 'Tus nodos, cables y condiciones; onStep para trabajo real', 'Ratón, táctil y teclado'],
     heroAbout: 'Un hero para móvil: una píldora con tu nombre y un menú que se hincha en panel, un titular y una imagen viva. Tres artes: un halo que respira y se inclina hacia tu dedo (al pulsar sale una onda), un degradado pixelado que se enfoca donde tocas, y nubes de color tras cristal acanalado. El texto entra palabra a palabra.',
     heroIncludes: ['Archivo de Figma con las tres artes', 'Código React + Tailwind, sin otras librerías', 'Tus textos, enlaces y colores', 'Ratón, táctil y teclado'],
     artLabel: 'Arte',
@@ -366,7 +371,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
@@ -375,6 +380,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'gen', cat: 'ai' },
   { id: 'hex', cat: 'cards' },
   { id: 'hero', cat: 'cards' },
+  { id: 'flow', cat: 'widgets' },
   { id: 'radial', cat: 'navigation' },
   { id: 'swap', cat: 'media' },
   { id: 'ascii', cat: 'characters' },
@@ -466,6 +472,7 @@ const GUMROAD: Record<Id, string> = {
   gen: 'https://arnolop.gumroad.com/l/generate?wanted=true',
   hex: 'https://arnolop.gumroad.com/l/hex_performance?wanted=true',
   hero: 'https://arnolop.gumroad.com/l/hero_card?wanted=true',
+  flow: '',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
@@ -482,6 +489,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   gen: 'generate',
   hex: 'hex-performance',
   hero: 'hero-card',
+  flow: 'workflow-canvas',
   acc: 'image-accordion',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
@@ -492,6 +500,7 @@ const REGISTRY_NAME: Record<Id, string> = {
 const FIND: Record<Id, [string, string]> = {
   bot: ['Bot', 'bot mascot character avatar eyes follow cursor face robot personaje mascota ojos cara'],
   heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
+  flow: ['Workflow canvas', 'workflow automation canvas nodes flow pipeline graph editor zap n8n run wires automatizacion lienzo nodos flujo cables editor'],
   hero: ['Hero card', 'hero mobile landing header section halo ring gradient pixel glass reeded menu nav card portada movil cabecera seccion anillo degradado pixel cristal menu tarjeta'],
   hex: ['Hex performance', 'hex hexagon honeycomb heatmap performance dashboard analytics chart email stats metrics card hexagono panal mapa calor rendimiento panel analitica grafico metricas tarjeta'],
   gen: ['Generate', 'generate ai image picture generation loading halftone model genera imagen ia foto carga'],
@@ -688,7 +697,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3676,6 +3685,82 @@ function HeroTile({ t }: { t: T }) {
                 <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Workflow canvas: a square layout, so it reads in a tile (the wires find their own sides)
+let flowFlip = false
+const FLOW_NODES: FlowNode[] = [
+  { id: 'trigger', title: 'Schedule trigger', icon: 'clock', x: 20, y: 56, rows: [[{ label: 'Cadence', value: 'Every 5 min' }], [{ label: 'Last', value: '14:05:00' }, { label: 'Next', value: '14:10:00' }]] },
+  { id: 'http', title: 'HTTP request', icon: 'code', x: 322, y: 40, rows: [[{ label: 'GET', value: '/v1/orders' }], [{ label: 'Duration', value: '0.2s' }]] },
+  { id: 'cond', title: 'Condition', icon: 'branch', x: 322, y: 232, condition: () => (flowFlip = !flowFlip), rows: [[{ label: 'If', value: 'total > 100' }], [{ label: 'True · Premium', value: '23' }, { label: 'False · Standard', value: '14' }], [{ label: 'Duration', value: '0.8s' }]] },
+  { id: 'mail', title: 'Send email', icon: 'mail', x: 20, y: 262, rows: [[{ label: 'To', value: 'customer' }, { label: 'Duration', value: '0.4s' }]] },
+  { id: 'log', title: 'Log order', icon: 'log', x: 20, y: 412, rows: [[{ label: 'Table', value: 'standard' }, { label: 'Duration', value: '0.1s' }]] },
+]
+const FLOW_EDGES: FlowEdge[] = [
+  { from: 'trigger', to: 'http' },
+  { from: 'http', to: 'cond' },
+  { from: 'cond', to: 'mail', branch: 'true' },
+  { from: 'cond', to: 'log', branch: 'false' },
+]
+const FLOW_SIZE = 560
+
+/** Workflow canvas: drawn at 560 and scaled to the tile. A click opens the details; a drag (a node, the board) doesn't. */
+function FlowTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const card = useRef<HTMLElement>(null)
+  const down = useRef({ x: 0, y: 0 })
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const theme = dark ? 'dark' : 'light'
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Workflow canvas`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div
+            className="pointer-events-auto shrink-0"
+            style={{ transform: `scale(${(w - 16) / FLOW_SIZE})` }}
+            onPointerDownCapture={(e) => { down.current = { x: e.clientX, y: e.clientY } }}
+            onClick={(e) => {
+              const moved = Math.hypot(e.clientX - down.current.x, e.clientY - down.current.y)
+              if (moved < 5 && !(e.target as HTMLElement).closest('button')) setOpen(true)
+            }}
+          >
+            {open ? null : <WorkflowCanvas key={theme} nodes={FLOW_NODES} edges={FLOW_EDGES} theme={theme} width={FLOW_SIZE} height={FLOW_SIZE} nodeWidth={210} />}
+          </div>
+        </div>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          cat={t.cats.widgets}
+          name="Workflow canvas"
+          about={t.flowAbout}
+          includes={t.flowIncludes}
+          usage={`<WorkflowCanvas${dark ? ' theme="dark"' : ''}\n  nodes={nodes}\n  edges={[{ from: 'trigger', to: 'http' }, { from: 'cond', to: 'mail', branch: 'true' }]}\n  onStep={async (node) => { await runStep(node.id) }}\n/>`}
+          href={GUMROAD.flow}
+          price={PRICE.flow}
+          onClose={() => setOpen(false)}
+          stage={<div style={{ transform: 'scale(0.9)' }}><WorkflowCanvas key={theme} nodes={FLOW_NODES} edges={FLOW_EDGES} theme={theme} width={FLOW_SIZE} height={FLOW_SIZE} nodeWidth={210} /></div>}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+            </Choice>
           }
         />
       ) : null}
