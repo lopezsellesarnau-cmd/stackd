@@ -51,6 +51,7 @@ import { ImageAccordion, type AccordionImage, type AccordionLayout } from './kit
 import { HexPerformance, demoCells, type HexRange } from './kit/hex-performance'
 import { HeroCard, type HeroArt } from './kit/hero-card'
 import { WorkflowCanvas, type FlowEdge, type FlowNode } from './kit/workflow-canvas'
+import { JellySidebar, type SidebarItem } from './kit/jelly-sidebar'
 import { useLanguage } from './language-context'
 import { Hero } from './hero'
 
@@ -139,6 +140,8 @@ const COPY = {
     asciiAbout: 'The Bot printed as a halftone: a ball of ink dots, shaded as if lit from the top left, with its eyes left blank. They follow your cursor around the page and blink now and then. Move over it and the dots under your hand turn into characters, densest right under it, thinning back to dots along the trail as it cools. Press and a wave of characters rolls out.',
     asciiIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nine bodies, four kinds of eyes, four glyph sets', 'Light and dark, respects reduced motion'],
     glyphsLabel: 'Glyphs',
+    sideAbout: 'An app side menu that moves like jelly. Fold it into a rail of icons or open it: the width springs a little. The black blob under the section you are on slides to the next one, stretching on the way. In the rail, pointing at an icon pops its name out; groups open with their items dropping in one by one. At the bottom, you, with the Bot as your avatar.',
+    sideIncludes: ['Figma file, open and folded', 'React + Tailwind code, with the Bot', 'Your sections, groups, counts and icons', 'Mouse, touch and keyboard ( [ folds it )'],
     flowAbout: 'An automation canvas: node cards on a dotted board, joined by soft wires. Drag a node and its wires follow like jelly. Press Run and the Bot rides the wires from node to node, stretching as it speeds up and squashing as it lands; each node works, logs its time and gets a tick, and the condition picks the green or the red branch.',
     flowIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Your nodes, wires and conditions; onStep for real work', 'Mouse, touch and keyboard'],
     heroAbout: 'A mobile hero: a pill with your name and a menu that swells into a panel, a headline and a living picture. Three arts: a halo that breathes and leans toward your finger (press it for a ripple), a pixel gradient that sharpens where you touch, and colour clouds behind reeded glass. The text comes in word by word.',
@@ -293,6 +296,8 @@ const COPY = {
     asciiAbout: 'El Bot impreso en trama: una bola de puntos de tinta, sombreada como si le diera la luz desde arriba a la izquierda, con los ojos en blanco. Siguen tu cursor por la página y parpadean de vez en cuando. Pasa por encima y los puntos bajo tu mano se vuelven caracteres, más densos justo debajo, y vuelven a ser puntos a lo largo del rastro mientras se enfría. Pulsa y sale una onda de caracteres.',
     asciiIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Nueve cuerpos, cuatro tipos de ojos, cuatro juegos de glifos', 'Claro y oscuro, respeta el movimiento reducido'],
     glyphsLabel: 'Glifos',
+    sideAbout: 'El menú lateral de una app, en gelatina. Pliégalo en una barra de iconos o ábrelo: el ancho rebota un poco. El blob negro bajo la sección activa se desliza a la siguiente estirándose. En la barra, al señalar un icono sale su nombre al lado; los grupos se abren y sus elementos caen uno a uno. Abajo, tú, con el Bot de avatar.',
+    sideIncludes: ['Archivo de Figma abierto y plegado', 'Código React + Tailwind, con el Bot', 'Tus secciones, grupos, contadores e iconos', 'Ratón, táctil y teclado ( [ pliega )'],
     flowAbout: 'Un lienzo de automatización: nodos sobre un tablero de puntos, unidos por cables suaves. Arrastra un nodo y sus cables le siguen como gelatina. Pulsa Run y el Bot recorre los cables de nodo en nodo, estirándose al acelerar y aplastándose al llegar; cada nodo trabaja, marca su tiempo y su tick, y la condición elige rama verde o roja.',
     flowIncludes: ['Archivo de Figma con cada estado', 'Código React + Tailwind, con el Bot', 'Tus nodos, cables y condiciones; onStep para trabajo real', 'Ratón, táctil y teclado'],
     heroAbout: 'Un hero para móvil: una píldora con tu nombre y un menú que se hincha en panel, un titular y una imagen viva. Tres artes: un halo que respira y se inclina hacia tu dedo (al pulsar sale una onda), un degradado pixelado que se enfoca donde tocas, y nubes de color tras cristal acanalado. El texto entra palabra a palabra.',
@@ -371,7 +376,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
@@ -381,6 +386,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'hex', cat: 'cards' },
   { id: 'hero', cat: 'cards' },
   { id: 'flow', cat: 'widgets' },
+  { id: 'side', cat: 'navigation' },
   { id: 'radial', cat: 'navigation' },
   { id: 'swap', cat: 'media' },
   { id: 'ascii', cat: 'characters' },
@@ -473,6 +479,7 @@ const GUMROAD: Record<Id, string> = {
   hex: 'https://arnolop.gumroad.com/l/hex_performance?wanted=true',
   hero: 'https://arnolop.gumroad.com/l/hero_card?wanted=true',
   flow: 'https://arnolop.gumroad.com/l/workflow_canvas?wanted=true',
+  side: '',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
@@ -490,6 +497,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   hex: 'hex-performance',
   hero: 'hero-card',
   flow: 'workflow-canvas',
+  side: 'jelly-sidebar',
   acc: 'image-accordion',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
@@ -500,6 +508,7 @@ const REGISTRY_NAME: Record<Id, string> = {
 const FIND: Record<Id, [string, string]> = {
   bot: ['Bot', 'bot mascot character avatar eyes follow cursor face robot personaje mascota ojos cara'],
   heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
+  side: ['Jelly sidebar', 'sidebar side menu navigation nav drawer rail collapse app dashboard saas menu lateral navegacion barra panel'],
   flow: ['Workflow canvas', 'workflow automation canvas nodes flow pipeline graph editor zap n8n run wires automatizacion lienzo nodos flujo cables editor'],
   hero: ['Hero card', 'hero mobile landing header section halo ring gradient pixel glass reeded menu nav card portada movil cabecera seccion anillo degradado pixel cristal menu tarjeta'],
   hex: ['Hex performance', 'hex hexagon honeycomb heatmap performance dashboard analytics chart email stats metrics card hexagono panal mapa calor rendimiento panel analitica grafico metricas tarjeta'],
@@ -697,7 +706,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3819,5 +3828,91 @@ function Fit({ size, children }: { size: number; children: React.ReactNode }) {
     <div ref={el} className="flex w-full justify-center" style={{ height: size * k }}>
       <div className="shrink-0 origin-top" style={{ transform: `scale(${k})` }}>{children}</div>
     </div>
+  )
+}
+
+// Jelly sidebar: the demo menu, inside a small app frame
+const SIDE_ITEMS: SidebarItem[] = [
+  { id: 'home', label: 'Home', icon: 'home' },
+  { id: 'inbox', label: 'Inbox', icon: 'inbox', badge: 12 },
+  { id: 'search', label: 'Search', icon: 'search' },
+  { id: 'analytics', label: 'Analytics', icon: 'chart' },
+  { id: 'projects', label: 'Projects', icon: 'folder', children: [{ id: 'p-site', label: 'Website redesign' }, { id: 'p-app', label: 'Mobile app', badge: 3 }, { id: 'p-brand', label: 'Brand kit' }] },
+  { id: 'calendar', label: 'Calendar', icon: 'calendar' },
+  { id: 'team', label: 'Team', icon: 'users' },
+]
+const SIDE_FOOTER: SidebarItem[] = [{ id: 'settings', label: 'Settings', icon: 'settings' }]
+const SIDE_SIZE = 560
+
+function SideApp({ dark }: { dark: boolean }) {
+  const [page, setPage] = useState('Home')
+  return (
+    <div className={`flex gap-2.5 rounded-[28px] p-2.5 ${dark ? 'bg-[#141310]' : 'bg-[#F2F1EF]'}`} style={{ width: SIDE_SIZE, height: SIDE_SIZE }}>
+      <JellySidebar items={SIDE_ITEMS} footer={SIDE_FOOTER} theme={dark ? 'dark' : 'light'} height={SIDE_SIZE - 20} onSelect={(it) => setPage(it.label)} />
+      <section className={`min-w-0 flex-1 rounded-[22px] p-6 ${dark ? 'bg-[#1A1916] text-[#F2F0EC]' : 'bg-white text-[#141310]'}`}>
+        <p className="text-[12px] opacity-50">Workspace</p>
+        <p key={page} className="mt-1 truncate text-[24px] font-semibold tracking-[-0.02em]">{page}</p>
+        <div className="mt-5 grid grid-cols-2 gap-2.5">
+          {Array.from({ length: 6 }, (_, i) => <div key={i} className={`h-20 rounded-2xl ${dark ? 'bg-white/5' : 'bg-black/[0.04]'}`} />)}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+/** Jelly sidebar: the app frame drawn at 560 and scaled to the tile. Its items are buttons, so the tile has an Open pill. */
+function SideTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Jelly sidebar`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto shrink-0 cursor-pointer" onClick={openFrom(setOpen)} style={{ transform: `scale(${(w - 16) / SIDE_SIZE})` }}>
+            {open ? null : <SideApp key={String(dark)} dark={dark} />}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className={`absolute bottom-3 right-3 z-10 rounded-full px-3 py-1 text-[12px] font-medium transition-transform hover:scale-105 active:scale-95 ${dark ? 'bg-paper text-ink' : 'bg-ink text-paper'}`}
+        >
+          {t.open} ›
+        </button>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          dark={dark}
+          cat={t.cats.navigation}
+          name="Jelly sidebar"
+          about={t.sideAbout}
+          includes={t.sideIncludes}
+          usage={`<JellySidebar${dark ? ' theme="dark"' : ''}\n  items={[{ id: 'home', label: 'Home', icon: 'home' }, { id: 'inbox', label: 'Inbox', icon: 'inbox', badge: 12 }]}\n  user={{ name: 'Ada', detail: 'Pro plan' }}\n  onSelect={(item) => router.push('/' + item.id)}\n/>`}
+          href={GUMROAD.side}
+          price={PRICE.side}
+          onClose={() => setOpen(false)}
+          stage={<Fit size={SIDE_SIZE}><SideApp key={String(dark)} dark={dark} /></Fit>}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+            </Choice>
+          }
+        />
+      ) : null}
+    </>
   )
 }
