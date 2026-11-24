@@ -50,6 +50,7 @@ const PRODUCT_IDS = {
   'image-accordion': 'FuQEX7Y8ljC2y2j7ryCI3Q==',
   'hex-performance': 'FgdZBFfq9LKzOZXJBv-8kg==',
   'hero-card': '-lTUBbHNWxHxJdPY1Ucmgg==',
+  'workflow-canvas': 'jVZQ7y-3pkZK2q0gbpUfJA==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -94,6 +95,7 @@ const ITEMS = [
   ['image-accordion', 'Image accordion', 'ImageAccordion.tsx', true, 'image_accordion', false, 'Pictures that share one fixed frame: the one you point at opens on a jelly spring and the rest give up the room. Grid, rows or columns.'],
   ['hex-performance', 'Hex performance', 'HexPerformance.tsx', true, 'hex_performance', false, 'A honeycomb heatmap card for dashboards: hexagons with soft corners, a jelly legend that lights one stat, and spongy motion.'],
   ['hero-card', 'Hero card', 'HeroCard.tsx', true, 'hero_card', false, 'A mobile hero with a living picture: a breathing halo, a pixel gradient that sharpens where you touch, or colour behind reeded glass.'],
+  ['workflow-canvas', 'Workflow canvas', 'WorkflowCanvas.tsx', true, 'workflow_canvas', true, 'An automation canvas: drag nodes on jelly wires, press Run and the Bot rides them from node to node; conditions branch green or red.'],
 ]
 
 const read = (f) => {

@@ -472,7 +472,7 @@ const GUMROAD: Record<Id, string> = {
   gen: 'https://arnolop.gumroad.com/l/generate?wanted=true',
   hex: 'https://arnolop.gumroad.com/l/hex_performance?wanted=true',
   hero: 'https://arnolop.gumroad.com/l/hero_card?wanted=true',
-  flow: '',
+  flow: 'https://arnolop.gumroad.com/l/workflow_canvas?wanted=true',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
