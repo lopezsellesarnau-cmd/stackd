@@ -1406,6 +1406,7 @@ function TimerTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.widgets}
           name="Focus timer"
           about={t.timerAbout}
@@ -1472,6 +1473,7 @@ function LoginTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.inputs}
           name="Bot login"
           about={t.loginAbout}
@@ -1604,6 +1606,7 @@ function TabsTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.navigation}
           name="Elastic tabs"
           about={t.tabsAbout}
@@ -1683,6 +1686,7 @@ function FeedbackTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.inputs}
           name="Bot feedback"
           about={t.feedbackAbout}
@@ -1782,6 +1786,7 @@ function PaletteTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.navigation}
           name="Command palette"
           about={t.paletteAbout}
@@ -1871,6 +1876,7 @@ function DropTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.inputs}
           name="File drop"
           about={t.dropAbout}
@@ -2002,6 +2008,7 @@ function LoaderTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.loaders}
           name="Bot loader"
           about={t.loaderAbout}
@@ -2100,6 +2107,7 @@ function OtpTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.inputs}
           name="OTP input"
           about={t.otpAbout}
@@ -2269,6 +2277,7 @@ function SwapTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.media}
           name="Card swap"
           about={t.swapAbout}
@@ -2334,6 +2343,7 @@ function CompareTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.media}
           name="Before / after"
           about={t.compareAbout}
@@ -2404,6 +2414,7 @@ function MemoTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.audio}
           name="Voice memo"
           about={t.memoAbout}
@@ -2469,6 +2480,7 @@ function ClockTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={theme === 'dark'}
           cat={t.cats.widgets}
           name="World clock"
           about={t.clockAbout}
@@ -2602,6 +2614,7 @@ function ActivityTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.cards}
           name="Activity"
           about={t.activityAbout}
@@ -2737,6 +2750,7 @@ function HeatTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.text}
           name="Heat word"
           about={t.heatAbout}
@@ -2822,6 +2836,7 @@ function RingTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.cards}
           name="Spending ring"
           about={t.ringAbout}
@@ -2879,6 +2894,7 @@ function BarsTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.cards}
           name="Stacked bars"
           about={t.barsAbout}
@@ -2923,6 +2939,7 @@ function MorphTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.media}
           name="Dot morph"
           about={t.morphAbout}
@@ -2981,6 +2998,7 @@ function SqueezeTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.buttons}
           name="Squeeze button"
           about={t.squeezeAbout}
@@ -3072,6 +3090,7 @@ function SplitTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.text}
           name="Split list"
           about={t.splitAbout}
@@ -3133,6 +3152,7 @@ function TapeTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.inputs}
           name="Tape measure"
           about={t.tapeAbout}
@@ -3210,6 +3230,7 @@ function LabelTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.inputs}
           name="Label maker"
           about={t.labelAbout}
@@ -3267,6 +3288,7 @@ function AsciiTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.characters}
           name="ASCII Bot"
           about={t.asciiAbout}
@@ -3368,15 +3390,24 @@ function RadialTile({ t }: { t: T }) {
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Radial menu`} className="absolute inset-0 cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           {/* Drawn at one size and scaled to the tile; you can use it right in the tile */}
-          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 40) / BASE)})` }}>
+          <div className="pointer-events-auto" style={{ transform: `scale(${Math.min(1, (w - 64) / BASE)})` }}>
             {open ? null : <RadialMenu key={theme} items={RADIAL_ITEMS} theme={theme} size={BASE} />}
           </div>
         </div>
+        {/* The menu's segments are its own buttons, so the tile gets one of its own to open the details */}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className={`absolute bottom-3 right-3 z-10 rounded-full px-3 py-1 text-[12px] font-medium transition-transform hover:scale-105 active:scale-95 ${dark ? 'bg-paper text-ink' : 'bg-ink text-paper'}`}
+        >
+          {t.open} ›
+        </button>
       </article>
 
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.navigation}
           name="Radial menu"
           about={t.radialAbout}
@@ -3449,6 +3480,7 @@ function GenTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.ai}
           name="Generate"
           about={t.genAbout}
@@ -3519,6 +3551,7 @@ function AccTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.media}
           name="Image accordion"
           about={t.accAbout}
@@ -3606,6 +3639,7 @@ function HexTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.cards}
           name="Hex performance"
           about={t.hexAbout}
@@ -3664,6 +3698,7 @@ function HeroTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.cards}
           name="Hero card"
           about={t.heroAbout}
@@ -3695,11 +3730,11 @@ function HeroTile({ t }: { t: T }) {
 // Workflow canvas: a square layout, so it reads in a tile (the wires find their own sides)
 let flowFlip = false
 const FLOW_NODES: FlowNode[] = [
-  { id: 'trigger', title: 'Schedule trigger', icon: 'clock', x: 20, y: 56, rows: [[{ label: 'Cadence', value: 'Every 5 min' }], [{ label: 'Last', value: '14:05:00' }, { label: 'Next', value: '14:10:00' }]] },
-  { id: 'http', title: 'HTTP request', icon: 'code', x: 322, y: 40, rows: [[{ label: 'GET', value: '/v1/orders' }], [{ label: 'Duration', value: '0.2s' }]] },
-  { id: 'cond', title: 'Condition', icon: 'branch', x: 322, y: 232, condition: () => (flowFlip = !flowFlip), rows: [[{ label: 'If', value: 'total > 100' }], [{ label: 'True · Premium', value: '23' }, { label: 'False · Standard', value: '14' }], [{ label: 'Duration', value: '0.8s' }]] },
-  { id: 'mail', title: 'Send email', icon: 'mail', x: 20, y: 262, rows: [[{ label: 'To', value: 'customer' }, { label: 'Duration', value: '0.4s' }]] },
-  { id: 'log', title: 'Log order', icon: 'log', x: 20, y: 412, rows: [[{ label: 'Table', value: 'standard' }, { label: 'Duration', value: '0.1s' }]] },
+  { id: 'trigger', title: 'Schedule trigger', icon: 'clock', x: 14, y: 50, rows: [[{ label: 'Cadence', value: 'Every 5 min' }], [{ label: 'Last', value: '14:05:00' }, { label: 'Next', value: '14:10:00' }]] },
+  { id: 'http', title: 'HTTP request', icon: 'code', x: 276, y: 34, rows: [[{ label: 'GET', value: '/v1/orders' }], [{ label: 'Duration', value: '0.2s' }]] },
+  { id: 'cond', title: 'Condition', icon: 'branch', x: 276, y: 206, condition: () => (flowFlip = !flowFlip), rows: [[{ label: 'If', value: 'total > 100' }], [{ label: 'True · Premium', value: '23' }, { label: 'False · Standard', value: '14' }], [{ label: 'Duration', value: '0.8s' }]] },
+  { id: 'mail', title: 'Send email', icon: 'mail', x: 14, y: 226, rows: [[{ label: 'To', value: 'customer' }, { label: 'Duration', value: '0.4s' }]] },
+  { id: 'log', title: 'Log order', icon: 'log', x: 14, y: 356, rows: [[{ label: 'Table', value: 'standard' }, { label: 'Duration', value: '0.1s' }]] },
 ]
 const FLOW_EDGES: FlowEdge[] = [
   { from: 'trigger', to: 'http' },
@@ -3707,9 +3742,9 @@ const FLOW_EDGES: FlowEdge[] = [
   { from: 'cond', to: 'mail', branch: 'true' },
   { from: 'cond', to: 'log', branch: 'false' },
 ]
-const FLOW_SIZE = 560
+const FLOW_SIZE = 480
 
-/** Workflow canvas: drawn at 560 and scaled to the tile. A click opens the details; a drag (a node, the board) doesn't. */
+/** Workflow canvas: drawn at 480 and scaled to the tile. A click opens the details; a drag (a node, the board) doesn't. */
 function FlowTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(false)
@@ -3739,7 +3774,7 @@ function FlowTile({ t }: { t: T }) {
               if (moved < 5 && !(e.target as HTMLElement).closest('button')) setOpen(true)
             }}
           >
-            {open ? null : <WorkflowCanvas key={theme} nodes={FLOW_NODES} edges={FLOW_EDGES} theme={theme} width={FLOW_SIZE} height={FLOW_SIZE} nodeWidth={210} />}
+            {open ? null : <WorkflowCanvas key={theme} nodes={FLOW_NODES} edges={FLOW_EDGES} theme={theme} width={FLOW_SIZE} height={FLOW_SIZE} nodeWidth={190} touchScroll />}
           </div>
         </div>
       </article>
@@ -3747,6 +3782,7 @@ function FlowTile({ t }: { t: T }) {
       {open ? (
         <Detail
           t={t}
+          dark={dark}
           cat={t.cats.widgets}
           name="Workflow canvas"
           about={t.flowAbout}
@@ -3755,7 +3791,7 @@ function FlowTile({ t }: { t: T }) {
           href={GUMROAD.flow}
           price={PRICE.flow}
           onClose={() => setOpen(false)}
-          stage={<div style={{ transform: 'scale(0.9)' }}><WorkflowCanvas key={theme} nodes={FLOW_NODES} edges={FLOW_EDGES} theme={theme} width={FLOW_SIZE} height={FLOW_SIZE} nodeWidth={210} /></div>}
+          stage={<Fit size={FLOW_SIZE}><WorkflowCanvas key={theme} nodes={FLOW_NODES} edges={FLOW_EDGES} theme={theme} width={FLOW_SIZE} height={FLOW_SIZE} nodeWidth={190} touchScroll /></Fit>}
           options={
             <Choice label={t.theme}>
               <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
@@ -3765,5 +3801,23 @@ function FlowTile({ t }: { t: T }) {
         />
       ) : null}
     </>
+  )
+}
+
+/** Shrinks a fixed-size component to the width it gets (never grows it): for pop-up stages on a phone */
+function Fit({ size, children }: { size: number; children: React.ReactNode }) {
+  const el = useRef<HTMLDivElement>(null)
+  const [k, setK] = useState(1)
+  useEffect(() => {
+    const d = el.current
+    if (!d) return
+    const ro = new ResizeObserver(([e]) => setK(Math.min(1, e.contentRect.width / size)))
+    ro.observe(d)
+    return () => ro.disconnect()
+  }, [size])
+  return (
+    <div ref={el} className="flex w-full justify-center" style={{ height: size * k }}>
+      <div className="shrink-0 origin-top" style={{ transform: `scale(${k})` }}>{children}</div>
+    </div>
   )
 }

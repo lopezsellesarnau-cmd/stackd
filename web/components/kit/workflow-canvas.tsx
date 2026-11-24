@@ -42,6 +42,8 @@ type Props = {
   height?: number
   /** Width of every node card, px. */
   nodeWidth?: number
+  /** On a touch screen, let an up or down swipe scroll the page (sideways still drags). For a canvas inside a page. */
+  touchScroll?: boolean
   className?: string
 }
 
@@ -67,7 +69,7 @@ const ICONS: Record<FlowIcon, string> = {
 
 type Spring = { x: number; y: number; vx: number; vy: number }
 
-export function WorkflowCanvas({ nodes, edges, start, onStep, theme = 'light', width = 820, height = 440, nodeWidth: W = 228, className = '' }: Props) {
+export function WorkflowCanvas({ nodes, edges, start, onStep, theme = 'light', width = 820, height = 440, nodeWidth: W = 228, touchScroll = false, className = '' }: Props) {
   const c = THEMES[theme]
   const [pos, setPos] = useState(() => Object.fromEntries(nodes.map((n) => [n.id, { x: n.x, y: n.y }])))
   const [pan, setPan] = useState({ x: 0, y: 0 })
@@ -240,7 +242,7 @@ export function WorkflowCanvas({ nodes, edges, start, onStep, theme = 'light', w
       <style>{CSS}</style>
       {/* the board: dotted, drag it to pan */}
       <div
-        className="absolute inset-0 cursor-grab touch-none active:cursor-grabbing"
+        className={`absolute inset-0 cursor-grab ${touchScroll ? 'touch-pan-y' : 'touch-none'} active:cursor-grabbing`}
         style={{ backgroundImage: `radial-gradient(${c.dot} 1.1px, transparent 1.3px)`, backgroundSize: '18px 18px', backgroundPosition: `${pan.x}px ${pan.y}px` }}
         onPointerDown={(e) => drag(e)}
       />
@@ -283,7 +285,7 @@ export function WorkflowCanvas({ nodes, edges, start, onStep, theme = 'light', w
                 aria-label={`${n.title}${st === 'running' ? ', running' : st === 'done' ? ', done' : st === 'failed' ? ', failed' : ''}`}
                 onPointerDown={(e) => drag(e, n.id)}
                 onKeyDown={(e) => onKeyNode(e, n.id)}
-                className={`wf-node pointer-events-auto cursor-grab touch-none rounded-[18px] p-1.5 outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-[#BE9344] ${st === 'running' ? 'wf-running' : ''} ${st === 'done' ? 'wf-done' : ''}`}
+                className={`wf-node pointer-events-auto cursor-grab ${touchScroll ? 'touch-pan-y' : 'touch-none'} rounded-[18px] p-1.5 outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-[#BE9344] ${st === 'running' ? 'wf-running' : ''} ${st === 'done' ? 'wf-done' : ''}`}
                 style={{ background: c.card, boxShadow: `0 0 0 1px ${st === 'failed' ? WINE : c.line}, 0 6px 20px rgba(20,19,16,0.06)` }}
               >
                 <div className="flex items-center gap-2 px-2 pb-1.5 pt-1">
