@@ -4025,7 +4025,7 @@ function FillStage({ children }: { children: (w: number, h: number) => React.Rea
     ro.observe(d)
     return () => ro.disconnect()
   }, [])
-  return <div ref={el} className="absolute inset-0 overflow-hidden rounded-[18px]">{box.w > 100 && box.h > 100 ? children(box.w, box.h) : null}</div>
+  return <div ref={el} className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-[18px]">{box.w > 100 && box.h > 100 ? children(box.w, box.h) : null}</div>
 }
 
 function RecordsTile({ t }: { t: T }) {
@@ -4046,7 +4046,7 @@ function RecordsTile({ t }: { t: T }) {
     <>
       <article ref={card} className={`group ${tile} bg-[#0B0A09]`}>
         {/* zoomed in: a wider tray than the tile, so the cards fill the square and the side cards run off the edges */}
-        {open || w < 100 ? null : <RecordFlow key={`${dir}-${w}`} images={RECORD_PICS} direction={dir} width={vert ? w : Math.round(w * 1.5)} height={vert ? Math.round(w * 1.3) : w} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 !rounded-none" />}
+        {open || w < 100 ? null : <div className="absolute inset-0 flex items-center justify-center overflow-hidden"><RecordFlow key={`${dir}-${w}`} images={RECORD_PICS} direction={dir} width={vert ? w : Math.round(w * 1.5)} height={vert ? Math.round(w * 1.3) : w} className="shrink-0 !rounded-none" /></div>}
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -4068,7 +4068,7 @@ function RecordsTile({ t }: { t: T }) {
           href={GUMROAD.records}
           price={PRICE.records}
           onClose={() => setOpen(false)}
-          stage={<FillStage>{(sw, sh) => <RecordFlow key={`${dir}-${sw}-${sh}`} images={RECORD_PICS} direction={dir} width={vert ? sw : Math.round(sw * 1.5)} height={sh} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 !rounded-none" />}</FillStage>}
+          stage={<FillStage>{(sw, sh) => <RecordFlow key={`${dir}-${sw}-${sh}`} images={RECORD_PICS} direction={dir} width={vert ? sw : Math.round(sw * 1.5)} height={sh} className="shrink-0 !rounded-none" />}</FillStage>}
           options={
             <Choice label={t.directionLabel}>
               <Pick on={!vert} label={t.horizontalL} onClick={() => setVert(false)}><span className="px-1">{t.horizontalL}</span></Pick>
