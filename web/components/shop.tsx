@@ -4014,6 +4014,20 @@ const RECORD_PICS: FlowPicture[] = [
 ]
 
 /** Record flow: the tray fills the tile at its real size. Its cards are buttons and it drags, so the tile has an Open pill. */
+// fills the whole details stage, edge to edge, and hands its size to the child
+function FillStage({ children }: { children: (w: number, h: number) => React.ReactNode }) {
+  const el = useRef<HTMLDivElement>(null)
+  const [box, setBox] = useState({ w: 0, h: 0 })
+  useEffect(() => {
+    const d = el.current
+    if (!d) return
+    const ro = new ResizeObserver(([e]) => setBox({ w: Math.round(e.contentRect.width), h: Math.round(e.contentRect.height) }))
+    ro.observe(d)
+    return () => ro.disconnect()
+  }, [])
+  return <div ref={el} className="absolute inset-0 overflow-hidden rounded-[18px]">{box.w > 100 && box.h > 100 ? children(box.w, box.h) : null}</div>
+}
+
 function RecordsTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [vert, setVert] = useState(false)
@@ -4031,7 +4045,8 @@ function RecordsTile({ t }: { t: T }) {
   return (
     <>
       <article ref={card} className={`group ${tile} bg-[#0B0A09]`}>
-        {open || w < 100 ? null : <RecordFlow key={`${dir}-${w}`} images={RECORD_PICS} direction={dir} width={w} height={w} className="absolute inset-0 !rounded-none" />}
+        {/* zoomed in: a wider tray than the tile, so the cards fill the square and the side cards run off the edges */}
+        {open || w < 100 ? null : <RecordFlow key={`${dir}-${w}`} images={RECORD_PICS} direction={dir} width={vert ? w : Math.round(w * 1.5)} height={vert ? Math.round(w * 1.3) : w} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 !rounded-none" />}
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -4053,7 +4068,7 @@ function RecordsTile({ t }: { t: T }) {
           href={GUMROAD.records}
           price={PRICE.records}
           onClose={() => setOpen(false)}
-          stage={<Fit size={520}>{vert ? <div className="flex w-[520px] justify-center"><RecordFlow key="v" images={RECORD_PICS} direction="vertical" width={380} height={520} /></div> : <RecordFlow key="h" images={RECORD_PICS} width={520} height={400} />}</Fit>}
+          stage={<FillStage>{(sw, sh) => <RecordFlow key={`${dir}-${sw}-${sh}`} images={RECORD_PICS} direction={dir} width={vert ? sw : Math.round(sw * 1.5)} height={sh} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 !rounded-none" />}</FillStage>}
           options={
             <Choice label={t.directionLabel}>
               <Pick on={!vert} label={t.horizontalL} onClick={() => setVert(false)}><span className="px-1">{t.horizontalL}</span></Pick>
