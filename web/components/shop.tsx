@@ -53,6 +53,7 @@ import { HeroCard, type HeroArt } from './kit/hero-card'
 import { WorkflowCanvas, type FlowEdge, type FlowNode } from './kit/workflow-canvas'
 import { JellySidebar, type SidebarItem } from './kit/jelly-sidebar'
 import { IronFilings } from './kit/iron-filings'
+import { RecordFlow, type FlowPicture } from './kit/record-flow'
 import { useLanguage } from './language-context'
 import { Hero } from './hero'
 
@@ -141,6 +142,11 @@ const COPY = {
     asciiAbout: 'The Bot printed as a halftone: a ball of ink dots, shaded as if lit from the top left, with its eyes left blank. They follow your cursor around the page and blink now and then. Move over it and the dots under your hand turn into characters, densest right under it, thinning back to dots along the trail as it cools. Press and a wave of characters rolls out.',
     asciiIncludes: ['Figma file with every state', 'React + Tailwind code and the StackD Bot', 'Nine bodies, four kinds of eyes, four glyph sets', 'Light and dark, respects reduced motion'],
     glyphsLabel: 'Glyphs',
+    flowpicsAbout: 'Pictures in a dark tray, in real 3D: the one in the middle faces you, big, with its title; the ones at the sides fan out, each tucked under the next, with shadows, fading into the dark. Drag and the row follows your finger; flick it and it carries a card or two, then settles. At rest they float. The one in front gives under the pointer; press it and it comes forward.',
+    flowpicsIncludes: ['Figma file, horizontal and vertical', 'React + Tailwind code, no other libraries', 'Your pictures, titles and credits', 'Mouse, touch, wheel and keyboard'],
+    directionLabel: 'Direction',
+    horizontalL: 'Horizontal',
+    verticalL: 'Vertical',
     filingsAbout: 'Thousands of ink needles on paper. At rest they trace the outline of a word or the Bot\'s face, like iron filings around a magnet. Your cursor is a magnet: the needles near it swing round and line up along its field, from pole to pole. Click and they jump, then settle back. Finished like a figure in print: labels in the corners and a live readout of the field.',
     filingsIncludes: ['Figma file with the word and the Bot', 'React + Tailwind code, no other libraries', 'Your word, density and magnet reach', 'Mouse and touch; respects reduced motion'],
     shapeWord: 'Word',
@@ -299,6 +305,11 @@ const COPY = {
     asciiAbout: 'El Bot impreso en trama: una bola de puntos de tinta, sombreada como si le diera la luz desde arriba a la izquierda, con los ojos en blanco. Siguen tu cursor por la página y parpadean de vez en cuando. Pasa por encima y los puntos bajo tu mano se vuelven caracteres, más densos justo debajo, y vuelven a ser puntos a lo largo del rastro mientras se enfría. Pulsa y sale una onda de caracteres.',
     asciiIncludes: ['Archivo de Figma con todos los estados', 'Código en React + Tailwind y el Bot de StackD', 'Nueve cuerpos, cuatro tipos de ojos, cuatro juegos de glifos', 'Claro y oscuro, respeta el movimiento reducido'],
     glyphsLabel: 'Glifos',
+    flowpicsAbout: 'Fotos en una bandeja oscura, en 3D de verdad: la del centro de frente y grande, con su título; las de los lados abiertas en abanico, cada una bajo la siguiente, con sombra y fundiéndose en negro. Arrastra y la fila sigue tu dedo; lánzala y avanza una o dos y se asienta. En reposo flotan. La del frente cede bajo el puntero; púlsala y se adelanta.',
+    flowpicsIncludes: ['Archivo de Figma horizontal y vertical', 'Código React + Tailwind, sin otras librerías', 'Tus fotos, títulos y créditos', 'Ratón, táctil, rueda y teclado'],
+    directionLabel: 'Dirección',
+    horizontalL: 'Horizontal',
+    verticalL: 'Vertical',
     filingsAbout: 'Miles de agujas de tinta sobre papel. En reposo siguen el contorno de una palabra o de la cara del Bot, como limaduras de hierro alrededor de un imán. Tu cursor es un imán: las agujas cercanas giran y se alinean con su campo, de un polo al otro. Haz clic y saltan, y vuelven a su sitio. Acabado de figura de revista: etiquetas en las esquinas y lectura del campo en vivo.',
     filingsIncludes: ['Archivo de Figma con la palabra y el Bot', 'Código React + Tailwind, sin otras librerías', 'Tu palabra, densidad y alcance del imán', 'Ratón y táctil; respeta reduced motion'],
     shapeWord: 'Palabra',
@@ -381,13 +392,14 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'heat', cat: 'text' },
   { id: 'filings', cat: 'text' },
+  { id: 'records', cat: 'media' },
   { id: 'gen', cat: 'ai' },
   { id: 'hex', cat: 'cards' },
   { id: 'hero', cat: 'cards' },
@@ -487,6 +499,7 @@ const GUMROAD: Record<Id, string> = {
   flow: 'https://arnolop.gumroad.com/l/workflow_canvas?wanted=true',
   side: '',
   filings: '',
+  records: '',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
@@ -506,6 +519,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   flow: 'workflow-canvas',
   side: 'jelly-sidebar',
   filings: 'iron-filings',
+  records: 'record-flow',
   acc: 'image-accordion',
   bot: 'bot', prompt: 'prompt-bar', pay: 'slide-to-pay', stat: 'stat-card', notify: 'notification-stack',
   flap: 'split-flap', dial: 'rotary-dial', timer: 'focus-timer', login: 'bot-login', tabs: 'elastic-tabs',
@@ -516,6 +530,7 @@ const REGISTRY_NAME: Record<Id, string> = {
 const FIND: Record<Id, [string, string]> = {
   bot: ['Bot', 'bot mascot character avatar eyes follow cursor face robot personaje mascota ojos cara'],
   heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
+  records: ['Record flow', 'record flow cover carousel gallery pictures photos 3d albums slider coverflow discos carrusel galeria fotos portadas'],
   filings: ['Iron filings', 'iron filings magnet magnetic field needles word text hero visual generative canvas limaduras iman campo agujas palabra texto'],
   side: ['Jelly sidebar', 'sidebar side menu navigation nav drawer rail collapse app dashboard saas menu lateral navegacion barra panel'],
   flow: ['Workflow canvas', 'workflow automation canvas nodes flow pipeline graph editor zap n8n run wires automatizacion lienzo nodos flujo cables editor'],
@@ -715,7 +730,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3979,6 +3994,71 @@ function FilingsTile({ t }: { t: T }) {
                 <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Record flow: architecture photos from Unsplash (free to use), with their photographers
+const RECORD_PICS: FlowPicture[] = [
+  { src: '/views/1.jpg', title: 'Grey terraces', credit: 'Fabian Bächli' },
+  { src: '/views/2.jpg', title: 'White blocks', credit: 'Joel Filipe' },
+  { src: '/views/3.jpg', title: 'Swirl', credit: 'Joakim Nådell' },
+  { src: '/views/4.jpg', title: 'Lattice', credit: 'Jimmy Liu' },
+  { src: '/views/5.jpg', title: 'Copper fold', credit: 'Ricardo Gomez Angel' },
+  { src: '/views/6.jpg', title: 'Wave hall', credit: 'Iltun Huseynli' },
+  { src: '/views/7.jpg', title: 'Rust tower', credit: 'Simone Hutsch' },
+  { src: '/views/8.jpg', title: 'Red balconies', credit: 'Ricardo Gomez Angel' },
+]
+
+/** Record flow: the tray fills the tile at its real size. Its cards are buttons and it drags, so the tile has an Open pill. */
+function RecordsTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [vert, setVert] = useState(false)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(0)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const dir = vert ? 'vertical' : 'horizontal'
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} bg-[#0B0A09]`}>
+        {open || w < 100 ? null : <RecordFlow key={`${dir}-${w}`} images={RECORD_PICS} direction={dir} width={w} height={w} className="absolute inset-0 !rounded-none" />}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="absolute bottom-3 right-3 z-10 rounded-full bg-paper px-3 py-1 text-[12px] font-medium text-ink transition-transform hover:scale-105 active:scale-95"
+        >
+          {t.open} ›
+        </button>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          dark
+          cat={t.cats.media}
+          name="Record flow"
+          about={t.flowpicsAbout}
+          includes={t.flowpicsIncludes}
+          usage={`<RecordFlow${vert ? ' direction="vertical"' : ''}\n  images={[{ src: '/photos/1.jpg', title: 'Swirl', credit: 'Joakim Nådell' }]}\n  onChange={(picture) => setNowShowing(picture)}\n/>`}
+          href={GUMROAD.records}
+          price={PRICE.records}
+          onClose={() => setOpen(false)}
+          stage={<Fit size={520}>{vert ? <div className="flex w-[520px] justify-center"><RecordFlow key="v" images={RECORD_PICS} direction="vertical" width={380} height={520} /></div> : <RecordFlow key="h" images={RECORD_PICS} width={520} height={400} />}</Fit>}
+          options={
+            <Choice label={t.directionLabel}>
+              <Pick on={!vert} label={t.horizontalL} onClick={() => setVert(false)}><span className="px-1">{t.horizontalL}</span></Pick>
+              <Pick on={vert} label={t.verticalL} onClick={() => setVert(true)}><span className="px-1">{t.verticalL}</span></Pick>
+            </Choice>
           }
         />
       ) : null}
