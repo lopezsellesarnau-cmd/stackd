@@ -52,6 +52,7 @@ const PRODUCT_IDS = {
   'hero-card': '-lTUBbHNWxHxJdPY1Ucmgg==',
   'workflow-canvas': 'jVZQ7y-3pkZK2q0gbpUfJA==',
   'jelly-sidebar': '9jH0--F71ltgxrtGACYF8g==',
+  'iron-filings': 'FPFMhfjJGRw1ntUueFgPCw==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -98,6 +99,7 @@ const ITEMS = [
   ['hero-card', 'Hero card', 'HeroCard.tsx', true, 'hero_card', false, 'A mobile hero with a living picture: a breathing halo, a pixel gradient that sharpens where you touch, or colour behind reeded glass.'],
   ['workflow-canvas', 'Workflow canvas', 'WorkflowCanvas.tsx', true, 'workflow_canvas', true, 'An automation canvas: drag nodes on jelly wires, press Run and the Bot rides them from node to node; conditions branch green or red.'],
   ['jelly-sidebar', 'Jelly sidebar', 'JellySidebar.tsx', true, 'jelly_sidebar', true, 'An app side menu that moves like jelly: it folds to a rail on a spring, and an ink blob stretches to the item you pick. Groups, counts and the Bot as the avatar.'],
+  ['iron-filings', 'Iron filings', 'IronFilings.tsx', true, 'iron_filings', true, 'Ink needles on paper trace a word or the Bot like iron filings; your cursor is a magnet that pulls them into its field.'],
 ]
 
 const read = (f) => {
