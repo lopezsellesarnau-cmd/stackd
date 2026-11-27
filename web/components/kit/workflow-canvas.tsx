@@ -44,6 +44,8 @@ type Props = {
   nodeWidth?: number
   /** On a touch screen, let an up or down swipe scroll the page (sideways still drags). For a canvas inside a page. */
   touchScroll?: boolean
+  /** Hold one moment of a run, for covers and mock-ups: the nodes already done, and the Bot part-way (0 to 1) along a wire. */
+  snapshot?: { done: string[]; rider?: { from: string; to: string; at: number } }
   className?: string
 }
 
@@ -69,7 +71,7 @@ const ICONS: Record<FlowIcon, string> = {
 
 type Spring = { x: number; y: number; vx: number; vy: number }
 
-export function WorkflowCanvas({ nodes, edges, start, onStep, theme = 'light', width = 820, height = 440, nodeWidth: W = 228, touchScroll = false, className = '' }: Props) {
+export function WorkflowCanvas({ nodes, edges, start, onStep, theme = 'light', width = 820, height = 440, nodeWidth: W = 228, touchScroll = false, snapshot, className = '' }: Props) {
   const c = THEMES[theme]
   const [pos, setPos] = useState(() => Object.fromEntries(nodes.map((n) => [n.id, { x: n.x, y: n.y }])))
   const [pan, setPan] = useState({ x: 0, y: 0 })
@@ -163,6 +165,25 @@ export function WorkflowCanvas({ nodes, edges, start, onStep, theme = 'light', w
   }
 
   // ride a wire: the Bot follows the path
+  // a held moment of a run (covers): set once the cards are measured and the wires drawn
+  const snapped = useRef(false)
+  useEffect(() => {
+    if (!snapshot || snapped.current || Object.keys(heights).length < nodes.length) return
+    snapped.current = true
+    const { done, rider: r } = snapshot
+    setState(Object.fromEntries(done.map((id) => [id, 'done' as const])))
+    setStats(Object.fromEntries(done.map((id, i) => [id, { last: '14:05:0' + i, ms: 300 + i * 250, t: byId[id]?.condition !== undefined ? 1 : 0 }])))
+    const passed = edges.filter((e) => done.includes(e.from) && (done.includes(e.to) || (r && e.from === r.from && e.to === r.to)))
+    setLit(passed.map(key))
+    if (r) requestAnimationFrame(() => {
+      const path = paths.current[`${r.from}>${r.to}`]
+      if (!path) return
+      const len = path.getTotalLength(), pt = path.getPointAtLength(r.at * len), ahead = path.getPointAtLength(Math.min(len, r.at * len + 4))
+      setRider({ x: pt.x, y: pt.y, dx: ahead.x - pt.x, dy: ahead.y - pt.y, v: Math.sin(Math.PI * r.at) * 6, lands: 0 })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heights])
+
   const ride = (e: FlowEdge) => new Promise<void>((done) => {
     const path = paths.current[key(e)]
     if (!path || still.current) { done(); return }

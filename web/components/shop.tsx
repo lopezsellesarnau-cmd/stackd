@@ -497,7 +497,7 @@ const GUMROAD: Record<Id, string> = {
   hex: 'https://arnolop.gumroad.com/l/hex_performance?wanted=true',
   hero: 'https://arnolop.gumroad.com/l/hero_card?wanted=true',
   flow: 'https://arnolop.gumroad.com/l/workflow_canvas?wanted=true',
-  side: '',
+  side: 'https://arnolop.gumroad.com/l/jelly_sidebar?wanted=true',
   filings: '',
   records: '',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
