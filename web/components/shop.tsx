@@ -54,6 +54,8 @@ import { WorkflowCanvas, type FlowEdge, type FlowNode } from './kit/workflow-can
 import { JellySidebar, type SidebarItem } from './kit/jelly-sidebar'
 import { WheelPicker, type WheelItem } from './kit/wheel-picker'
 import { DottedGlobe, GLOBE_ARCS } from './kit/dotted-globe'
+import { BotChat } from './kit/bot-chat'
+import { JellyFolder } from './kit/jelly-folder'
 import { IronFilings } from './kit/iron-filings'
 import { RecordFlow, type FlowPicture } from './kit/record-flow'
 import { useLanguage } from './language-context'
@@ -157,6 +159,10 @@ const COPY = {
     globeArcs: 'Arcs',
     globeOn: 'On',
     globeOff: 'Off',
+    chatAbout: 'A small chat where the Bot is the one you talk to, and you can see it listen. It watches the field while you type, looks up while it thinks, moves its mouth as the answer comes in word by word, and its face takes the answer\'s mood. Plug in your own answers: an AI model, a FAQ, anything.',
+    chatIncludes: ['Figma file, light and dark', 'React + Tailwind code, with the Bot', 'Your answers, name, greeting and suggestions', 'Keyboard and touch'],
+    folderAbout: 'A folder for a dashboard that feels soft. Drag files from your desktop and the flap opens to take them; each one flies in along an arc and the folder squashes like a sponge as it lands. Point at it and the papers inside peek out and fan open. Photos show as little prints, other files as sheets with their extension.',
+    folderIncludes: ['Figma file, light and dark', 'React + Tailwind code, no other libraries', 'Real files and photos, or your own add button', 'Drag and drop, mouse and touch'],
     shapeWord: 'Word',
     sideAbout: 'An app side menu that moves like jelly. Fold it into a rail of icons or open it: the width springs a little. The black blob under the section you are on slides to the next one, stretching on the way. In the rail, pointing at an icon pops its name out; groups open with their items dropping in one by one. At the bottom, you, with the Bot as your avatar.',
     sideIncludes: ['Figma file, open and folded', 'React + Tailwind code, with the Bot', 'Your sections, groups, counts and icons', 'Mouse, touch and keyboard ( [ folds it )'],
@@ -332,6 +338,10 @@ const COPY = {
     globeArcs: 'Arcos',
     globeOn: 'Sí',
     globeOff: 'No',
+    chatAbout: 'Un chat pequeño donde hablas con el Bot y se nota que escucha. Mira el campo mientras escribes, mira arriba mientras piensa, mueve la boca mientras la respuesta entra palabra a palabra y su cara toma el tono de la respuesta. Conecta tus propias respuestas: un modelo de IA, unas preguntas frecuentes, lo que quieras.',
+    chatIncludes: ['Archivo de Figma, claro y oscuro', 'Código React + Tailwind, con el Bot', 'Tus respuestas, nombre, saludo y sugerencias', 'Teclado y táctil'],
+    folderAbout: 'Una carpeta para un panel que se siente blanda. Arrastra archivos desde el escritorio y la solapa se abre para recibirlos; cada uno entra volando en arco y la carpeta se aplasta como una esponja al recibirlo. Pasa el ratón y los papeles asoman y se abren en abanico. Las fotos se ven como copias, el resto como hojas con su extensión.',
+    folderIncludes: ['Archivo de Figma, claro y oscuro', 'Código React + Tailwind, sin otras librerías', 'Archivos y fotos reales, o tu propio botón', 'Arrastrar y soltar, ratón y táctil'],
     shapeWord: 'Palabra',
     sideAbout: 'El menú lateral de una app, en gelatina. Pliégalo en una barra de iconos o ábrelo: el ancho rebota un poco. El blob negro bajo la sección activa se desliza a la siguiente estirándose. En la barra, al señalar un icono sale su nombre al lado; los grupos se abren y sus elementos caen uno a uno. Abajo, tú, con el Bot de avatar.',
     sideIncludes: ['Archivo de Figma abierto y plegado', 'Código React + Tailwind, con el Bot', 'Tus secciones, grupos, contadores e iconos', 'Ratón, táctil y teclado ( [ pliega )'],
@@ -418,7 +428,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'globe' | 'wheel' | 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'chat' | 'folder' | 'globe' | 'wheel' | 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
@@ -426,8 +436,10 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'heat', cat: 'text' },
   { id: 'filings', cat: 'text' },
   { id: 'globe', cat: 'widgets' },
+  { id: 'folder', cat: 'widgets' },
   { id: 'records', cat: 'media' },
   { id: 'gen', cat: 'ai' },
+  { id: 'chat', cat: 'ai' },
   { id: 'hex', cat: 'cards' },
   { id: 'hero', cat: 'cards' },
   { id: 'flow', cat: 'widgets' },
@@ -528,6 +540,8 @@ const GUMROAD: Record<Id, string> = {
   side: 'https://arnolop.gumroad.com/l/jelly_sidebar?wanted=true',
   wheel: 'https://arnolop.gumroad.com/l/wheel_picker?wanted=true',
   globe: '',
+  chat: '',
+  folder: '',
   filings: 'https://arnolop.gumroad.com/l/iron_filings?wanted=true',
   records: 'https://arnolop.gumroad.com/l/record_flow?wanted=true',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
@@ -550,6 +564,8 @@ const REGISTRY_NAME: Record<Id, string> = {
   side: 'jelly-sidebar',
   wheel: 'wheel-picker',
   globe: 'dotted-globe',
+  chat: 'bot-chat',
+  folder: 'jelly-folder',
   filings: 'iron-filings',
   records: 'record-flow',
   acc: 'image-accordion',
@@ -564,6 +580,8 @@ const FIND: Record<Id, [string, string]> = {
   heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
   records: ['Record flow', 'record flow cover carousel gallery pictures photos 3d albums slider coverflow discos carrusel galeria fotos portadas'],
   filings: ['Iron filings', 'iron filings magnet magnetic field needles word text hero visual generative canvas limaduras iman campo agujas palabra texto'],
+  chat: ['Bot chat', 'bot chat assistant ai chatbot messages conversation support widget llm agent face eyes mood typing chat asistente ia mensajes conversacion soporte'],
+  folder: ['Jelly folder', 'jelly folder files photos upload drag drop dashboard documents squash spring carpeta archivos fotos subir arrastrar soltar panel documentos'],
   globe: ['Dotted globe', 'dotted globe world map earth dots spin users live pings arcs dashboard hero saas visual canvas globo mundo mapa tierra puntos usuarios arcos panel'],
   wheel: ['Wheel picker', 'wheel picker time hour minute date select spinner ios scroll dial rueda selector hora minutos fecha elegir'],
   side: ['Jelly sidebar', 'sidebar side menu navigation nav drawer rail collapse app dashboard saas menu lateral navegacion barra panel'],
@@ -764,7 +782,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'chat' ? <ChatTile t={t} /> : c.item.id === 'folder' ? <FolderTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -4204,6 +4222,114 @@ function GlobeTile({ t }: { t: T }) {
                 <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
               </Choice>
             </>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Bot chat and Jelly folder: drawn at a fixed size and scaled to the tile, used right there; the Open pill opens the pop-up
+function useWidth<E extends HTMLElement>() {
+  const ref = useRef<E>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return [ref, w] as const
+}
+
+function TileOpen({ t, dark, onOpen }: { t: T; dark: boolean; onOpen: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className={`absolute bottom-3 right-3 z-10 rounded-full px-3 py-1 text-[12px] font-medium transition-transform hover:scale-105 active:scale-95 ${dark ? 'bg-paper text-ink' : 'bg-ink text-paper'}`}
+    >
+      {t.open} ›
+    </button>
+  )
+}
+
+const CHAT_SIZE = 400
+function ChatTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [card, w] = useWidth<HTMLElement>()
+  const theme = dark ? 'dark' : 'light'
+  return (
+    <>
+      <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-[#F2F2F0]'}`}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="shrink-0" style={{ transform: `scale(${(w - 24) / CHAT_SIZE})` }}>
+            {open ? null : <BotChat key={theme} theme={theme} width={CHAT_SIZE} height={CHAT_SIZE} />}
+          </div>
+        </div>
+        <TileOpen t={t} dark={dark} onOpen={() => setOpen(true)} />
+      </article>
+      {open ? (
+        <Detail
+          t={t}
+          dark={dark}
+          cat={t.cats.ai}
+          name="Bot chat"
+          about={t.chatAbout}
+          includes={t.chatIncludes}
+          usage={`<BotChat${dark ? ' theme="dark"' : ''}\n  name="Bot"\n  onSend={async (text, history) => ({ text: await ask(text), mood: 0.6 })}\n/>`}
+          href={GUMROAD.chat}
+          price={PRICE.chat}
+          onClose={() => setOpen(false)}
+          stage={<Fit size={CHAT_SIZE}><BotChat key={theme} theme={theme} width={CHAT_SIZE} height={460} /></Fit>}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+            </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+const FOLDER_SIZE = 340
+function FolderTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [card, w] = useWidth<HTMLElement>()
+  const theme = dark ? 'dark' : 'light'
+  return (
+    <>
+      <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-[#F2F2F0]'}`}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="shrink-0" style={{ transform: `scale(${(w - 24) / FOLDER_SIZE})` }}>
+            {open ? null : <JellyFolder key={theme} theme={theme} name="Brand kit" width={FOLDER_SIZE} />}
+          </div>
+        </div>
+        <TileOpen t={t} dark={dark} onOpen={() => setOpen(true)} />
+      </article>
+      {open ? (
+        <Detail
+          t={t}
+          dark={dark}
+          cat={t.cats.widgets}
+          name="Jelly folder"
+          about={t.folderAbout}
+          includes={t.folderIncludes}
+          usage={`<JellyFolder${dark ? ' theme="dark"' : ''}\n  name="Brand kit"\n  items={files}\n  onAdd={(added) => upload(added)}\n/>`}
+          href={GUMROAD.folder}
+          price={PRICE.folder}
+          onClose={() => setOpen(false)}
+          stage={<Fit size={FOLDER_SIZE}><JellyFolder key={theme} theme={theme} name="Brand kit" width={FOLDER_SIZE} /></Fit>}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+            </Choice>
           }
         />
       ) : null}
