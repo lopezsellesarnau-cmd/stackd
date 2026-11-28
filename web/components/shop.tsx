@@ -4183,7 +4183,7 @@ function GlobeTile({ t }: { t: T }) {
   return (
     <>
       <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-paper'}`}>
-        {open || w < 100 ? null : <DottedGlobe key={`${theme}-${w}`} theme={theme} accent={color} arcs={arcList} size={w} zoom={1.3} className="absolute inset-0" />}
+        {open || w < 100 ? null : <DottedGlobe key={`${theme}-${w}`} theme={theme} accent={color} arcs={arcList} size={w} className="absolute inset-0" />}
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -4205,7 +4205,7 @@ function GlobeTile({ t }: { t: T }) {
           href={GUMROAD.globe}
           price={PRICE.globe}
           onClose={() => setOpen(false)}
-          stage={<Fit size={460}><DottedGlobe key={theme} theme={theme} accent={color} arcs={arcList} size={460} zoom={1.15} /></Fit>}
+          stage={<Fit size={460}><DottedGlobe key={theme} theme={theme} accent={color} arcs={arcList} size={460} /></Fit>}
           options={
             <>
               <Choice label={t.globeAccent}>
