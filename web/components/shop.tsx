@@ -545,7 +545,7 @@ const GUMROAD: Record<Id, string> = {
   flow: 'https://arnolop.gumroad.com/l/workflow_canvas?wanted=true',
   side: 'https://arnolop.gumroad.com/l/jelly_sidebar?wanted=true',
   wheel: 'https://arnolop.gumroad.com/l/wheel_picker?wanted=true',
-  globe: '',
+  globe: 'https://arnolop.gumroad.com/l/dotted_globe?wanted=true',
   chat: '',
   dash: '',
   folder: '',

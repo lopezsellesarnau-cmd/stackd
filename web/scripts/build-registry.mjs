@@ -55,6 +55,7 @@ const PRODUCT_IDS = {
   'iron-filings': 'FPFMhfjJGRw1ntUueFgPCw==',
   'record-flow': 'gVop8inw_d9caYuLktNeSg==',
   'wheel-picker': 'BRxNsqRMJQgW3sV3T4paPQ==',
+  'dotted-globe': 'Jcb0Z3fVy0zhoVPwvzrSxw==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -104,6 +105,7 @@ const ITEMS = [
   ['iron-filings', 'Iron filings', 'IronFilings.tsx', true, 'iron_filings', true, 'Ink needles on paper trace a word or the Bot like iron filings; your cursor is a magnet that pulls them into its field.'],
   ['record-flow', 'Record flow', 'RecordFlow.tsx', true, 'record_flow', false, 'Pictures in a dark tray in real 3D, like records in a crate: drag or flick through them, a row or a column, square or wide cards.'],
   ['wheel-picker', 'Wheel picker', 'WheelPicker.tsx', true, 'wheel_picker', false, 'A quiet picker wheel like iOS: only the choice at rest, the neighbours curve out as you spin; flick, soft landing, loops for hours and minutes, text or icons.'],
+  ['dotted-globe', 'Dotted globe', 'DottedGlobe.tsx', true, 'dotted_globe', false, 'Where your users are, on a world of dots: the land rises into 3D hills where they gather; drag, pinch to zoom, click a city to turn to it. Map built in.'],
 ]
 
 const read = (f) => {
