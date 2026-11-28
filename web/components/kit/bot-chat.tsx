@@ -26,6 +26,10 @@ type Props = {
   status?: string
   /** The Bot's first message. */
   greeting?: string
+  /** A conversation to start from (after the greeting), for a saved chat or a mock-up. */
+  initial?: { from: 'you' | 'bot'; text: string }[]
+  /** Text already in the field, as if someone were typing. */
+  draft?: string
   /** Chips to start with; they go once you've written. */
   suggestions?: string[]
   placeholder?: string
@@ -72,6 +76,8 @@ export function BotChat({
   name = 'Bot',
   status = 'Here to help',
   greeting = "Hi, I'm the Bot. What can I do for you?",
+  initial = [],
+  draft: startDraft = '',
   suggestions = ['How do you work?', 'Is it free?', "What's the weather?"],
   placeholder = 'Write a message',
   shape = 'hexagon',
@@ -83,14 +89,14 @@ export function BotChat({
 }: Props) {
   const c = THEMES[theme]
   const uid = useId().replace(/:/g, '')
-  const [msgs, setMsgs] = useState<ChatMessage[]>([{ id: 0, from: 'bot', text: greeting }])
-  const [draft, setDraft] = useState('')
-  const [phase, setPhase] = useState<'idle' | 'typing' | 'thinking' | 'talking'>('idle')
+  const [msgs, setMsgs] = useState<ChatMessage[]>(() => [{ id: 0, from: 'bot', text: greeting }, ...initial.map((m, i) => ({ id: i + 1, at: Date.now(), ...m }))])
+  const [draft, setDraft] = useState(startDraft)
+  const [phase, setPhase] = useState<'idle' | 'typing' | 'thinking' | 'talking'>(startDraft ? 'typing' : 'idle')
   const [mood, setMood] = useState(0.3)
   const [mouth, setMouth] = useState(0)
   const [focus, setFocus] = useState(false)
   const list = useRef<HTMLDivElement>(null)
-  const nextId = useRef(1)
+  const nextId = useRef(initial.length + 1)
   const still = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   // keep the newest message in view
@@ -197,7 +203,7 @@ export function BotChat({
               >
                 {m.text}
               </div>
-              {m === lastYou ? <span className="pr-1 text-[11px]" style={{ color: c.mute, animation: `botchat-fade-${uid} .4s .25s both` }}>Sent · {time(m.at)}</span> : null}
+              {m === lastYou ? <span className="pr-1 text-[11px]" style={{ color: c.mute, animation: `botchat-fade-${uid} .4s .25s both` }}>{m.at ? `Sent · ${time(m.at)}` : 'Sent'}</span> : null}
             </div>
           ) : (
             <p key={m.id} className="max-w-[88%] whitespace-pre-wrap self-start text-[14px] leading-[1.55]" style={{ transformOrigin: '0% 0%', animation: spring() }}>
