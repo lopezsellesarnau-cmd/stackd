@@ -53,6 +53,8 @@ const PRODUCT_IDS = {
   'workflow-canvas': 'jVZQ7y-3pkZK2q0gbpUfJA==',
   'jelly-sidebar': '9jH0--F71ltgxrtGACYF8g==',
   'iron-filings': 'FPFMhfjJGRw1ntUueFgPCw==',
+  'record-flow': 'gVop8inw_d9caYuLktNeSg==',
+  'wheel-picker': 'BRxNsqRMJQgW3sV3T4paPQ==',
 }
 
 // Release folders named differently from the registry (kit/release/stackd-<folder>)
@@ -100,6 +102,8 @@ const ITEMS = [
   ['workflow-canvas', 'Workflow canvas', 'WorkflowCanvas.tsx', true, 'workflow_canvas', true, 'An automation canvas: drag nodes on jelly wires, press Run and the Bot rides them from node to node; conditions branch green or red.'],
   ['jelly-sidebar', 'Jelly sidebar', 'JellySidebar.tsx', true, 'jelly_sidebar', true, 'An app side menu that moves like jelly: it folds to a rail on a spring, and an ink blob stretches to the item you pick. Groups, counts and the Bot as the avatar.'],
   ['iron-filings', 'Iron filings', 'IronFilings.tsx', true, 'iron_filings', true, 'Ink needles on paper trace a word or the Bot like iron filings; your cursor is a magnet that pulls them into its field.'],
+  ['record-flow', 'Record flow', 'RecordFlow.tsx', true, 'record_flow', false, 'Pictures in a dark tray in real 3D, like records in a crate: drag or flick through them, a row or a column, square or wide cards.'],
+  ['wheel-picker', 'Wheel picker', 'WheelPicker.tsx', true, 'wheel_picker', false, 'A quiet picker wheel like iOS: only the choice at rest, the neighbours curve out as you spin; flick, soft landing, loops for hours and minutes, text or icons.'],
 ]
 
 const read = (f) => {

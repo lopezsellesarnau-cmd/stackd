@@ -31,6 +31,10 @@ type Props = {
   /** Called when a picture comes to the middle. */
   onChange?: (picture: FlowPicture, index: number) => void
   className?: string
+  /** Card width ÷ height: 1 (square) by default; 1.5 or so for wide pictures, like desktop screens. */
+  aspect?: number
+  /** Share of the row's width the card in front can take, 0 to 1 (0.42 by default). Raise it for bigger cards. */
+  share?: number
 }
 
 const FONT = '"SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif'
@@ -39,12 +43,14 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 const quartOut = (t: number) => 1 - (1 - t) ** 4
 const PERIODS = [5.1, 6.3, 4.7, 5.8, 6.9, 5.4, 4.9, 6.1] // awkward on purpose: no two cards drift together
 
-export function RecordFlow({ images, direction = 'horizontal', width, height, start, float = 40, sink = 50, onChange, className = '' }: Props) {
+export function RecordFlow({ images, direction = 'horizontal', width, height, start, float = 40, sink = 50, onChange, className = '', aspect = 1, share = 0.42 }: Props) {
   const n = images.length
   const vert = direction === 'vertical'
   const W = width ?? (vert ? 420 : 820)
   const H = height ?? (vert ? 720 : 440)
-  const S = vert ? Math.min(W * 0.66, H * 0.5) : Math.min(H * 0.78, W * 0.42) // the card
+  // S is the card's height; CW its width (S × aspect). With the defaults it's the square card it always was.
+  const S = vert ? Math.min(W * 0.66, H * 0.5) : Math.min(H * 0.78, (W * share) / aspect)
+  const CW = S * aspect
   const PULL = S * 0.5 // px of drag that move one card
 
   const slots = useRef<(HTMLDivElement | null)[]>([])
@@ -70,7 +76,8 @@ export function RecordFlow({ images, direction = 'horizontal', width, height, st
       // like the Figma frame: the side cards face in toward the middle, their OUTER edge tall and the one tucked
       // under the next card short. Each card has its own perspective (the vanishing point at its own centre),
       // so it's a symmetric trapezoid, and nothing sorts in 3D: the paint order below decides what's on top.
-      const along = side * (k * S * 0.66 + Math.max(0, d - 1) * S * 0.28) * (1 + L * 0.16)
+      const step = vert ? S : CW // in a row, cards stand apart by their own width
+      const along = side * (k * step * 0.66 + Math.max(0, d - 1) * step * 0.28) * (1 + L * 0.16)
       const turn = -side * k * 66
       const back = -k * S * 0.2 - (d > 0.5 ? L * S * 0.2 : 0) // set back a little, so the tall outer edge is about the centre card's height
       const near = d < 0.5 ? L * S * 0.12 : 0
@@ -96,7 +103,7 @@ export function RecordFlow({ images, direction = 'horizontal', width, height, st
     }
     const f = clamp(Math.round(p), 0, n - 1)
     setFront((x) => (x === f ? x : f))
-  }, [n, S, vert])
+  }, [n, S, CW, vert])
   useLayoutEffect(paint, [paint])
   useEffect(() => () => cancelAnimationFrame(raf.current), [])
   const told = useRef(-1)
@@ -198,7 +205,7 @@ export function RecordFlow({ images, direction = 'horizontal', width, height, st
       <style>{CSS}</style>
       <div className="absolute left-1/2 top-1/2" style={{ width: 0, height: 0 }}>
         {images.map((img, i) => (
-          <div key={img.src + i} ref={(el) => { slots.current[i] = el }} className="absolute left-0 top-0" style={{ width: S, height: S, transformStyle: 'preserve-3d' }}>
+          <div key={img.src + i} ref={(el) => { slots.current[i] = el }} className="absolute left-0 top-0" style={{ width: CW, height: S, transformStyle: 'preserve-3d' }}>
             {/* the drift: its own element, so the keyframes own this transform and nothing else writes it */}
             <div
               className="rf-float h-full w-full"

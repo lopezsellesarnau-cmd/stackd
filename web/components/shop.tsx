@@ -52,6 +52,7 @@ import { HexPerformance, demoCells, type HexRange } from './kit/hex-performance'
 import { HeroCard, type HeroArt } from './kit/hero-card'
 import { WorkflowCanvas, type FlowEdge, type FlowNode } from './kit/workflow-canvas'
 import { JellySidebar, type SidebarItem } from './kit/jelly-sidebar'
+import { WheelPicker, type WheelItem } from './kit/wheel-picker'
 import { IronFilings } from './kit/iron-filings'
 import { RecordFlow, type FlowPicture } from './kit/record-flow'
 import { useLanguage } from './language-context'
@@ -152,6 +153,12 @@ const COPY = {
     shapeWord: 'Word',
     sideAbout: 'An app side menu that moves like jelly. Fold it into a rail of icons or open it: the width springs a little. The black blob under the section you are on slides to the next one, stretching on the way. In the rail, pointing at an icon pops its name out; groups open with their items dropping in one by one. At the bottom, you, with the Bot as your avatar.',
     sideIncludes: ['Figma file, open and folded', 'React + Tailwind code, with the Bot', 'Your sections, groups, counts and icons', 'Mouse, touch and keyboard ( [ folds it )'],
+    wheelAbout: 'A picker wheel like the one on iOS, but quiet: at rest only the chosen option shows. Spin it and the neighbours come out of the dark, curving back on the wheel; let go and it carries on with your flick, then lands with a soft bounce. It loops for hours and minutes, and takes icons, like the Bot shapes.',
+    wheelIncludes: ['Figma file, at rest and spinning', 'React + Tailwind code, no other libraries', 'Text or icons, looping or not', 'Touch, mouse wheel and keyboard'],
+    wheelTime: 'Time',
+    wheelBots: 'Bots',
+    wheelTalk: 'Talk every day at',
+    wheelChoose: 'Choose your Bot',
     flowAbout: 'An automation canvas: node cards on a dotted board, joined by soft wires. Drag a node and its wires follow like jelly. Press Run and the Bot rides the wires from node to node, stretching as it speeds up and squashing as it lands; each node works, logs its time and gets a tick, and the condition picks the green or the red branch.',
     flowIncludes: ['Figma file with every state', 'React + Tailwind code, with the Bot', 'Your nodes, wires and conditions; onStep for real work', 'Mouse, touch and keyboard'],
     heroAbout: 'A mobile hero: a pill with your name and a menu that swells into a panel, a headline and a living picture. Three arts: a halo that breathes and leans toward your finger (press it for a ripple), a pixel gradient that sharpens where you touch, and colour clouds behind reeded glass. The text comes in word by word.',
@@ -315,6 +322,12 @@ const COPY = {
     shapeWord: 'Palabra',
     sideAbout: 'El menú lateral de una app, en gelatina. Pliégalo en una barra de iconos o ábrelo: el ancho rebota un poco. El blob negro bajo la sección activa se desliza a la siguiente estirándose. En la barra, al señalar un icono sale su nombre al lado; los grupos se abren y sus elementos caen uno a uno. Abajo, tú, con el Bot de avatar.',
     sideIncludes: ['Archivo de Figma abierto y plegado', 'Código React + Tailwind, con el Bot', 'Tus secciones, grupos, contadores e iconos', 'Ratón, táctil y teclado ( [ pliega )'],
+    wheelAbout: 'Una rueda para elegir, como la de iOS pero tranquila: en reposo solo se ve la opción elegida. Gírala y las vecinas salen de la oscuridad curvándose en la rueda; suéltala y sigue con tu impulso hasta posarse con un pequeño rebote. Da vueltas sin fin para horas y minutos, y admite iconos, como las formas del Bot.',
+    wheelIncludes: ['Archivo de Figma en reposo y girando', 'Código React + Tailwind, sin otras librerías', 'Texto o iconos, con o sin vueltas', 'Táctil, rueda del ratón y teclado'],
+    wheelTime: 'Hora',
+    wheelBots: 'Bots',
+    wheelTalk: 'Charlar cada día a las',
+    wheelChoose: 'Elige tu Bot',
     flowAbout: 'Un lienzo de automatización: nodos sobre un tablero de puntos, unidos por cables suaves. Arrastra un nodo y sus cables le siguen como gelatina. Pulsa Run y el Bot recorre los cables de nodo en nodo, estirándose al acelerar y aplastándose al llegar; cada nodo trabaja, marca su tiempo y su tick, y la condición elige rama verde o roja.',
     flowIncludes: ['Archivo de Figma con cada estado', 'Código React + Tailwind, con el Bot', 'Tus nodos, cables y condiciones; onStep para trabajo real', 'Ratón, táctil y teclado'],
     heroAbout: 'Un hero para móvil: una píldora con tu nombre y un menú que se hincha en panel, un titular y una imagen viva. Tres artes: un halo que respira y se inclina hacia tu dedo (al pulsar sale una onda), un degradado pixelado que se enfoca donde tocas, y nubes de color tras cristal acanalado. El texto entra palabra a palabra.',
@@ -392,7 +405,7 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'wheel' | 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
@@ -405,6 +418,7 @@ const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'hero', cat: 'cards' },
   { id: 'flow', cat: 'widgets' },
   { id: 'side', cat: 'navigation' },
+  { id: 'wheel', cat: 'inputs' },
   { id: 'radial', cat: 'navigation' },
   { id: 'swap', cat: 'media' },
   { id: 'ascii', cat: 'characters' },
@@ -498,8 +512,9 @@ const GUMROAD: Record<Id, string> = {
   hero: 'https://arnolop.gumroad.com/l/hero_card?wanted=true',
   flow: 'https://arnolop.gumroad.com/l/workflow_canvas?wanted=true',
   side: 'https://arnolop.gumroad.com/l/jelly_sidebar?wanted=true',
+  wheel: 'https://arnolop.gumroad.com/l/wheel_picker?wanted=true',
   filings: 'https://arnolop.gumroad.com/l/iron_filings?wanted=true',
-  records: '',
+  records: 'https://arnolop.gumroad.com/l/record_flow?wanted=true',
   acc: 'https://arnolop.gumroad.com/l/image_accordion?wanted=true',
 }
 
@@ -518,6 +533,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   hero: 'hero-card',
   flow: 'workflow-canvas',
   side: 'jelly-sidebar',
+  wheel: 'wheel-picker',
   filings: 'iron-filings',
   records: 'record-flow',
   acc: 'image-accordion',
@@ -532,6 +548,7 @@ const FIND: Record<Id, [string, string]> = {
   heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
   records: ['Record flow', 'record flow cover carousel gallery pictures photos 3d albums slider coverflow discos carrusel galeria fotos portadas'],
   filings: ['Iron filings', 'iron filings magnet magnetic field needles word text hero visual generative canvas limaduras iman campo agujas palabra texto'],
+  wheel: ['Wheel picker', 'wheel picker time hour minute date select spinner ios scroll dial rueda selector hora minutos fecha elegir'],
   side: ['Jelly sidebar', 'sidebar side menu navigation nav drawer rail collapse app dashboard saas menu lateral navegacion barra panel'],
   flow: ['Workflow canvas', 'workflow automation canvas nodes flow pipeline graph editor zap n8n run wires automatizacion lienzo nodos flujo cables editor'],
   hero: ['Hero card', 'hero mobile landing header section halo ring gradient pixel glass reeded menu nav card portada movil cabecera seccion anillo degradado pixel cristal menu tarjeta'],
@@ -572,7 +589,7 @@ const FIND: Record<Id, [string, string]> = {
 }
 /** For a tile whose component covers it: a click on the component opens the details, except on its own controls */
 const openFrom = (setOpen: (v: boolean) => void) => (e: React.MouseEvent) => {
-  if (!(e.target as HTMLElement).closest('button, a, input, textarea, [role="slider"], [role="tab"]')) setOpen(true)
+  if (!(e.target as HTMLElement).closest('button, a, input, textarea, [role="slider"], [role="tab"], [role="spinbutton"]')) setOpen(true)
 }
 
 const REGISTRY_BY_HREF: Record<string, string> = Object.fromEntries(
@@ -730,7 +747,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -3934,6 +3951,105 @@ function SideTile({ t }: { t: T }) {
               <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
               <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
             </Choice>
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+// Wheel picker: the time (hours : minutes, looping) or the Bot shapes, on a card drawn at 360 and scaled to the tile
+const WHEEL_SIZE = 360
+const WHEEL_HOURS: WheelItem[] = Array.from({ length: 24 }, (_, i) => ({ id: `h${i}`, label: String(i).padStart(2, '0') }))
+const WHEEL_MINUTES: WheelItem[] = Array.from({ length: 12 }, (_, i) => ({ id: `m${i * 5}`, label: String(i * 5).padStart(2, '0') }))
+const WHEEL_SHAPES: { shape: BotShape; label: string }[] = [
+  { shape: 'hexagon', label: 'Hexagon' }, { shape: 'circle', label: 'Circle' }, { shape: 'squircle', label: 'Squircle' },
+  { shape: 'pill', label: 'Pill' }, { shape: 'arch', label: 'Arch' }, { shape: 'drop', label: 'Drop' },
+  { shape: 'triangle', label: 'Triangle' }, { shape: 'cloud', label: 'Cloud' }, { shape: 'clover', label: 'Clover' },
+]
+
+function WheelCard({ t, dark, bots }: { t: T; dark: boolean; bots: boolean }) {
+  const [hour, setHour] = useState('h10')
+  const [min, setMin] = useState('m30')
+  const [shape, setShape] = useState('hexagon')
+  const theme = dark ? 'dark' : 'light'
+  const ink = dark ? '#F2F0EC' : '#141310', paper = dark ? '#141310' : '#FFFFFF'
+  const items: WheelItem[] = WHEEL_SHAPES.map(({ shape: s, label }) => ({
+    id: s, label, icon: <Bot size={76} shape={s} eyes="tall" color={ink} eyeColor={paper} follow={0} poke={false} />,
+  }))
+  return (
+    <div className={`flex flex-col items-center justify-center rounded-[30px] px-6 ${dark ? 'bg-[#141310] text-[#F2F0EC]' : 'bg-white text-[#141310]'}`} style={{ width: WHEEL_SIZE, height: WHEEL_SIZE }}>
+      <p className="text-[14px] opacity-50">{bots ? t.wheelChoose : t.wheelTalk}</p>
+      {bots ? (
+        <WheelPicker items={items} value={shape} onChange={(it) => setShape(it.id)} theme={theme} label="Bot shape" className="mt-2" />
+      ) : (
+        <div className="mt-3 flex items-center">
+          <WheelPicker items={WHEEL_HOURS} value={hour} onChange={(it) => setHour(it.id)} loop width={96} theme={theme} label="Hour" />
+          <span className="pb-1 text-[28px] font-medium">:</span>
+          <WheelPicker items={WHEEL_MINUTES} value={min} onChange={(it) => setMin(it.id)} loop width={96} theme={theme} label="Minutes" />
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** Wheel picker: the card scaled to the tile. Spin it right there; the Open pill (or a click beside it) opens the pop-up. */
+function WheelTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [bots, setBots] = useState(false)
+  const card = useRef<HTMLElement>(null)
+  const [w, setW] = useState(320)
+  useEffect(() => {
+    const el = card.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  return (
+    <>
+      <article ref={card} className={`group ${tile} transition-colors duration-300 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Wheel picker`} className="absolute inset-0 cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto shrink-0 cursor-pointer" onClick={openFrom(setOpen)} style={{ transform: `scale(${(w - 16) / WHEEL_SIZE})` }}>
+            {open ? null : <WheelCard key={`${dark}-${bots}`} t={t} dark={dark} bots={bots} />}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className={`absolute bottom-3 right-3 z-10 rounded-full px-3 py-1 text-[12px] font-medium transition-transform hover:scale-105 active:scale-95 ${dark ? 'bg-paper text-ink' : 'bg-ink text-paper'}`}
+        >
+          {t.open} ›
+        </button>
+      </article>
+
+      {open ? (
+        <Detail
+          t={t}
+          dark={dark}
+          cat={t.cats.inputs}
+          name="Wheel picker"
+          about={t.wheelAbout}
+          includes={t.wheelIncludes}
+          usage={`<WheelPicker${dark ? ' theme="dark"' : ''}\n  items={hours}  // [{ id: 'h10', label: '10' }, …]\n  value={hour}\n  onChange={(item) => setHour(item.id)}\n  loop\n/>`}
+          href={GUMROAD.wheel}
+          price={PRICE.wheel}
+          onClose={() => setOpen(false)}
+          stage={<Fit size={WHEEL_SIZE}><WheelCard key={`${dark}-${bots}`} t={t} dark={dark} bots={bots} /></Fit>}
+          options={
+            <>
+              <Choice label={t.theme}>
+                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+              </Choice>
+              <Choice label={t.wheelTime + ' / ' + t.wheelBots}>
+                <Pick on={!bots} label={t.wheelTime} onClick={() => setBots(false)}><span className="px-1">{t.wheelTime}</span></Pick>
+                <Pick on={bots} label={t.wheelBots} onClick={() => setBots(true)}><span className="px-1">{t.wheelBots}</span></Pick>
+              </Choice>
+            </>
           }
         />
       ) : null}
