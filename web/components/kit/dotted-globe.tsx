@@ -200,7 +200,7 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
     }
 
     let hover: { x: number; y: number } | null = null
-    let raf = 0, last = performance.now(), visible = true
+    let raf = 0, last = performance.now(), visible = true, drawn = 0
     const t0 = performance.now()
 
     const draw = (now: number) => {
@@ -336,7 +336,9 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
         view.lat = clamp(view.lat + view.vLat * dt, -60, 60)
         if (Math.abs(view.vLat) < 4) view.lat += (tilt - view.lat) * Math.min(1, dt * 0.6)
       }
-      draw(now)
+      // only spinning on its own, it's slow: 30 frames a second is plenty (and half the work). Hands on it: every frame
+      const busyHands = view.drag || !!view.focus || Math.abs(view.zoomTo - view.zoom) > 0.001 || Math.abs(view.vLon - spin) > 0.5 || !!hover
+      if (busyHands || now - drawn > 31) { draw(now); drawn = now }
       const moving = !still || view.drag || !!view.focus || Math.abs(view.vLon) > 0.01 || Math.abs(view.lat - tilt) > 0.05 || Math.abs(view.zoomTo - view.zoom) > 0.001
       if (visible && moving) raf = requestAnimationFrame(frame)
     }

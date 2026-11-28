@@ -80,18 +80,17 @@ function Face({
   const last = useRef<number | null>(null);
   const svg = useRef<SVGSVGElement>(null);
 
-  // The hands move outside React, every frame
+  // The hands move outside React, four times a second: the second hand steps once a second, so every frame was wasted work
   useEffect(() => {
-    let raf = 0;
     const tick = () => {
       const z = zone(at.current());
       hour.current?.setAttribute("transform", `rotate(${((z.h % 12) + z.m / 60 + z.s / 3600) * 30} 50 50)`);
       minute.current?.setAttribute("transform", `rotate(${(z.m + z.s / 60) * 6} 50 50)`);
       second.current?.setAttribute("transform", `rotate(${z.s * 6} 50 50)`);
-      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
   }, [zone, at]);
 
   const angle = (e: React.PointerEvent) => {

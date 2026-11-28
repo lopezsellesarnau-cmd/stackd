@@ -556,6 +556,26 @@ const GUMROAD: Record<Id, string> = {
 
 const tile = 'relative aspect-square overflow-hidden rounded-[18px]'
 
+/**
+ * A tile only exists while it's on screen or about to be. Further away it's an empty square of the same size, so its
+ * animations, timers and canvases stop: with dozens of live components, keeping them all running made laptops hot.
+ * It mounts a screen ahead (so it's ready when you get there) and lets go two screens behind.
+ * A tile with its pop-up open stays, whatever the scroll.
+ */
+function Near({ children }: { children: React.ReactNode }) {
+  const el = useRef<HTMLDivElement>(null)
+  const [on, setOn] = useState(false)
+  useEffect(() => {
+    const d = el.current
+    if (!d) return
+    const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) setOn(true) }, { rootMargin: '100% 0px' })
+    const far = new IntersectionObserver(([e]) => { if (!e.isIntersecting && !d.querySelector('dialog[open]')) setOn(false) }, { rootMargin: '200% 0px' })
+    near.observe(d); far.observe(d)
+    return () => { near.disconnect(); far.disconnect() }
+  }, [])
+  return <div ref={el}>{on ? children : <div className={`${tile} bg-paper`} aria-hidden />}</div>
+}
+
 // Each component's name in the shadcn registry (www.stackd.codes/r/{name}.json)
 const REGISTRY_NAME: Record<Id, string> = {
   squeeze: 'squeeze-button',
@@ -791,7 +811,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'dash' ? <DashTile t={t} /> : c.item.id === 'chat' ? <ChatTile t={t} /> : c.item.id === 'folder' ? <FolderTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  <Near>{c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'dash' ? <DashTile t={t} /> : c.item.id === 'chat' ? <ChatTile t={t} /> : c.item.id === 'folder' ? <FolderTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}</Near>
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -4298,17 +4318,23 @@ function DashFit({ theme }: { theme: 'light' | 'dark' }) {
 function DashTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(false)
+  // a whole live dashboard in a small tile was the heaviest thing on the page: it's a picture until you point at it
+  const [live, setLive] = useState(false)
   const [card, w] = useWidth<HTMLElement>()
   const theme = dark ? 'dark' : 'light'
   const k = (w - 20) / DASH_SQ
   return (
     <>
-      <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-[#E9E8E5]'}`}>
+      <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-[#E9E8E5]'}`} onPointerEnter={(e) => { if (e.pointerType === 'mouse') setLive(true) }} onPointerLeave={() => setLive(false)}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Live dashboard`} className="absolute inset-0 z-[5] cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="shrink-0" style={{ width: DASH_SQ, height: DASH_SQ, transform: `scale(${k})` }}>
-            {open ? null : <LiveDashboard key={theme} theme={theme} height={DASH_SQ} />}
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`/dash/${theme}.webp`} alt="" width={DASH_SQ} height={DASH_SQ} className="absolute inset-[10px] h-[calc(100%-20px)] w-[calc(100%-20px)] object-cover" />
+          {live && !open ? (
+            <div className="relative shrink-0" style={{ width: DASH_SQ, height: DASH_SQ, transform: `scale(${k})` }}>
+              <LiveDashboard key={theme} theme={theme} height={DASH_SQ} />
+            </div>
+          ) : null}
         </div>
         <TileOpen t={t} dark={dark} onOpen={() => setOpen(true)} />
       </article>

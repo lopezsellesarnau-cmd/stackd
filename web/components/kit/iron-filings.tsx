@@ -148,7 +148,8 @@ export function IronFilings({ shape = 'word', text = 'HELLO', spacing = 8, reach
       g.lineCap = 'round'
       for (const n of needles) {
         // the magnet's field here: B = 3(m·r̂)r̂ − m, with m pointing up
-        let target = n.rest + (n.hold < 0.05 ? Math.sin(t * 0.6 + n.x * 0.05) * 0.15 : 0)
+        // the free needles sway a little, but only while the pointer is around: at rest the canvas stops drawing
+        let target = n.rest + (n.hold < 0.05 && mag.onT > 0 ? Math.sin(t * 0.6 + n.x * 0.05) * 0.15 : 0)
         let pull = 0
         if (mag.on > 0.01) {
           const rx = n.x - mag.x, ry = n.y - mag.y
