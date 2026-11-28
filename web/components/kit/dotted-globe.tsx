@@ -6,13 +6,13 @@ import { useEffect, useRef } from 'react'
  * Dotted globe · StackD Kit
  * The world in dots, turning slowly. Your places pulse on it like live users, and arcs fly between them with a light
  * running along each one. Drag it to spin it your way; let go and it carries on, then goes back to its own pace.
- * Point at a place to see its name.
+ * The land around each place glows in your colour; point at a place to see its name, click it and the globe turns to it.
  *
  * The land is built in (Natural Earth, public domain, at 1°), so there's nothing to load.
  * One canvas, drawn only on screen. React + Tailwind, no other dependencies. Respects reduced motion.
  */
 
-export type GlobePlace = { lat: number; lon: number; label?: string }
+export type GlobePlace = { lat: number; lon: number; label?: string; /** A second line, like '1,204 online'. */ detail?: string }
 export type GlobeArc = { from: [number, number]; to: [number, number] }
 
 type Props = {
@@ -60,8 +60,8 @@ const isLand = (lat: number, lon: number) => {
 }
 
 const THEMES = {
-  light: { bg: '#FFFFFF', dot: '20,19,16', sphere: ['#FFFFFF', '#F1F0EC'], rim: 'rgba(20,19,16,0.08)', label: '#141310', labelText: '#FFFFFF' },
-  dark: { bg: '#141310', dot: '242,240,236', sphere: ['#1E1D1A', '#141310'], rim: 'rgba(242,240,236,0.1)', label: '#F2F0EC', labelText: '#141310' },
+  light: { bg: '#FFFFFF', dot: '20,19,16', sphere: ['#FFFFFF', '#F1F0EC'], rim: 'rgba(20,19,16,0.08)', halo: '20,19,16', label: '#141310', labelText: '#FFFFFF' },
+  dark: { bg: '#141310', dot: '242,240,236', sphere: ['#1E1D1A', '#141310'], rim: 'rgba(242,240,236,0.1)', halo: '242,240,236', label: '#F2F0EC', labelText: '#141310' },
 }
 const FONT = '"SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif'
 const RAD = Math.PI / 180
@@ -69,15 +69,15 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 const vec = (lat: number, lon: number): [number, number, number] => [Math.cos(lat * RAD) * Math.sin(lon * RAD), Math.sin(lat * RAD), Math.cos(lat * RAD) * Math.cos(lon * RAD)]
 
 export const GLOBE_PLACES: GlobePlace[] = [
-  { lat: 52.37, lon: 4.9, label: 'Amsterdam' },
-  { lat: 40.71, lon: -74.0, label: 'New York' },
-  { lat: 37.77, lon: -122.42, label: 'San Francisco' },
-  { lat: -23.55, lon: -46.63, label: 'São Paulo' },
-  { lat: 6.52, lon: 3.38, label: 'Lagos' },
-  { lat: 19.08, lon: 72.88, label: 'Mumbai' },
-  { lat: 1.35, lon: 103.82, label: 'Singapore' },
-  { lat: 35.68, lon: 139.69, label: 'Tokyo' },
-  { lat: -33.87, lon: 151.21, label: 'Sydney' },
+  { lat: 52.37, lon: 4.9, label: 'Amsterdam', detail: '1,204 online' },
+  { lat: 40.71, lon: -74.0, label: 'New York', detail: '2,310 online' },
+  { lat: 37.77, lon: -122.42, label: 'San Francisco', detail: '1,876 online' },
+  { lat: -23.55, lon: -46.63, label: 'São Paulo', detail: '942 online' },
+  { lat: 6.52, lon: 3.38, label: 'Lagos', detail: '518 online' },
+  { lat: 19.08, lon: 72.88, label: 'Mumbai', detail: '1,397 online' },
+  { lat: 1.35, lon: 103.82, label: 'Singapore', detail: '806 online' },
+  { lat: 35.68, lon: 139.69, label: 'Tokyo', detail: '1,655 online' },
+  { lat: -33.87, lon: 151.21, label: 'Sydney', detail: '611 online' },
 ]
 export const GLOBE_ARCS: GlobeArc[] = [
   { from: [52.37, 4.9], to: [40.71, -74.0] },
@@ -111,6 +111,15 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
       }
     }
     const pv = places.map((p) => ({ ...p, v: vec(p.lat, p.lon), phase: Math.random() * 3 }))
+    // the land around each place glows: 1 at the place, 0 at 8° away
+    const near8 = Math.cos(8 * RAD)
+    const glow = new Float32Array(dots.length / 3)
+    for (let i = 0; i < glow.length; i++) {
+      for (const p of pv) {
+        const d = dots[i * 3] * p.v[0] + dots[i * 3 + 1] * p.v[1] + dots[i * 3 + 2] * p.v[2]
+        if (d > near8) glow[i] = Math.max(glow[i], (d - near8) / (1 - near8))
+      }
+    }
     // each arc: points along the great circle, lifted off the surface in the middle
     const av = arcs.map((a, i) => {
       const A = vec(a.from[0], a.from[1]), B = vec(a.to[0], a.to[1])
@@ -127,7 +136,7 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
     })
 
     // ── the view: which longitude faces you, and the lean ──
-    const view = { lon: start, lat: tilt, vLon: 0, vLat: 0, drag: false }
+    const view = { lon: start, lat: tilt, vLon: 0, vLat: 0, drag: false, focus: null as null | { lon: number; lat: number; until: number } }
     const project = (x: number, y: number, z: number) => {
       const cl = Math.cos(-view.lon * RAD), sl = Math.sin(-view.lon * RAD)
       const x1 = x * cl + z * sl, z1 = -x * sl + z * cl
@@ -144,14 +153,33 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
       const time = (now - t0) / 1000
       g.setTransform(dpr, 0, 0, dpr, 0, 0)
       g.clearRect(0, 0, S, S)
+      // the atmosphere: a soft halo just outside the sphere
+      const halo = g.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.16)
+      halo.addColorStop(0, `rgba(${c.halo},0.1)`); halo.addColorStop(1, `rgba(${c.halo},0)`)
+      g.fillStyle = halo; g.beginPath(); g.arc(cx, cy, R * 1.16, 0, Math.PI * 2); g.fill()
       // the sphere: a soft body and a thin rim
       const body = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R)
       body.addColorStop(0, c.sphere[0]); body.addColorStop(1, c.sphere[1])
       g.fillStyle = body; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill()
       g.strokeStyle = c.rim; g.lineWidth = 1; g.stroke()
+      // meridians and parallels every 30°, barely there, on the near side
+      g.strokeStyle = `rgba(${c.halo},0.06)`; g.lineWidth = 0.8
+      g.beginPath()
+      const line = (pts: [number, number][]) => {
+        let pen = false
+        for (const [la, lo] of pts) {
+          const v = vec(la, lo), [x, y, z] = project(v[0], v[1], v[2])
+          if (z < 0) { pen = false; continue }
+          if (!pen) { g.moveTo(x, y); pen = true } else g.lineTo(x, y)
+        }
+      }
+      for (let lo = -180; lo < 180; lo += 30) line(Array.from({ length: 31 }, (_, k) => [-90 + k * 6, lo] as [number, number]))
+      for (let la = -60; la <= 60; la += 30) line(Array.from({ length: 73 }, (_, k) => [la, -180 + k * 5] as [number, number]))
+      g.stroke()
 
       // the dots, the far side faint, the near side fuller towards the middle
       const buckets = [new Path2D(), new Path2D(), new Path2D(), new Path2D(), new Path2D()]
+      const lit = [new Path2D(), new Path2D(), new Path2D()] // dots in the glow around a place, by strength
       const alpha = [0.05, 0.16, 0.4, 0.66, 0.86]
       const dot = R * 0.0085 + 0.3
       for (let i = 0; i < dots.length; i += 3) {
@@ -159,9 +187,14 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
         const b = z < 0 ? 0 : z < 0.25 ? 1 : z < 0.5 ? 2 : z < 0.75 ? 3 : 4
         if (b === 0 && z < -0.6) continue
         const r = b === 0 ? dot * 0.7 : dot * (0.75 + 0.25 * z)
-        buckets[b].moveTo(x + r, y); buckets[b].arc(x, y, r, 0, Math.PI * 2)
+        const gl = glow[i / 3]
+        const into = b >= 2 && gl > 0.12 ? lit[gl > 0.66 ? 2 : gl > 0.36 ? 1 : 0] : buckets[b]
+        into.moveTo(x + r, y); into.arc(x, y, r, 0, Math.PI * 2)
       }
       buckets.forEach((p, i) => { g.fillStyle = `rgba(${c.dot},${alpha[i]})`; g.fill(p) })
+      g.fillStyle = accent
+      lit.forEach((p, i) => { g.globalAlpha = [0.45, 0.7, 0.95][i]; g.fill(p) })
+      g.globalAlpha = 1
 
       // the arcs: a faint path, and a light running along it, then a ping where it lands
       const hidden = (x: number, y: number, z: number) => z < 0 && Math.hypot(x - cx, y - cy) < R
@@ -186,10 +219,24 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
           g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke()
         }
         g.globalAlpha = 1
+        // the light's head, glowing
+        if (run <= 1) {
+          const [hx, hy, hz] = P[Math.min(48, Math.round(head * 48))]
+          if (!hidden(hx, hy, hz)) {
+            const gr = g.createRadialGradient(hx, hy, 0, hx, hy, 9)
+            gr.addColorStop(0, accent); gr.addColorStop(1, 'rgba(0,0,0,0)')
+            g.globalAlpha = 0.55; g.fillStyle = gr; g.beginPath(); g.arc(hx, hy, 9, 0, Math.PI * 2); g.fill()
+            g.globalAlpha = 1; g.fillStyle = c.bg; g.beginPath(); g.arc(hx, hy, 1.4, 0, Math.PI * 2); g.fill()
+          }
+        } else {
+          // where it lands, a burst
+          const k = (run - 1) / 0.25, [tx, ty, tz] = P[48]
+          if (tz > 0) { g.strokeStyle = accent; g.lineWidth = 1.6; g.globalAlpha = 1 - k; g.beginPath(); g.arc(tx, ty, 4 + k * 22, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1 }
+        }
       }
 
       // the places: a dot and a ring that grows and fades, like a live user
-      let near: { label: string; x: number; y: number } | null = null
+      let near: { label: string; detail?: string; x: number; y: number } | null = null
       for (const p of pv) {
         const [x, y, z] = project(p.v[0], p.v[1], p.v[2])
         if (z < 0.05) continue
@@ -204,24 +251,36 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
         g.fillStyle = accent; g.beginPath(); g.arc(x, y, 3.4, 0, Math.PI * 2); g.fill()
         g.fillStyle = c.bg; g.beginPath(); g.arc(x, y, 1.3, 0, Math.PI * 2); g.fill()
         g.globalAlpha = 1
-        if (hover && p.label && Math.hypot(hover.x - x, hover.y - y) < 14) near = { label: p.label, x, y }
+        if (hover && p.label && Math.hypot(hover.x - x, hover.y - y) < 14) near = { label: p.label, detail: p.detail, x, y }
       }
       // the name of the place you point at, in a little pill
       if (near) {
-        g.font = `500 12px ${FONT}`
-        const w = g.measureText(near.label).width + 18
-        const lx = clamp(near.x - w / 2, 4, S - w - 4), ly = near.y - 34
-        g.fillStyle = c.label; g.beginPath(); g.roundRect(lx, ly, w, 24, 12); g.fill()
-        g.fillStyle = c.labelText; g.textBaseline = 'middle'; g.fillText(near.label, lx + 9, ly + 12.5)
+        g.font = `600 12px ${FONT}`
+        const w1 = g.measureText(near.label).width
+        g.font = `400 12px ${FONT}`
+        const w2 = near.detail ? g.measureText(near.detail).width + 8 : 0
+        const w = w1 + w2 + 20
+        const lx = clamp(near.x - w / 2, 4, S - w - 4), ly = near.y - 36
+        g.fillStyle = c.label; g.beginPath(); g.roundRect(lx, ly, w, 26, 13); g.fill()
+        g.textBaseline = 'middle'; g.fillStyle = c.labelText
+        g.font = `600 12px ${FONT}`; g.fillText(near.label, lx + 10, ly + 13.5)
+        if (near.detail) { g.globalAlpha = 0.6; g.font = `400 12px ${FONT}`; g.fillText(near.detail, lx + 10 + w1 + 8, ly + 13.5); g.globalAlpha = 1 }
       }
-      canvas.style.cursor = view.drag ? 'grabbing' : near ? 'default' : 'grab'
+      canvas.style.cursor = view.drag ? 'grabbing' : near ? 'pointer' : 'grab'
     }
 
     const frame = (now: number) => {
       raf = 0
       const dt = Math.min(48, now - last) / 1000
       last = now
-      if (!view.drag) {
+      if (view.focus && !view.drag) {
+        // turning to a place you clicked: the shortest way round, then a pause there
+        const f = view.focus
+        const dLon = ((((f.lon - view.lon) % 360) + 540) % 360) - 180
+        view.lon += dLon * Math.min(1, dt * 3.2); view.lat += (f.lat - view.lat) * Math.min(1, dt * 3.2)
+        view.vLon = 0; view.vLat = 0
+        if (now > f.until) view.focus = null
+      } else if (!view.drag) {
         // after a throw it carries on, then eases back to its own pace and lean
         const own = still ? 0 : spin
         view.vLon += (own - view.vLon) * Math.min(1, dt * 1.4)
@@ -231,7 +290,7 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
         view.lat += (tilt - view.lat) * Math.min(1, dt * 0.6) * (Math.abs(view.vLat) < 4 ? 1 : 0)
       }
       draw(now)
-      const moving = !still || view.drag || Math.abs(view.vLon) > 0.01 || Math.abs(view.lat - tilt) > 0.05
+      const moving = !still || view.drag || !!view.focus || Math.abs(view.vLon) > 0.01 || Math.abs(view.lat - tilt) > 0.05
       if (visible && moving) raf = requestAnimationFrame(frame)
     }
     const wake = () => { if (!raf && visible) { last = performance.now(); raf = requestAnimationFrame(frame) } }
@@ -240,12 +299,12 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
     io.observe(canvas)
 
     const pos = (e: PointerEvent) => { const r = canvas.getBoundingClientRect(); return { x: ((e.clientX - r.left) / r.width) * S, y: ((e.clientY - r.top) / r.height) * S } }
-    let lp = { x: 0, y: 0, t: 0 }
+    let lp = { x: 0, y: 0, t: 0 }, down = { x: 0, y: 0 }
     const onDown = (e: PointerEvent) => {
       const q = pos(e)
       if (Math.hypot(q.x - cx, q.y - cy) > R * 1.08) return
-      view.drag = true; view.vLon = 0; view.vLat = 0
-      lp = { ...q, t: performance.now() }
+      view.drag = true; view.vLon = 0; view.vLat = 0; view.focus = null
+      lp = { ...q, t: performance.now() }; down = q
       canvas.setPointerCapture(e.pointerId)
       wake()
     }
@@ -266,6 +325,14 @@ export function DottedGlobe({ size = 440, theme = 'light', places = GLOBE_PLACES
     const onUp = (e: PointerEvent) => {
       if (!view.drag) return
       view.drag = false
+      // a click, not a drag: on a place, the globe turns to it
+      const q = pos(e)
+      if (Math.hypot(q.x - down.x, q.y - down.y) < 5) {
+        for (const p of pv) {
+          const [x, y, z] = project(p.v[0], p.v[1], p.v[2])
+          if (z > 0.05 && Math.hypot(q.x - x, q.y - y) < 14) { view.focus = { lon: p.lon, lat: clamp(p.lat * 0.7, -40, 50), until: performance.now() + 3500 }; break }
+        }
+      }
       if (performance.now() - lp.t > 80) { view.vLon = 0; view.vLat = 0 } // held still before letting go: no throw
       view.vLon = clamp(view.vLon, -400, 400); view.vLat = clamp(view.vLat, -200, 200)
       try { canvas.releasePointerCapture(e.pointerId) } catch { /* already released */ }

@@ -53,7 +53,6 @@ import { HeroCard, type HeroArt } from './kit/hero-card'
 import { WorkflowCanvas, type FlowEdge, type FlowNode } from './kit/workflow-canvas'
 import { JellySidebar, type SidebarItem } from './kit/jelly-sidebar'
 import { WheelPicker, type WheelItem } from './kit/wheel-picker'
-import { ThreadWord } from './kit/thread-word'
 import { DottedGlobe, GLOBE_ARCS } from './kit/dotted-globe'
 import { IronFilings } from './kit/iron-filings'
 import { RecordFlow, type FlowPicture } from './kit/record-flow'
@@ -152,11 +151,7 @@ const COPY = {
     verticalL: 'Vertical',
     filingsAbout: 'Thousands of ink needles on paper. At rest they trace the outline of a word or the Bot\'s face, like iron filings around a magnet. Your cursor is a magnet: the needles near it swing round and line up along its field, from pole to pole. Click and they jump, then settle back. Finished like a figure in print: labels in the corners and a live readout of the field.',
     filingsIncludes: ['Figma file with the word and the Bot', 'React + Tailwind code, no other libraries', 'Your word, density and magnet reach', 'Mouse and touch; respects reduced motion'],
-    threadAbout: 'A word embroidered on fabric in satin stitch, the way a machine sews lettering on a cap or a patch: long glossy threads across each stroke that shimmer as they turn. Change the word and the needle sews it in, zigzagging up each column. Your cursor tugs the threads and they spring back; a click plucks them.',
-    threadIncludes: ['Figma file in four thread colours', 'React + Tailwind code, no other libraries', 'Your word, thread colour and density', 'Mouse and touch'],
-    threadWord: 'Word',
-    threadColour: 'Thread',
-    globeAbout: 'The world in dots, turning slowly. Your places pulse on it like live users, and arcs fly between them with a light running along each one. Drag it to spin it your way: it carries on, then goes back to its own pace. Point at a place to see its name. The map is built in, so there is nothing to load.',
+    globeAbout: 'The world in dots, turning slowly. Your places pulse on it like live users, and arcs fly between them with a light running along each one. The land around each place glows in your colour. Drag it to spin it your way, point at a place to see its name and numbers, click it and the globe turns to it. The map is built in, so there is nothing to load.',
     globeIncludes: ['Figma file, light and dark', 'React + Tailwind code, no other libraries', 'Your places, arcs and colour', 'Mouse and touch'],
     globeAccent: 'Colour',
     globeArcs: 'Arcs',
@@ -331,11 +326,7 @@ const COPY = {
     verticalL: 'Vertical',
     filingsAbout: 'Miles de agujas de tinta sobre papel. En reposo siguen el contorno de una palabra o de la cara del Bot, como limaduras de hierro alrededor de un imán. Tu cursor es un imán: las agujas cercanas giran y se alinean con su campo, de un polo al otro. Haz clic y saltan, y vuelven a su sitio. Acabado de figura de revista: etiquetas en las esquinas y lectura del campo en vivo.',
     filingsIncludes: ['Archivo de Figma con la palabra y el Bot', 'Código React + Tailwind, sin otras librerías', 'Tu palabra, densidad y alcance del imán', 'Ratón y táctil; respeta reduced motion'],
-    threadAbout: 'Una palabra bordada sobre tela en punto satén, como cose una máquina las letras de una gorra o un parche: hilos largos y brillantes que cruzan cada trazo y destellan al girar. Cambia la palabra y la aguja la cose en zigzag, columna a columna. El cursor tira de los hilos y vuelven a su sitio; un clic los pellizca.',
-    threadIncludes: ['Archivo de Figma en cuatro colores de hilo', 'Código React + Tailwind, sin otras librerías', 'Tu palabra, color de hilo y densidad', 'Ratón y táctil'],
-    threadWord: 'Palabra',
-    threadColour: 'Hilo',
-    globeAbout: 'El mundo en puntos, girando despacio. Tus lugares laten como usuarios en directo y entre ellos vuelan arcos con una luz que los recorre. Arrástralo para girarlo a tu manera: sigue con el impulso y vuelve a su ritmo. Señala un lugar para ver su nombre. El mapa va dentro, no hay nada que cargar.',
+    globeAbout: 'El mundo en puntos, girando despacio. Tus lugares laten como usuarios en directo y entre ellos vuelan arcos con una luz que los recorre. La tierra alrededor de cada lugar brilla en tu color. Arrástralo para girarlo a tu manera, señala un lugar para ver su nombre y sus cifras, haz clic y el globo gira hacia él. El mapa va dentro, no hay nada que cargar.',
     globeIncludes: ['Archivo de Figma, claro y oscuro', 'Código React + Tailwind, sin otras librerías', 'Tus lugares, arcos y color', 'Ratón y táctil'],
     globeAccent: 'Color',
     globeArcs: 'Arcos',
@@ -427,14 +418,13 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'globe' | 'thread' | 'wheel' | 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'globe' | 'wheel' | 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
   { id: 'heat', cat: 'text' },
   { id: 'filings', cat: 'text' },
-  { id: 'thread', cat: 'text' },
   { id: 'globe', cat: 'widgets' },
   { id: 'records', cat: 'media' },
   { id: 'gen', cat: 'ai' },
@@ -537,7 +527,6 @@ const GUMROAD: Record<Id, string> = {
   flow: 'https://arnolop.gumroad.com/l/workflow_canvas?wanted=true',
   side: 'https://arnolop.gumroad.com/l/jelly_sidebar?wanted=true',
   wheel: 'https://arnolop.gumroad.com/l/wheel_picker?wanted=true',
-  thread: '',
   globe: '',
   filings: 'https://arnolop.gumroad.com/l/iron_filings?wanted=true',
   records: 'https://arnolop.gumroad.com/l/record_flow?wanted=true',
@@ -560,7 +549,6 @@ const REGISTRY_NAME: Record<Id, string> = {
   flow: 'workflow-canvas',
   side: 'jelly-sidebar',
   wheel: 'wheel-picker',
-  thread: 'thread-word',
   globe: 'dotted-globe',
   filings: 'iron-filings',
   records: 'record-flow',
@@ -577,7 +565,6 @@ const FIND: Record<Id, [string, string]> = {
   records: ['Record flow', 'record flow cover carousel gallery pictures photos 3d albums slider coverflow discos carrusel galeria fotos portadas'],
   filings: ['Iron filings', 'iron filings magnet magnetic field needles word text hero visual generative canvas limaduras iman campo agujas palabra texto'],
   globe: ['Dotted globe', 'dotted globe world map earth dots spin users live pings arcs dashboard hero saas visual canvas globo mundo mapa tierra puntos usuarios arcos panel'],
-  thread: ['Thread word', 'thread word embroidery embroidered stitch satin sewing needle fabric text hero visual canvas hilo bordado punto costura aguja tela palabra texto'],
   wheel: ['Wheel picker', 'wheel picker time hour minute date select spinner ios scroll dial rueda selector hora minutos fecha elegir'],
   side: ['Jelly sidebar', 'sidebar side menu navigation nav drawer rail collapse app dashboard saas menu lateral navegacion barra panel'],
   flow: ['Workflow canvas', 'workflow automation canvas nodes flow pipeline graph editor zap n8n run wires automatizacion lienzo nodos flujo cables editor'],
@@ -777,7 +764,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'thread' ? <ThreadTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -4134,83 +4121,6 @@ function FilingsTile({ t }: { t: T }) {
               <Choice label={t.shape}>
                 <Pick on={shape === 'word'} label={t.shapeWord} onClick={() => setShape('word')}><span className="px-1">{t.shapeWord}</span></Pick>
                 <Pick on={shape === 'bot'} label="Bot" onClick={() => setShape('bot')}><span className="px-1">Bot</span></Pick>
-              </Choice>
-              <Choice label={t.theme}>
-                <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
-                <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
-              </Choice>
-            </>
-          }
-        />
-      ) : null}
-    </>
-  )
-}
-
-// Thread word: the four StackD threads, and a few words to watch the needle sew
-const THREADS = [
-  { id: 'wine', label: 'Wine', color: '#901919' },
-  { id: 'ink', label: 'Ink', color: undefined },
-  { id: 'olive', label: 'Olive', color: '#6C8544' },
-  { id: 'ochre', label: 'Ochre', color: '#BE9344' },
-] as const
-const THREAD_WORDS = ['HELLO', 'STACKD', 'SEW'] as const
-
-/** Thread word: drawn at the tile's own size (a canvas, no scaling). A click plucks the threads, so the tile has an Open pill. */
-function ThreadTile({ t }: { t: T }) {
-  const [open, setOpen] = useState(false)
-  const [dark, setDark] = useState(false)
-  const [thread, setThread] = useState<(typeof THREADS)[number]['id']>('wine')
-  const [word, setWord] = useState<(typeof THREAD_WORDS)[number]>('HELLO')
-  const card = useRef<HTMLElement>(null)
-  const [w, setW] = useState(0)
-  useEffect(() => {
-    const el = card.current
-    if (!el) return
-    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-  const theme = dark ? 'dark' : 'light'
-  const color = THREADS.find((x) => x.id === thread)!.color
-
-  return (
-    <>
-      <article ref={card} className={`group ${tile} ${dark ? 'bg-[#191816]' : 'bg-[#ECE8DF]'}`}>
-        {open || w < 100 ? null : <ThreadWord key={`${word}-${theme}-${thread}-${w}`} text={word} thread={color} theme={theme} width={w} height={w} className="absolute inset-0 !rounded-none" />}
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className={`absolute bottom-3 left-3 z-10 rounded-full px-3 py-1 text-[12px] font-medium transition-transform hover:scale-105 active:scale-95 ${dark ? 'bg-paper text-ink' : 'bg-ink text-paper'}`}
-        >
-          {t.open} ›
-        </button>
-      </article>
-
-      {open ? (
-        <Detail
-          t={t}
-          dark={dark}
-          cat={t.cats.text}
-          name="Thread word"
-          about={t.threadAbout}
-          includes={t.threadIncludes}
-          usage={`<ThreadWord text="${word}"${color ? ` thread="${color}"` : ''}${dark ? ' theme="dark"' : ''} width={640} height={360} />`}
-          href={GUMROAD.thread}
-          price={PRICE.thread}
-          onClose={() => setOpen(false)}
-          stage={<Fit size={460}><ThreadWord key={`${word}-${theme}-${thread}`} text={word} thread={color} theme={theme} width={460} height={460} /></Fit>}
-          options={
-            <>
-              <Choice label={t.threadWord}>
-                {THREAD_WORDS.map((x) => (
-                  <Pick key={x} on={word === x} label={x} onClick={() => setWord(x)}><span className="px-1">{x}</span></Pick>
-                ))}
-              </Choice>
-              <Choice label={t.threadColour}>
-                {THREADS.map((x) => (
-                  <Pick key={x.id} on={thread === x.id} label={x.label} onClick={() => setThread(x.id)}><span className="px-1">{x.label}</span></Pick>
-                ))}
               </Choice>
               <Choice label={t.theme}>
                 <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
