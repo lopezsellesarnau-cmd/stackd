@@ -546,7 +546,7 @@ const GUMROAD: Record<Id, string> = {
   side: 'https://arnolop.gumroad.com/l/jelly_sidebar?wanted=true',
   wheel: 'https://arnolop.gumroad.com/l/wheel_picker?wanted=true',
   globe: 'https://arnolop.gumroad.com/l/dotted_globe?wanted=true',
-  chat: '',
+  chat: 'https://arnolop.gumroad.com/l/bot_chat?wanted=true',
   dash: '',
   folder: '',
   filings: 'https://arnolop.gumroad.com/l/iron_filings?wanted=true',
