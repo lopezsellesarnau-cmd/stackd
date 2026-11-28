@@ -153,8 +153,8 @@ const COPY = {
     verticalL: 'Vertical',
     filingsAbout: 'Thousands of ink needles on paper. At rest they trace the outline of a word or the Bot\'s face, like iron filings around a magnet. Your cursor is a magnet: the needles near it swing round and line up along its field, from pole to pole. Click and they jump, then settle back. Finished like a figure in print: labels in the corners and a live readout of the field.',
     filingsIncludes: ['Figma file with the word and the Bot', 'React + Tailwind code, no other libraries', 'Your word, density and magnet reach', 'Mouse and touch; respects reduced motion'],
-    globeAbout: 'The world in dots, turning slowly. Your places pulse on it like live users, and arcs fly between them with a light running along each one. The land around each place glows in your colour. Drag it to spin it your way, point at a place to see its name and numbers, click it and the globe turns to it. The map is built in, so there is nothing to load.',
-    globeIncludes: ['Figma file, light and dark', 'React + Tailwind code, no other libraries', 'Your places, arcs and colour', 'Mouse and touch'],
+    globeAbout: 'Where your users are, on a world made of dots. The land darkens where more people are, like a heat map you can turn, and each city raises a little pillar as tall as its crowd. Drag to spin it, pinch to zoom, point at a city to see how many are there, click it and the globe turns to it. The map is built in, so there is nothing to load.',
+    globeIncludes: ['Figma file, light and dark', 'React + Tailwind code, no other libraries', 'Your cities and user counts, colour and zoom', 'Drag, pinch and touch'],
     globeAccent: 'Colour',
     globeArcs: 'Arcs',
     globeOn: 'On',
@@ -332,8 +332,8 @@ const COPY = {
     verticalL: 'Vertical',
     filingsAbout: 'Miles de agujas de tinta sobre papel. En reposo siguen el contorno de una palabra o de la cara del Bot, como limaduras de hierro alrededor de un imán. Tu cursor es un imán: las agujas cercanas giran y se alinean con su campo, de un polo al otro. Haz clic y saltan, y vuelven a su sitio. Acabado de figura de revista: etiquetas en las esquinas y lectura del campo en vivo.',
     filingsIncludes: ['Archivo de Figma con la palabra y el Bot', 'Código React + Tailwind, sin otras librerías', 'Tu palabra, densidad y alcance del imán', 'Ratón y táctil; respeta reduced motion'],
-    globeAbout: 'El mundo en puntos, girando despacio. Tus lugares laten como usuarios en directo y entre ellos vuelan arcos con una luz que los recorre. La tierra alrededor de cada lugar brilla en tu color. Arrástralo para girarlo a tu manera, señala un lugar para ver su nombre y sus cifras, haz clic y el globo gira hacia él. El mapa va dentro, no hay nada que cargar.',
-    globeIncludes: ['Archivo de Figma, claro y oscuro', 'Código React + Tailwind, sin otras librerías', 'Tus lugares, arcos y color', 'Ratón y táctil'],
+    globeAbout: 'Dónde están tus usuarios, en un mundo hecho de puntos. La tierra se oscurece donde hay más gente, como un mapa de calor que puedes girar, y cada ciudad levanta una columna tan alta como su público. Arrastra para girarlo, pellizca para hacer zoom, señala una ciudad para ver cuántos hay y haz clic para que el globo gire hacia ella. El mapa va dentro, no hay nada que cargar.',
+    globeIncludes: ['Archivo de Figma, claro y oscuro', 'Código React + Tailwind, sin otras librerías', 'Tus ciudades y usuarios, color y zoom', 'Arrastrar, pellizcar y táctil'],
     globeAccent: 'Color',
     globeArcs: 'Arcos',
     globeOn: 'Sí',
@@ -4166,7 +4166,7 @@ function GlobeTile({ t }: { t: T }) {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(false)
   const [accent, setAccent] = useState<(typeof GLOBE_ACCENTS)[number]['id']>('ochre')
-  const [arcs, setArcs] = useState(true)
+  const [arcs, setArcs] = useState(false)
   const card = useRef<HTMLElement>(null)
   const [w, setW] = useState(0)
   useEffect(() => {
@@ -4183,7 +4183,7 @@ function GlobeTile({ t }: { t: T }) {
   return (
     <>
       <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-paper'}`}>
-        {open || w < 100 ? null : <DottedGlobe key={`${theme}-${w}`} theme={theme} accent={color} arcs={arcList} size={w} className="absolute inset-0" />}
+        {open || w < 100 ? null : <DottedGlobe key={`${theme}-${w}`} theme={theme} accent={color} arcs={arcList} size={w} zoom={1.3} className="absolute inset-0" />}
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -4201,11 +4201,11 @@ function GlobeTile({ t }: { t: T }) {
           name="Dotted globe"
           about={t.globeAbout}
           includes={t.globeIncludes}
-          usage={`<DottedGlobe${dark ? ' theme="dark"' : ''} accent="${color}"\n  places={[{ lat: 52.37, lon: 4.9, label: 'Amsterdam' }, …]}\n  arcs={${arcs ? "[{ from: [52.37, 4.9], to: [40.71, -74] }, …]" : '[]'}}\n/>`}
+          usage={`<DottedGlobe${dark ? ' theme="dark"' : ''} accent="${color}"\n  places={[{ lat: 52.37, lon: 4.9, label: 'Amsterdam', users: 1204 }, …]}\n  arcs={${arcs ? "[{ from: [52.37, 4.9], to: [40.71, -74] }, …]" : '[]'}}\n/>`}
           href={GUMROAD.globe}
           price={PRICE.globe}
           onClose={() => setOpen(false)}
-          stage={<Fit size={460}><DottedGlobe key={theme} theme={theme} accent={color} arcs={arcList} size={460} /></Fit>}
+          stage={<Fit size={460}><DottedGlobe key={theme} theme={theme} accent={color} arcs={arcList} size={460} zoom={1.15} /></Fit>}
           options={
             <>
               <Choice label={t.globeAccent}>
