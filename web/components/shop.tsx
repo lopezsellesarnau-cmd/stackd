@@ -56,6 +56,7 @@ import { WheelPicker, type WheelItem } from './kit/wheel-picker'
 import { DottedGlobe, GLOBE_ARCS } from './kit/dotted-globe'
 import { BotChat } from './kit/bot-chat'
 import { JellyFolder } from './kit/jelly-folder'
+import { LiveDashboard } from './kit/live-dashboard'
 import { IronFilings } from './kit/iron-filings'
 import { RecordFlow, type FlowPicture } from './kit/record-flow'
 import { useLanguage } from './language-context'
@@ -163,6 +164,8 @@ const COPY = {
     chatIncludes: ['Figma file, light and dark', 'React + Tailwind code, with the Bot', 'Your answers, name, greeting and suggestions', 'Keyboard and touch'],
     folderAbout: 'A folder for a dashboard that feels soft. Drag files from your desktop and the flap opens to take them; each one flies in along an arc and the folder squashes like a sponge as it lands. Point at it and the papers inside peek out and fan open. Photos show as little prints, other files as sheets with their extension.',
     folderIncludes: ['Figma file, light and dark', 'React + Tailwind code, no other libraries', 'Real files and photos, or your own add button', 'Drag and drop, mouse and touch'],
+    dashAbout: 'A whole dashboard that feels alive, made of StackD pieces: the Jelly sidebar, stat cards whose numbers roll, a chart that draws itself, the Dotted globe with your users, a live feed of what\'s happening and the activity grid. Switch the period, and it lays itself out for its own width: sidebar open, folded into a rail, or one column on a phone.',
+    dashIncludes: ['Figma file, light and dark, desktop and phone', 'React + Tailwind code for every piece', 'Live chart and Live feed included', 'Lays itself out from phone to desktop'],
     shapeWord: 'Word',
     sideAbout: 'An app side menu that moves like jelly. Fold it into a rail of icons or open it: the width springs a little. The black blob under the section you are on slides to the next one, stretching on the way. In the rail, pointing at an icon pops its name out; groups open with their items dropping in one by one. At the bottom, you, with the Bot as your avatar.',
     sideIncludes: ['Figma file, open and folded', 'React + Tailwind code, with the Bot', 'Your sections, groups, counts and icons', 'Mouse, touch and keyboard ( [ folds it )'],
@@ -241,7 +244,7 @@ const COPY = {
     setup: 'Set up once after buying',
     setupJson: 'Add the StackD registry to components.json:',
     setupKey: 'Put the licence key from your Gumroad receipt in .env.local. Bought more than one? Separate the keys with commas.',
-    cats: { ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation', media: 'Images', audio: 'Audio' },
+    cats: { templates: 'Templates', ai: 'AI', characters: 'Characters', buttons: 'Buttons', inputs: 'Inputs', loaders: 'Loaders', cards: 'Cards', notifications: 'Notifications', text: 'Text', widgets: 'Widgets', navigation: 'Navigation', media: 'Images', audio: 'Audio' },
   },
   es: {
     title: 'Componentes',
@@ -342,6 +345,8 @@ const COPY = {
     chatIncludes: ['Archivo de Figma, claro y oscuro', 'Código React + Tailwind, con el Bot', 'Tus respuestas, nombre, saludo y sugerencias', 'Teclado y táctil'],
     folderAbout: 'Una carpeta para un panel que se siente blanda. Arrastra archivos desde el escritorio y la solapa se abre para recibirlos; cada uno entra volando en arco y la carpeta se aplasta como una esponja al recibirlo. Pasa el ratón y los papeles asoman y se abren en abanico. Las fotos se ven como copias, el resto como hojas con su extensión.',
     folderIncludes: ['Archivo de Figma, claro y oscuro', 'Código React + Tailwind, sin otras librerías', 'Archivos y fotos reales, o tu propio botón', 'Arrastrar y soltar, ratón y táctil'],
+    dashAbout: 'Un panel entero que se siente vivo, hecho con piezas de StackD: el Jelly sidebar, tarjetas cuyos números ruedan, una gráfica que se dibuja sola, el Dotted globe con tus usuarios, un feed en directo de lo que pasa y la cuadrícula de actividad. Cambia el periodo, y se ordena según su propio ancho: barra abierta, plegada en iconos o en una columna en el móvil.',
+    dashIncludes: ['Archivo de Figma, claro y oscuro, escritorio y móvil', 'Código React + Tailwind de cada pieza', 'Live chart y Live feed incluidos', 'Se ordena solo del móvil al escritorio'],
     shapeWord: 'Palabra',
     sideAbout: 'El menú lateral de una app, en gelatina. Pliégalo en una barra de iconos o ábrelo: el ancho rebota un poco. El blob negro bajo la sección activa se desliza a la siguiente estirándose. En la barra, al señalar un icono sale su nombre al lado; los grupos se abren y sus elementos caen uno a uno. Abajo, tú, con el Bot de avatar.',
     sideIncludes: ['Archivo de Figma abierto y plegado', 'Código React + Tailwind, con el Bot', 'Tus secciones, grupos, contadores e iconos', 'Ratón, táctil y teclado ( [ pliega )'],
@@ -420,7 +425,7 @@ const COPY = {
     setup: 'Configúralo una vez tras comprar',
     setupJson: 'Añade el registro de StackD a components.json:',
     setupKey: 'Pon la clave de licencia del recibo de Gumroad en .env.local. ¿Compraste más de uno? Separa las claves con comas.',
-    cats: { ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación', media: 'Imágenes', audio: 'Audio' },
+    cats: { templates: 'Plantillas', ai: 'IA', characters: 'Personajes', buttons: 'Botones', inputs: 'Campos', loaders: 'Cargas', cards: 'Tarjetas', notifications: 'Notificaciones', text: 'Texto', widgets: 'Widgets', navigation: 'Navegación', media: 'Imágenes', audio: 'Audio' },
   },
 }
 
@@ -428,11 +433,12 @@ type Cat = keyof (typeof COPY)['en']['cats']
 const CATS = Object.keys(COPY.en.cats) as Cat[]
 
 // The live components, with their category
-type Id = 'chat' | 'folder' | 'globe' | 'wheel' | 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
+type Id = 'dash' | 'chat' | 'folder' | 'globe' | 'wheel' | 'records' | 'filings' | 'side' | 'flow' | 'hero' | 'hex' | 'bot' | 'prompt' | 'pay' | 'stat' | 'notify' | 'flap' | 'dial' | 'timer' | 'login' | 'tabs' | 'feedback' | 'palette' | 'drop' | 'loader' | 'otp' | 'glass' | 'swap' | 'compare' | 'memo' | 'clock' | 'pull' | 'activity' | 'toast' | 'heat' | 'ring' | 'bars' | 'morph' | 'squeeze' | 'split' | 'tape' | 'label' | 'ascii' | 'radial' | 'gen' | 'acc'
 // Shop order (not the kit numbers): the Bot first (most visits are on mobile, where this is the first thing seen), then the liveliest, the three picture ones kept apart
 // Most striking first; the Bot stays first (half of all downloads)
 const ITEMS: { id: Id; cat: Cat }[] = [
   { id: 'bot', cat: 'characters' },
+  { id: 'dash', cat: 'templates' },
   { id: 'heat', cat: 'text' },
   { id: 'filings', cat: 'text' },
   { id: 'globe', cat: 'widgets' },
@@ -541,6 +547,7 @@ const GUMROAD: Record<Id, string> = {
   wheel: 'https://arnolop.gumroad.com/l/wheel_picker?wanted=true',
   globe: '',
   chat: '',
+  dash: '',
   folder: '',
   filings: 'https://arnolop.gumroad.com/l/iron_filings?wanted=true',
   records: 'https://arnolop.gumroad.com/l/record_flow?wanted=true',
@@ -565,6 +572,7 @@ const REGISTRY_NAME: Record<Id, string> = {
   wheel: 'wheel-picker',
   globe: 'dotted-globe',
   chat: 'bot-chat',
+  dash: 'live-dashboard',
   folder: 'jelly-folder',
   filings: 'iron-filings',
   records: 'record-flow',
@@ -580,6 +588,7 @@ const FIND: Record<Id, [string, string]> = {
   heat: ['Heat word', 'heat text word glow hover cursor hero headline title thermal texto palabra calor titular'],
   records: ['Record flow', 'record flow cover carousel gallery pictures photos 3d albums slider coverflow discos carrusel galeria fotos portadas'],
   filings: ['Iron filings', 'iron filings magnet magnetic field needles word text hero visual generative canvas limaduras iman campo agujas palabra texto'],
+  dash: ['Live dashboard', 'live dashboard template admin saas analytics panel stats chart globe feed sidebar realtime plantilla panel administracion analitica estadisticas grafica tiempo real'],
   chat: ['Bot chat', 'bot chat assistant ai chatbot messages conversation support widget llm agent face eyes mood typing chat asistente ia mensajes conversacion soporte'],
   folder: ['Jelly folder', 'jelly folder files photos upload drag drop dashboard documents squash spring carpeta archivos fotos subir arrastrar soltar panel documentos'],
   globe: ['Dotted globe', 'dotted globe world map earth dots spin users live pings arcs dashboard hero saas visual canvas globo mundo mapa tierra puntos usuarios arcos panel'],
@@ -782,7 +791,7 @@ export function Shop() {
             {cells.map((c) =>
               c.kind === 'item' ? (
                 <li key={c.key}>
-                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'chat' ? <ChatTile t={t} /> : c.item.id === 'folder' ? <FolderTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
+                  {c.item.id === 'records' ? <RecordsTile t={t} /> : c.item.id === 'filings' ? <FilingsTile t={t} /> : c.item.id === 'side' ? <SideTile t={t} /> : c.item.id === 'wheel' ? <WheelTile t={t} /> : c.item.id === 'globe' ? <GlobeTile t={t} /> : c.item.id === 'dash' ? <DashTile t={t} /> : c.item.id === 'chat' ? <ChatTile t={t} /> : c.item.id === 'folder' ? <FolderTile t={t} /> : c.item.id === 'flow' ? <FlowTile t={t} /> : c.item.id === 'hero' ? <HeroTile t={t} /> : c.item.id === 'hex' ? <HexTile t={t} /> : c.item.id === 'bot' ? <BotTile t={t} /> : c.item.id === 'prompt' ? <PromptTile t={t} /> : c.item.id === 'pay' ? <PayTile t={t} /> : c.item.id === 'stat' ? <StatTile t={t} /> : c.item.id === 'notify' ? <NotifyTile t={t} /> : c.item.id === 'flap' ? <FlapTile t={t} /> : c.item.id === 'dial' ? <DialTile t={t} /> : c.item.id === 'timer' ? <TimerTile t={t} /> : c.item.id === 'login' ? <LoginTile t={t} /> : c.item.id === 'tabs' ? <TabsTile t={t} /> : c.item.id === 'feedback' ? <FeedbackTile t={t} /> : c.item.id === 'palette' ? <PaletteTile t={t} /> : c.item.id === 'drop' ? <DropTile t={t} /> : c.item.id === 'loader' ? <LoaderTile t={t} /> : c.item.id === 'otp' ? <OtpTile t={t} /> : c.item.id === 'glass' ? <GlassTile t={t} /> : c.item.id === 'swap' ? <SwapTile t={t} /> : c.item.id === 'memo' ? <MemoTile t={t} /> : c.item.id === 'clock' ? <ClockTile t={t} /> : c.item.id === 'pull' ? <PullTile t={t} /> : c.item.id === 'activity' ? <ActivityTile t={t} /> : c.item.id === 'toast' ? <ToastTile t={t} /> : c.item.id === 'heat' ? <HeatTile t={t} /> : c.item.id === 'ring' ? <RingTile t={t} /> : c.item.id === 'bars' ? <BarsTile t={t} /> : c.item.id === 'morph' ? <MorphTile t={t} /> : c.item.id === 'squeeze' ? <SqueezeTile t={t} /> : c.item.id === 'split' ? <SplitTile t={t} /> : c.item.id === 'tape' ? <TapeTile t={t} /> : c.item.id === 'label' ? <LabelTile t={t} /> : c.item.id === 'ascii' ? <AsciiTile t={t} /> : c.item.id === 'radial' ? <RadialTile t={t} /> : c.item.id === 'gen' ? <GenTile t={t} /> : c.item.id === 'acc' ? <AccTile t={t} /> : <CompareTile t={t} />}
                 </li>
               ) : c.kind === 'soon' ? (
                 <li key={c.key} aria-hidden className={`${tile} bg-ink`}>
@@ -4252,6 +4261,67 @@ function TileOpen({ t, dark, onOpen }: { t: T; dark: boolean; onOpen: () => void
     >
       {t.open} ›
     </button>
+  )
+}
+
+// Live dashboard: drawn at desktop size and scaled down, so it keeps its desktop layout in the tile and the pop-up
+const DASH_W = 1280, DASH_H = 800
+function DashFit({ children }: { children: React.ReactNode }) {
+  const el = useRef<HTMLDivElement>(null)
+  const [k, setK] = useState(0.5)
+  useEffect(() => {
+    const d = el.current
+    if (!d) return
+    const ro = new ResizeObserver(([e]) => setK(Math.min(1, e.contentRect.width / DASH_W)))
+    ro.observe(d)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div ref={el} className="w-full overflow-hidden" style={{ height: DASH_H * k }}>
+      <div className="origin-top-left" style={{ width: DASH_W, transform: `scale(${k})` }}>{children}</div>
+    </div>
+  )
+}
+
+function DashTile({ t }: { t: T }) {
+  const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [card, w] = useWidth<HTMLElement>()
+  const theme = dark ? 'dark' : 'light'
+  const k = (w - 20) / DASH_W
+  return (
+    <>
+      <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-[#E9E8E5]'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Live dashboard`} className="absolute inset-0 z-[5] cursor-pointer" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="shrink-0" style={{ width: DASH_W, height: DASH_H, transform: `scale(${k})` }}>
+            {open ? null : <LiveDashboard key={theme} theme={theme} height={DASH_H} />}
+          </div>
+        </div>
+        <TileOpen t={t} dark={dark} onOpen={() => setOpen(true)} />
+      </article>
+      {open ? (
+        <Detail
+          t={t}
+          dark={dark}
+          cat={t.cats.templates}
+          name="Live dashboard"
+          about={t.dashAbout}
+          includes={t.dashIncludes}
+          usage={`<LiveDashboard${dark ? ' theme="dark"' : ''} name="Ada" height={820} />`}
+          href={GUMROAD.dash}
+          price={PRICE.dash}
+          onClose={() => setOpen(false)}
+          stage={<DashFit><LiveDashboard key={theme} theme={theme} height={DASH_H} /></DashFit>}
+          options={
+            <Choice label={t.theme}>
+              <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
+              <Pick on={dark} label={t.darkT} onClick={() => setDark(true)}><span className="px-1">{t.darkT}</span></Pick>
+            </Choice>
+          }
+        />
+      ) : null}
+    </>
   )
 }
 
