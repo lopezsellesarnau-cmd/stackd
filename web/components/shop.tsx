@@ -853,7 +853,10 @@ function Detail({
   dark,
   options,
   onClose,
+  wide,
 }: {
+  /** A big stage and a narrow column of details: for the dashboard. */
+  wide?: boolean
   t: T
   cat: string
   name: string
@@ -887,13 +890,13 @@ function Detail({
       tabIndex={-1}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && ref.current?.close()}
-      className="m-0 h-[100dvh] max-h-none w-full max-w-none bg-transparent p-0 outline-none backdrop:bg-card sm:m-auto sm:backdrop:bg-ink/40 sm:backdrop:backdrop-blur-[2px] sm:h-[min(640px,calc(100svh-48px))] sm:w-[min(1040px,calc(100vw-48px))]"
+      className={`m-0 h-[100dvh] max-h-none w-full max-w-none bg-transparent p-0 outline-none backdrop:bg-card sm:m-auto sm:backdrop:bg-ink/40 sm:backdrop:backdrop-blur-[2px] ${wide ? 'sm:h-[min(780px,calc(100svh-48px))] sm:w-[min(1320px,calc(100vw-48px))]' : 'sm:h-[min(640px,calc(100svh-48px))] sm:w-[min(1040px,calc(100vw-48px))]'}`}
       style={{ fontFamily: SANS }}
     >
-      <div className="grid h-full grid-cols-[minmax(0,1fr)] grid-rows-[max-content_1fr] overflow-y-auto bg-card p-3 text-[13px] leading-[1.45] text-ink sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:grid-rows-1 sm:gap-3 sm:overflow-hidden sm:rounded-[24px]">
+      <div className={`grid h-full grid-cols-[minmax(0,1fr)] grid-rows-[max-content_1fr] overflow-y-auto bg-card p-3 text-[13px] leading-[1.45] text-ink ${wide ? 'sm:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)]' : 'sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]'} sm:grid-rows-1 sm:gap-3 sm:overflow-hidden sm:rounded-[24px]`}>
         {/* The stage */}
         <div
-          className={`kit-stage relative flex min-h-[360px] items-center justify-center rounded-[18px] p-5 transition-colors duration-300 sm:min-h-0 ${dark ? 'bg-ink' : 'bg-paper'}`}
+          className={`kit-stage relative flex min-h-[360px] items-center justify-center rounded-[18px] ${wide ? 'p-3' : 'p-5'} transition-colors duration-300 sm:min-h-0 ${dark ? 'bg-ink' : 'bg-paper'}`}
         >
           {stage}
           {/* On a phone the details scroll away, so the close button also sits on the stage */}
@@ -4265,20 +4268,29 @@ function TileOpen({ t, dark, onOpen }: { t: T; dark: boolean; onOpen: () => void
 }
 
 // Live dashboard: drawn at desktop size and scaled down, so it keeps its desktop layout in the tile and the pop-up
-const DASH_W = 1280, DASH_H = 800
-function DashFit({ children }: { children: React.ReactNode }) {
+const DASH_W = 1280, DASH_H = 800 // the pop-up: desktop layout
+const DASH_SQ = 960 // the tile: a square, where it lays itself out with the sidebar folded
+function DashFit({ theme }: { theme: 'light' | 'dark' }) {
+  // the dashboard keeps its desktop width and takes the stage's height, so it fills the stage edge to edge
   const el = useRef<HTMLDivElement>(null)
-  const [k, setK] = useState(0.5)
+  const [box, setBox] = useState({ k: 0, h: DASH_H })
   useEffect(() => {
     const d = el.current
     if (!d) return
-    const ro = new ResizeObserver(([e]) => setK(Math.min(1, e.contentRect.width / DASH_W)))
+    const ro = new ResizeObserver(([e]) => {
+      const k = Math.min(1, e.contentRect.width / DASH_W)
+      setBox({ k, h: Math.max(560, Math.round(e.contentRect.height / k)) })
+    })
     ro.observe(d)
     return () => ro.disconnect()
   }, [])
   return (
-    <div ref={el} className="w-full overflow-hidden" style={{ height: DASH_H * k }}>
-      <div className="origin-top-left" style={{ width: DASH_W, transform: `scale(${k})` }}>{children}</div>
+    <div ref={el} className="h-full min-h-[360px] w-full overflow-hidden">
+      {box.k ? (
+        <div className="origin-top-left" style={{ width: DASH_W, height: box.h, transform: `scale(${box.k})` }}>
+          <LiveDashboard key={`${theme}-${box.h}`} theme={theme} height={box.h} />
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -4288,14 +4300,14 @@ function DashTile({ t }: { t: T }) {
   const [dark, setDark] = useState(false)
   const [card, w] = useWidth<HTMLElement>()
   const theme = dark ? 'dark' : 'light'
-  const k = (w - 20) / DASH_W
+  const k = (w - 20) / DASH_SQ
   return (
     <>
       <article ref={card} className={`group ${tile} ${dark ? 'bg-ink' : 'bg-[#E9E8E5]'}`}>
         <button type="button" onClick={() => setOpen(true)} aria-label={`${t.open} Live dashboard`} className="absolute inset-0 z-[5] cursor-pointer" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="shrink-0" style={{ width: DASH_W, height: DASH_H, transform: `scale(${k})` }}>
-            {open ? null : <LiveDashboard key={theme} theme={theme} height={DASH_H} />}
+          <div className="shrink-0" style={{ width: DASH_SQ, height: DASH_SQ, transform: `scale(${k})` }}>
+            {open ? null : <LiveDashboard key={theme} theme={theme} height={DASH_SQ} />}
           </div>
         </div>
         <TileOpen t={t} dark={dark} onOpen={() => setOpen(true)} />
@@ -4306,13 +4318,14 @@ function DashTile({ t }: { t: T }) {
           dark={dark}
           cat={t.cats.templates}
           name="Live dashboard"
+          wide
           about={t.dashAbout}
           includes={t.dashIncludes}
           usage={`<LiveDashboard${dark ? ' theme="dark"' : ''} name="Ada" height={820} />`}
           href={GUMROAD.dash}
           price={PRICE.dash}
           onClose={() => setOpen(false)}
-          stage={<DashFit><LiveDashboard key={theme} theme={theme} height={DASH_H} /></DashFit>}
+          stage={<DashFit theme={theme} />}
           options={
             <Choice label={t.theme}>
               <Pick on={!dark} label={t.light} onClick={() => setDark(false)}><span className="px-1">{t.light}</span></Pick>
